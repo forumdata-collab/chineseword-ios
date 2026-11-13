@@ -1,1 +1,1 @@
-{"ipaUrl":"https://github.com/forumdata-collab/chineseword-ios/releases/download/v2.31/chineseword-ios-v2.31.ipa","notes":"iOS v2.31 — 與 Android v2.31 同步（開首順動畫＋紅印、糴／嘢／獒／文筆順修正）。","versionCode":35,"versionName":"2.31"}
+{"ipaUrl": "https://github.com/forumdata-collab/chineseword-ios/releases/download/v2.32/chineseword-ios-v2.32.ipa", "notes": "iOS v2.32 — 與 Android v2.32 同步（EDB 筆畫數據修正 15 筆：隅／卑／孿／箏／籌／鹼／齡／齪／齷重建、麗／聽／廳／箏反轉、驀截斷、暗補下日底橫；儔已核實正確唔使改；辶 6 字筆順修正；餘食部改香港一劃）。", "versionCode": 36, "versionName": "2.32"}

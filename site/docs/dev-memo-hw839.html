@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>開發備忘：字形設計邏輯與 HW 839 審計 — 中文筆順練習簿</title>
+<link rel="stylesheet" href="../fonts/lxgw.css">
+<style>
+  :root {
+    --accent: #2563eb;
+    --ink: #1e293b;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --bg: #f8fafc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.75;
+    padding: 24px 16px 60px;
+  }
+  .container { max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 1.6em; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 0.95em; margin-bottom: 20px; }
+  a.back { display: inline-block; color: var(--accent); text-decoration: none; margin-bottom: 24px; font-size: 0.95em; }
+  a.back:hover { text-decoration: underline; }
+  h2 {
+    font-size: 1.2em; margin: 32px 0 12px;
+    padding-bottom: 6px; border-bottom: 2px solid var(--line);
+  }
+  h3 { font-size: 1.02em; margin: 20px 0 8px; color: #334155; }
+  p, li { font-size: 0.95em; }
+  ul { padding-left: 22px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 12px 0 20px;
+    background: #fff; border: 1px solid var(--line); font-size: 0.92em;
+  }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: #f1f5f9; font-weight: 600; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  .hanzi { font-size: 1.25em; font-weight: 600; white-space: nowrap; }
+  .note {
+    background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--accent);
+    padding: 12px 16px; border-radius: 4px; margin: 16px 0; font-size: 0.92em;
+  }
+  .tag {
+    display: inline-block; font-size: 0.78em; padding: 1px 8px; border-radius: 10px;
+    background: #eff6ff; color: var(--accent); margin-left: 6px; white-space: nowrap;
+  }
+  .tag.struct { background: #f0fdf4; color: #16a34a; }
+  .tag.same { background: #fef3c7; color: #b45309; }
+  code { background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 0.88em; }
+  /* 數據統計圖表 */
+  .stat-figure { margin: 20px 0; }
+  .stat-figure-title { font-weight: 600; font-size: 0.98em; margin-bottom: 8px; }
+  .bar-segmented {
+    display: flex; height: 26px; border-radius: 3px; overflow: hidden;
+    background: #e2e8f0; width: 100%;
+  }
+  .bar-seg { height: 100%; }
+  .bar-edb { background: #2563eb; }
+  .bar-fallback { background: #94a3b8; }
+  .bar-twpen { background: #cbd5e1; }
+  .legend { margin-top: 10px; font-size: 0.88em; color: var(--muted); line-height: 1.9; }
+  .stat-note { margin-top: 10px; font-size: 0.88em; color: var(--muted); line-height: 1.8; }
+  .legend span { margin-right: 18px; white-space: nowrap; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+  .legend .dot-edb { background: #2563eb; }
+  .legend .dot-fallback { background: #94a3b8; }
+  .legend .dot-twpen { background: #cbd5e1; }
+  .stat-line { font-size: 0.95em; color: var(--ink); }
+  .stat-line b { color: #2563eb; font-size: 1.1em; }
+  /* 常用漢字筆畫名稱表 */
+  .stroke-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 10px; margin: 12px 0 20px;
+  }
+  .stroke-item {
+    background: #fff; border: 1px solid var(--line);
+    padding: 8px 4px 10px; text-align: center;
+  }
+  .stroke-item svg { width: 100%; height: 44px; }
+  .stroke-item {
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .stroke-item:hover { border-color: #2563eb; background: #f0f7ff; }
+  /* v2.10: filled-outline brush strokes (remade from scratch).
+     The visible shape is a filled outline (.body) with real thick/thin
+     (press, taper, flat 捺 foot, sharp hook tips). A stroked copy of the
+     centerline inside an SVG mask (.reveal) is drawn by dashoffset, which
+     progressively un-masks the body -- the brush draws along the path.
+     A red tip dot (.tip) travels the same centerline via CSS Motion Path,
+     in sync with the reveal. */
+  .stroke-item .body {
+    fill: #1e293b;
+  }
+  /* v2.11: default shows the FULL shape (mask open, tip hidden).
+     Click replays the draw: .playing keyframes run dashoffset 1 -> 0
+     and the tip travels, ending at the full shape (forwards fill). */
+  .stroke-item .reveal {
+    fill: none; stroke: #fff; stroke-width: 14;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 1; stroke-dashoffset: 0;
+  }
+  .stroke-item .tip {
+    opacity: 0;
+    offset-distance: 0%;
+  }
+  .stroke-item.playing .reveal {
+    animation: stroke-draw var(--stroke-dur, 1.5s) cubic-bezier(0.45, 0.05, 0.35, 1) forwards;
+  }
+  .stroke-item.playing .tip {
+    animation: tip-move var(--stroke-dur, 1.5s) cubic-bezier(0.45, 0.05, 0.35, 1) forwards;
+  }
+  @keyframes stroke-draw {
+    from { stroke-dashoffset: 1; }
+    to   { stroke-dashoffset: 0; }
+  }
+  @keyframes tip-move {
+    0% { offset-distance: 0%; opacity: 0; }
+    4% { opacity: 1; }
+    92% { opacity: 1; }
+    100% { offset-distance: 100%; opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stroke-item.playing .reveal,
+    .stroke-item.playing .tip { animation: none; }
+    .stroke-item .reveal { stroke-dashoffset: 0; }
+  }
+  .stroke-name { font-size: 0.85em; font-weight: 600; margin-top: 4px; }
+  .stroke-no { color: var(--muted); font-weight: 400; margin-right: 3px; font-size: 0.8em; }
+  .stroke-example {
+    font-size: 1.05em; color: var(--ink); margin-top: 3px; font-weight: 500;
+    font-family: "LXGW WenKai TC", "KaiTi", "STKaiti", "DFKai-SB", "Noto Serif CJK TC", "Songti TC", serif;
+  }
+  .src-badge { font-size:.82em; padding:0 4px; border:1px solid #cfd6dd; border-radius:3px;
+               color:#6a7480; font-family: ui-monospace, Consolas, monospace; }
+  /* 情境示例 */
+  .example-box { background:#fff; border:1px solid var(--line); border-left:4px solid var(--accent);
+                 border-radius:4px; padding:16px 18px; margin:16px 0; }
+  .example-text { font-size:1.04em; line-height:2; margin:0 0 10px; }
+  .example-text b { color:var(--accent); font-weight:500; }
+  .example-cap { font-size:0.86em; color:var(--muted); margin:0; }
+  .example-cap .k { color:#334155; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>開發備忘：字形設計邏輯與 HW 839 審計</h1>
+  <div class="subtitle">中文筆順練習簿（chineseword.we1co.me）— 字形與筆順的設計邏輯、重繪清單與待決字。最後更新：2026-11-13；數字截至 APK v2.32／網站 v2.32（已提交 Hermes，待部署）。</div>
+  <a class="back" href="../index.html">← 返回練習簿</a>
+  <a class="back" href="../about.html" style="margin-left:16px">← 返回開發說明</a>
+
+  <div class="note">
+    本備忘的數字全部來自審計報告與程式核對，唔係估算。報告來源：<code>tools/hw839_hk_audit.md</code>（原審計）、<code>tools/hw839_reaudit_decomp.md</code>（201 字再審計）、<code>tools/hw839_reaudit23.md</code>（23 字第二輪）、<code>tools/twpen_hk_audit_work.md</code>（twpen 194 字）、<code>tools/hk_order_hw.json</code>。核對程式：<code>tools/check_hw839_hk.js</code>、<code>tools/check_twpen_hk.js</code>。括號內的十六進制碼為該字的 Unicode 碼位。
+  </div>
+
+  <h2>數字總表</h2>
+  <table>
+    <thead><tr><th>項目</th><th>數字</th><th>說明</th></tr></thead>
+    <tbody>
+      <tr><td>收錄漢字（CHAR_DB）</td><td><b>5,560 字</b></td><td>全部有粵拼、普通話拼音及筆畫數</td></tr>
+      <tr><td>EDB 字形</td><td><b>4,528 字</b></td><td>香港教育局《香港小學學習字詞表》官方筆順，標「香港教育標準」</td></tr>
+      <tr><td>twpen 字形</td><td><b>194 字</b></td><td>台灣教育部《筆順字典》字形，筆順已按香港次序，標「香港次序」</td></tr>
+      <tr><td>HanziWriter 後備（現時）</td><td><b>838 字</b></td><td>無 EDB／twpen 字形者，用 HanziWriter 通用字形；見下方註</td></tr>
+      <tr><td>HW 審計對象</td><td><b>839 字</b></td><td>原後備字總數；獒（7352）獲 EDB 字形後升入 EDB 層，現時後備為 838 字</td></tr>
+      <tr><td>twpen 核對結果</td><td>182 相同 ／ 11 重排 ／ 1 重繪 ／ 0 待決</td><td>共 194 字，全部已核對（見 §2.5、§3）</td></tr>
+      <tr><td>HW 審計結果</td><td>666 相同 ／ 76 重排 ／ 64 重繪（58 v2.28 已做＋5 本輪已做＋1 韙核實正確毋須重繪）／ 25 數據問題（10 v2.28 已解決＋10 本輪已做＋3 佈局核實正確毋須改動＋1 禳已裁決毋須改動＋1 諛已裁決毋須改動）／ 8 已有老師拆字（4 本輪解決＋4 跟進解決：夔 perm、齧／贗／鬻核實正確）</td><td>共 839 字；666＋76＋64＋25＋8＝839（見 §2、§3）</td></tr>
+      <tr><td>以 EDB 邏輯重繪／重建</td><td><b>85 項（84 字）</b></td><td>58 HW 重繪（v2.28）＋8 新建筆順動畫＋1 twpen 重繪＋1 EDB 拼合新字形＋16 本輪重繪（鬮、啷、骶、鼐、糍、錒、礴、驊、瓤、穰、醴、粼、邃、覷、鎩、饗）＋1 餚有部重繪（老師批准後做，見 §3.4）；覷虛部其後按 EDB 12 筆重做（同一項，唔另計）；獒計兩次（見 §2）</td></tr>
+      <tr><td>仍未解決</td><td><b>0 字</b></td><td>839 審計內全部解決（2026-11-13 跟進：夔 perm、齧／贗／鬻核實正確、諛已裁決毋須改動，見 §3 及 <code>tools/organize_followup6.md</code>）。另餚（不在 839 審計內）食部 #2 已按 EDB 飯改好，有部亦已重繪（老師 2026-11-13 19:07 HKT 批准；CHAR_DB 17→16）；飯 #8 EDB median 方向錯亦已按老師批准寫入（見 §3.4 及 <code>tools/organize_followup6.md</code>）</td></tr>
+    </tbody>
+  </table>
+  <p class="stat-note">註：網站現時 <code>glyph_sources.json</code> 將獒（7352）標為 twpen（EDB 4,527／twpen 195），工作副本及 APK 標為 EDB（EDB 4,528／twpen 194）；總數同為 4,722，字形本身相同，只係來源標籤唔同，待更正。本備忘用工作副本／APK 計法。</p>
+
+  <h2>一、設計邏輯</h2>
+
+  <h3>1.1 三層字形架構（權威順序：EDB ＞ twpen ＞ HanziWriter ＞ 系統字體）</h3>
+  <p>本站每隻字按以下次序取字形，上一層有就唔用下一層：</p>
+  <table>
+    <thead><tr><th>層</th><th>來源</th><th>字數</th><th>字形</th><th>筆順</th><th>徽章</th></tr></thead>
+    <tbody>
+      <tr><td>第 1 層</td><td>香港教育局《香港小學學習字詞表》（edbchinese.hk）官方筆順動畫，逆向提取為向量輪廓（<code>glyphs/&lt;hex&gt;.json</code>，<code>{s, m}</code>）</td><td>4,528</td><td>香港官方字形</td><td>香港官方次序</td><td>香港教育標準</td></tr>
+      <tr><td>第 2 層</td><td>台灣教育部《筆順字典》（twpen.com）分解圖逆向提取</td><td>194</td><td>台灣字形</td><td>已逐字核對並按香港次序重排</td><td>香港次序</td></tr>
+      <tr><td>第 3 層</td><td>HanziWriter（hanziwriter.org）通用字形與筆順（<code>hanzi-writer-data</code>，9,511 字）</td><td>838</td><td>通用字形</td><td>已逐字核對者按香港次序，其餘為通用次序</td><td>香港次序／參考字形（見 §1.6）</td></tr>
+      <tr><td>最後後備</td><td>系統字體</td><td>0</td><td>—</td><td>—</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p>現時 5,560 字全部有字形來源（4,528＋194＋838＝5,560），無字落入系統字體。第 3 層的 838 字即 HW 審計對象減去獒（見總表註）。字形檔案格式：EDB／twpen 字形為 <code>{s:[輪廓路徑], m:[中線點列]}</code>，hex 為小寫碼位；HanziWriter 數據為 <code>{strokes, medians, radStrokes}</code>。</p>
+
+  <div class="note">
+    <strong>例子：點解幕同冪望落唔同</strong>——幕（U+5E55）有 EDB 字形（14 筆，標「香港教育標準」），冪（U+51AA）無 EDB 字形（唔在字詞表內），退回 HanziWriter 通用字形（16 筆，標「參考字形」）。筆數一致（冖 2＋幕 14＝16，HanziWriter 冪亦 16 筆），分別純粹係字體風格：EDB 同 HanziWriter 係兩套唔同的字體，同一部件（莫、巾）寫出嚟筆形同比例都唔同。呢個就係第 3 層字形風格不一致問題的具體例子（見 §4）：839 字 HanziWriter 字形同 EDB／twpen 風格唔同，全部按 EDB 風格重畫係大工程，待用戶決定。
+  </div>
+
+  <h3>1.2 點解以 EDB 為準</h3>
+  <p><strong>EDB 是金律</strong>（老師 2026-11-13 定）：筆數、筆順、字形有爭議嗰陣，一律跟香港教育局《香港小學學習字詞表》，其他來源（台灣 MOE、康熙、字典、HanziWriter）只作參照，唔可以推翻 EDB。例子：禳按 EDB 係 21 畫（礻 4＋襄 17），MOE／康熙計法係 22 畫，跟 EDB，21 畫，毋須改動。</p>
+  <ul>
+    <li><strong>字形與筆順的權威是香港教育局《香港小學學習字詞表》</strong>，因為本站對象是香港學生，默書與考試跟香港學校標準；台灣、大陸的寫法與次序只作參照，唔可以直接採用。</li>
+    <li><strong>筆畫總數的權威是中大粵語審音配詞字庫</strong>（CUHK Lexis），另以教育部簡編本、重編本及 Unihan 覆核。</li>
+    <li><strong>港台／兩岸計法有別，必須按香港計</strong>，例子：
+      <ul>
+        <li>饉 19 畫（飠 8＋堇 11）；康熙計法食部 9 畫得 20 畫，唔用。</li>
+        <li>骨 10 畫（香港；CNS、twpen、ecj.hk 部首皆 10 畫），大陸 9 畫唔適用。</li>
+        <li>艹 4 筆（EDB 花首 4 筆：橫、豎、橫、豎）；HanziWriter／台灣 3 筆變體無 EDB 證據支持，唔採納。</li>
+        <li>辶香港 4 筆，HanziWriter 全庫系統性得 3 筆（遠、邊、道、遂、邃全部一樣），修復要成批處理（見 §3.2、§4）。</li>
+      </ul>
+    </li>
+    <li><strong>筆畫數以實際出貨字形的筆數為準</strong>（有字形者跟字形，無字形者跟 HanziWriter 筆數）；CHAR_DB 的 <code>s</code> 欄位已按此同步更正 51 字（v2.28）。</li>
+  </ul>
+
+  <h3>1.3 拆解法：拆字，參考現有 EDB 標準，反向分析</h3>
+  <p>遇未確定字，唔好因為該字本身無 EDB 檔就標待決，亦唔好硬判。方法係：將字拆開做部件，再搵 EDB 有的字去反拆出同一部件的次序。</p>
+  <ul>
+    <li><strong>例子</strong>：堇（本身無 EDB 檔）由勤／覲反拆；哌由派反拆；蝟由蚊取虫＋胃；鐐由僚取尞；纍由田 ×3＋累取糸；艹＝EDB 4 筆（花首 4 筆）。</li>
+    <li><strong>認筆方法</strong>：一律用 EDB glyph 的 <code>s</code> 輪廓形狀（bbox、起筆／收筆方向、逐筆彩色渲染讀圖）認筆，唔用 EDB <code>m</code> 中線——EDB medians 唔可靠，次序亦唔一定啱。HanziWriter 自身數據用 <code>medians</code> 核對方向。</li>
+    <li><strong>參照要取對位置</strong>：獨立 EDB 字形唔適合做壓縮部件參照（歸一化假象），一律用部件位置對應的 EDB 參照（例如理王部唔係獨立王、筆竹部唔係獨立竹、空／穿穴部唔係獨立穴）。</li>
+    <li><strong>判定標準</strong>：same＝筆順已經係香港次序；reorder＝筆集齊全、淨係次序錯（畀 perm）；redraw＝筆組／筆數本身唔同（缺筆、合併筆、筆形錯），perm 修唔到；data_problem＝數據檔本身錯（缺檔、median 反向、筆形錯、佈局錯）；pending＝證據唔夠，要具體講邊個部件搵唔到參照／邊個筆數衝突未解，唔硬判。</li>
+  </ul>
+
+  <h3>1.4 Median 座標核實規則——糴／嘢教訓</h3>
+  <p><strong>規則：重排任何筆畫之前，必須先用 median 座標核實每筆的實際位置；唔好憑筆形猜測部件歸屬。</strong>以下兩次錯誤都係憑筆形猜部件而嚟：</p>
+  <ul>
+    <li><strong>糴（7cf4，2026-11-13，用戶：「錯得離譜」）</strong>：v2.24／v2.25 的 perm <code>[6,7,2,3,4,5,0,1,8..21]</code> 係錯的。審計誤將 #0／#1 認做米、#6／#7 認做入，將米底兩筆調到最前、入調到第 6／7 位，動畫由字底開始寫。Median 座標證實原 twpen 次序本身正確：入 #0 撇、#1 捺 → 米 #2 點、#3 撇、#4 橫、#5 豎、#6 撇、#7 捺 → 翟 #8–#21，米內次序同 EDB 米一致。已還原原次序並重新平滑（worst dev 2.76）。</li>
+    <li><strong>嘢（5622，2026-11-13，用戶確認「里首是豎」）</strong>：v2.17 誤將里認做耳，將 #3／#4 對調做「橫先」；但里首筆係豎（EDB 里 #0），原次序（豎先）本身正確。嘢＝口＋野（里＋予），唔係口＋耳＋阝。已對調返 #3／#4 還原原次序，形狀唔變、唔使重新平滑。</li>
+    <li>同類誤判亦曾出現於揳／猰（v2.17 錯誤重排，v2.24 還原原檔）、嚟（v2.18 誤判要重繪，v2.19 更正為相同）、鰵／齁／齆／齇／齉（將鼻部誤認做齒部，v2.18 更正）。</li>
+    <li><strong>改 EDB median 數據或出貨筆順修正之前，先將 findings 交老師確認。</strong></li>
+  </ul>
+
+  <h3>1.5 Perm 系統（hk_order.js）</h3>
+  <ul>
+    <li><code>hk_order.js</code>（<code>window.HK_ORDER</code>）現有 <strong>760 項</strong>：v2.23 之前 671 項；HW 後備字 perm 79 項（76 項純重排＋獒、蓽、饉 3 項隨重繪附帶，見 §2.5）；本輪整理 4 項（冪、鼐、驊、夔）＋辶 6 項（迅、透、造、週、過、遐，2026-11-13 老師「全做」批准）。另有 <code>hw_hk_same.js</code>（<code>window.HW_HK_SAME</code>），580 字——原審計判 same 的 HW 字，筆順本身已是香港次序，唔使 perm。</li>
+    <li><code>applyHKOrder</code>（<code>glyph-engine.js</code>）：取 perm 後按新次序重排 <code>strokes</code>／<code>medians</code>。有長度守則：<code>perm.length !== data.strokes.length</code> 時原樣返回，唔做任何事——perm 靜默失效。</li>
+    <li><strong>長度守則的後果（獒網站 bug）</strong>：網站用 CDN HanziWriter 數據，獒得 14 筆（冇咗敖嗰點），perm 長 15，守則令 perm 唔生效，網站獒筆順錯；App 內置數據有 15 筆，perm 生效，App 正確。修正方法係新增 EDB 拼合字形 <code>glyphs/7352.json</code>（見 §2.4），而唔係改守則——守則係安全網，防止錯長度 perm 亂排。</li>
+    <li><strong>perm 只改次序，改唔到筆數同筆形</strong>。缺筆、合併筆、筆形錯、佈局錯一律要重繪或換數據，唔可以用 perm 補救。</li>
+    <li>twpen 11 字的重排已直接寫入字形檔（<code>glyphs/*.json</code>），唔經 <code>hk_order.js</code>——已核實 11 字皆不在 <code>hk_order.js</code> 內。</li>
+  </ul>
+
+  <h3>1.6 徽章／層級邏輯</h3>
+  <p>來源判定：<code>src = GLYPH_SOURCES[hex] || (CHAR_DB[ch] ? 'HW' : null)</code>（<code>index.html</code>）。徽章按以下邏輯顯示：</p>
+  <table>
+    <thead><tr><th>來源</th><th>條件</th><th>徽章</th></tr></thead>
+    <tbody>
+      <tr><td>EDB</td><td><code>src === 'EDB'</code></td><td>香港教育標準</td></tr>
+      <tr><td>twpen</td><td><code>src === 'twpen'</code></td><td>香港次序</td></tr>
+      <tr><td>HW（已核對）</td><td><code>src === 'HW'</code> 且（<code>HK_ORDER</code> 有 perm 或 <code>HW_HK_SAME</code> 有該字）</td><td>香港次序</td></tr>
+      <tr><td>HW（未核對）</td><td><code>src === 'HW'</code> 且以上皆無</td><td>參考字形</td></tr>
+    </tbody>
+  </table>
+  <div class="note">
+    <strong>注意（已核實，待決定）</strong>：v2.28 重繪的 58 字及新建動畫的 8 字，數據已按 EDB 修正，但徽章邏輯只認 <code>HK_ORDER</code>／<code>HW_HK_SAME</code>；除獒、蓽、饉（有附帶 perm）外，其餘 63 字仍顯示「參考字形」。哌、鯤亦同（筆順已確認相同，但唔在上述兩個集合內）。是否將已重繪／已修正的字納入「香港次序」徽章，待決定。另 HW 徽章本身維持不變（見 §4）。
+  </div>
+
+  <h3>1.7 座標：HW 同 EDB 都係 y-up</h3>
+  <p>HanziWriter medians 同 EDB medians 都係 y-up；EDB（1080 空間）轉 HanziWriter（1024 空間）只做純縮放 ×1024/1080，唔 flip。早前「HW 係 y-down」的講法係錯的，已更正。</p>
+  <p><strong>文（6587）教訓</strong>：HanziWriter 用 median 做遮罩揭示筆畫；EDB median #3（捺）只去到 (510,335)，但 outline 伸到 (970,108)，遮罩蓋唔到捺腳，動畫播出兩截。靜態字形本身正確，問題只在動畫遮罩。修正：沿 outline 中線延長 <code>m[3]</code>，加 6 點到 (940,138)；<code>s</code> 輪廓唔郁。動畫實測捺一筆連續，唔再斷開。</p>
+
+  <h2>二、以 EDB 邏輯重繪／重建的字</h2>
+  <p><strong>總數：68 項（67 字）</strong>＝（a）58 字 HW 重繪（v2.28）＋（b）8 字新建筆順動畫（v2.28）＋（c）1 字 twpen 重繪（哶，v2.19）＋（d）1 字 EDB 拼合新字形（獒，2026-11-13）。獒在（a）及（d）各出現一次：App 內 HW 數據重繪＋網站用 EDB 拼合字形，兩個唔同檔案、唔同機制，故 68 項對應 67 字。</p>
+  <p><strong>唔計入此總數的</strong>：純重排（perm 只改次序，筆形筆數唔變）——HW 76 字、twpen 11 字，見 §2.5；median 修正（文、哌）——筆形唔變，見 §1.7／§3.3。</p>
+
+  <h3>2.1 （a）58 字 HW 重繪（v2.28）</h3>
+  <p>全部按 EDB 部件重繪 HanziWriter 數據檔，原因係筆組／筆數本身唔同（缺筆、合併筆、筆形錯），perm 修唔到。分三組：</p>
+
+  <h3>艹組 20 字——艹得 3 筆，EDB 艹 4 筆</h3>
+  <ul>
+    <li><strong>艹得 3 筆（橫、豎、豎），缺一橫（6 字）</strong>：薅（8585）、薏（858f）、薨（85a8）、薹（85b9）、藁（85c1）、藜（85dc）。EDB 花／草／茶／苦／英艹全部 4 筆（橫、豎、橫、豎），搵唔到 EDB 證據支持 3 筆變體。</li>
+    <li><strong>艹頂一筆長橫合併 EDB 兩橫，少一橫（14 字）</strong>：葆（8446）、葳（8473）、葺（847a）、蒈（8488）、蒗（8497）、蒡（84a1）、蓍（84cd）、蓐（84d0）、蓿（84ff）、蔫（852b）、蔻（853b）、噶（5676，葛部艹）、蕤（8564）。另蒯（84af）艹得 3 筆但橫寫最後，兼次序唔同，少一橫。</li>
+  </ul>
+  <p class="stat-note">註：其他組之中，醛（荃頂艹）、蠓（蒙頂艹）、貘（莫部艹）三字的重繪亦涉及艹缺筆，與艹組同一性質；實施分組按字的主部件計，故歸入其他組。若純按筆畫問題劃分，艹相關共 23 字。</p>
+
+  <h3>阝／阜／氏組 12 字——HW 得 2 筆，EDB 3 筆</h3>
+  <ul>
+    <li><strong>氏部（1 字）</strong>：秭（79ed）——氏部 HW #7 係全高直豎，唔係 EDB #2 中部短橫；#8 係撇，唔係 EDB 斜鈎。</li>
+    <li><strong>右阝（7 字）</strong>：郜（90dc）、郝（90dd）、郟（90df）、郢（90e2）、郫（90eb）、郯（90ef）、郴（90f4）——HW 右阝得 2 筆（#7 一筆過寫晒橫折＋橫折鈎，#8 豎）；EDB 右阝 3 筆（橫折、橫折鈎、豎）。正確筆數各加 1（CHAR_DB <code>s</code> 已同步更正）。</li>
+    <li><strong>左阜（4 字）</strong>：陘（9658）、陞（965e）、陟（965f）、陬（966c）——HW 左阜得 2 筆（#0 一筆過寫晒兩個橫折，#1 長豎）；EDB 阜部 3 筆（橫折、橫折、長豎）。正確筆數各加 1。</li>
+  </ul>
+
+  <h3>其他組 26 字——逐字原因</h3>
+  <table>
+    <thead><tr><th>字</th><th>hex</th><th>重繪原因（一句）</th></tr></thead>
+    <tbody>
+      <tr><td class="hanzi">熳</td><td>71b3</td><td>曼部 #8 應為撇（EDB 曼 #4），HW 寫成豎；筆數次序正確，淨係筆形錯。</td></tr>
+      <tr><td class="hanzi">瞋</td><td>778b</td><td>頂部十字 #5 應為橫寫成凵形、#6 應為豎寫成撇；#12 另於 v2.29 修正（豎折→橫）。</td></tr>
+      <tr><td class="hanzi">踞</td><td>8e1e</td><td>足部 #5 應為撇，HW 輪廓錯。</td></tr>
+      <tr><td class="hanzi">踮</td><td>8e2e</td><td>足部 #5 應為撇（同踞）。</td></tr>
+      <tr><td class="hanzi">縭</td><td>7e2d</td><td>离部 HW 16 筆，#14 一筆豎折合併咗 EDB 兩筆（正確 17 筆）。</td></tr>
+      <tr><td class="hanzi">螭</td><td>87ad</td><td>同縭（离部合併，16 vs 17 筆）。</td></tr>
+      <tr><td class="hanzi">螯</td><td>87af</td><td>敖部 HW 10 筆，少咗 EDB 中間一點（正確 17 筆，HW 16 筆）。</td></tr>
+      <tr><td class="hanzi">醚</td><td>919a</td><td>辶部 #14 橫折合併咗 EDB 兩筆，少一筆（16 vs 17 筆）。</td></tr>
+      <tr><td class="hanzi">醛</td><td>919b</td><td>荃頂艹 3 筆，#7 長橫合併兩筆艹橫（16 vs 17 筆）。</td></tr>
+      <tr><td class="hanzi">餚</td><td>991a</td><td>食部 HW 8 筆，EDB 食 9 筆，少一筆（16 vs 17 筆）。食部另於 v2.28 重排做 EDB 次序，待用戶覆核（見 §4）。</td></tr>
+      <tr><td class="hanzi">蟥</td><td>87e5</td><td>黃部 HW 11 筆，缺 EDB 廿底短橫（#3）。</td></tr>
+      <tr><td class="hanzi">貘</td><td>8c98</td><td>莫部艹只得 3 筆，HW #7 一條長橫合併 EDB 兩橫（莫 10 vs 11 筆）。</td></tr>
+      <tr><td class="hanzi">髂</td><td>9ac2</td><td>左骨 HW 9 筆，缺 EDB 骨 #2 橫或 #3 豎其一。</td></tr>
+      <tr><td class="hanzi">癟</td><td>765f</td><td>右扁 HW 14 筆對 EDB 扁 9 筆（方框寫法＋拆筆＋多橫）。</td></tr>
+      <tr><td class="hanzi">繾</td><td>7e7e</td><td>右遣 HW 13 筆對 EDB 14 筆，辶部缺 EDB 一撇。</td></tr>
+      <tr><td class="hanzi">蠓</td><td>8813</td><td>蒙頂艹 HW #6 一筆長橫合併 EDB 兩橫，少一筆。</td></tr>
+      <tr><td class="hanzi">饉</td><td>9949</td><td>莫部多處錯（廿次序、日部橫折缺失、大撇寫成長豎）；廿 perm 另於 v2.30 修正，#12 另於 v2.29 修正。正確 19 畫。</td></tr>
+      <tr><td class="hanzi">魑</td><td>9b51</td><td>鬼部 HW 9 筆缺 EDB #4 豎；离部缺 EDB 禽 #11 一橫。</td></tr>
+      <tr><td class="hanzi">髑</td><td>9ad1</td><td>骨部 HW 9 筆，缺 EDB 骨 #2 短橫。</td></tr>
+      <tr><td class="hanzi">潢</td><td>6f62</td><td>黃部 HW 11 筆，缺 EDB 廿底短橫（#3）；同蟥同一缺筆。</td></tr>
+      <tr><td class="hanzi">獒</td><td>7352</td><td>敖部 HW 10 筆，欠 EDB #3 一點（大陸 10 畫寫法）；另見 §2.4。</td></tr>
+      <tr><td class="hanzi">箍</td><td>7b8d</td><td>固部 HW 有提＋豎折，EDB／CNS 固無此二筆；筆數不變，問題係筆形。</td></tr>
+      <tr><td class="hanzi">蓽</td><td>84fd</td><td>畢部中段 HW 一條長橫合併 EDB 左右兩橫，少一筆。</td></tr>
+      <tr><td class="hanzi">鋌</td><td>92cc</td><td>廷部 HW 6 筆，EDB 廷 7 筆，少一個橫撇。</td></tr>
+      <tr><td class="hanzi">噠</td><td>5660</td><td>辶部 HW 3 筆，EDB 辶 4 筆（#13 單一橫折，少一折）。</td></tr>
+      <tr><td class="hanzi">噶</td><td>5676</td><td>葛部艹 HW 3 筆，#3 長橫合併 EDB 兩橫，少一橫。</td></tr>
+      <tr><td class="hanzi">憨</td><td>61a8</td><td>敢部 HW 11 筆，EDB 敢 12 筆（首橫＋短豎合併成橫折）。</td></tr>
+      <tr><td class="hanzi">蕤</td><td>8564</td><td>艹 HW 3 筆，#0 長橫合併 EDB 兩橫，少一橫。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 （b）8 字新建筆順動畫（v2.28）</h3>
+  <p>以下 8 字原本無 HanziWriter 數據檔（無筆順動畫），由 EDB 部件拼合新建數據，筆順可由 EDB 部件完全定出：</p>
+  <table>
+    <thead><tr><th>字</th><th>hex</th><th>筆數</th><th>EDB 部件拼合</th></tr></thead>
+    <tbody>
+      <tr><td class="hanzi">欸</td><td>6b38</td><td>11</td><td>矣（7）＋欠（4）</td></tr>
+      <tr><td class="hanzi">慍</td><td>614d</td><td>13</td><td>忄（3）＋𥁕（10）；關鍵更正：右部係𥁕，唔係昷（9 筆）</td></tr>
+      <tr><td class="hanzi">蝟</td><td>875f</td><td>15</td><td>虫（6，取自蚊）＋胃（9）</td></tr>
+      <tr><td class="hanzi">靚</td><td>975a</td><td>15</td><td>青（8）＋見（7）</td></tr>
+      <tr><td class="hanzi">謐</td><td>8b10</td><td>17</td><td>言（7）＋益（10）</td></tr>
+      <tr><td class="hanzi">聵</td><td>8075</td><td>18</td><td>耳（6）＋貴（12）</td></tr>
+      <tr><td class="hanzi">鐐</td><td>9410</td><td>20</td><td>金（8）＋尞（12，取自僚）</td></tr>
+      <tr><td class="hanzi">纍</td><td>7e8d</td><td>21</td><td>畾（15，田 5×3，品字形）＋糸（6，取自累）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.3 （c）1 字 twpen 重繪——哶（54f6，v2.19）</h3>
+  <p>哶的羋部卝重繪做香港卝：橫、豎、豎、橫，底橫最後寫（EDB 共／巷實證）。v2.18 曾誤寫「橫、豎、橫、豎」，已更正。口、干唔郁。</p>
+
+  <h3>2.4 （d）1 字 EDB 拼合新字形——獒（7352，2026-11-13）</h3>
+  <p>獒由 EDB 敖（6556，11 筆）＋犬（72ac，4 筆）拼合，15 筆，逐筆核實；新增 <code>glyphs/7352.json</code>，<code>glyph_sources</code> 加 <code>7352:EDB</code>（總數 4,721→4,722）。背景見 §1.5：網站 CDN 數據得 14 筆，perm 因長度守則唔生效，故須以 EDB 字形取代。獒同時在 §2.1 的 58 字重繪之列（App 內 HW 數據重繪補點），故重繪總數 68 項對應 67 字。</p>
+
+  <h3>2.5 重排數字（分開計，唔係重繪）</h3>
+  <p>純重排只改次序，筆形筆數唔變，唔計入上述 68 項：</p>
+  <table>
+    <thead><tr><th>組別</th><th>字數</th><th>明細</th></tr></thead>
+    <tbody>
+      <tr><td>HW 重排</td><td><b>77 字</b></td><td>原審計 58 字（v2.23）＋再審計 17 字（v2.28：瘢、鋩、澠、蕓、謔、蕷、薊、嚳、櫸、懾、衊、儻、鑊、欒、臠、髖、顴）＋懨（第二輪，v2.28）＋冪（本輪整理）</td></tr>
+      <tr><td>twpen 重排</td><td><b>11 字</b></td><td>嘅、慂、芃、苾、蕁、駔、騸、驁、驄、驍、獁（馬部橫先、艹橫先等；已直接寫入字形檔）</td></tr>
+      <tr><td>合計純重排</td><td><b>88 字</b></td><td>另獒、蓽、饉、鼐、驊 5 項 perm 隨重繪附帶，唔計入 77 字內</td></tr>
+    </tbody>
+  </table>
+  <p class="stat-note">跟進修正：瞋、饉第 12 筆另於 v2.29 修正（瞋 #12 豎折→橫，饉 #12 斜點→日部左豎，筆數唔變）；饉廿次序 perm 另於 v2.30 修正（749→750 項）；鯤 #17 改橫，連 HanziWriter 比、昆同一系統性錯一併修（v2.28）。</p>
+
+  <h2>三、仍待決的字</h2>
+  <p><strong>未解決 0 字</strong>——839 審計內全部解決。本輪整理（2026-11-13）解決 23 字：8 字組 4 字（冪 perm、鬮重繪、蠼／鱺核實正確）、數據問題組 13 字（10 字重繪／更正＋飆／鰲／龕核實正確毋須改動）、6 字重繪組 6 字（5 字重繪＋韙核實正確毋須重繪）；跟進（同日）解決餘下 5 字：夔 perm（中行目先、止後）、齧／贗／鬻核實正確（分別跟 CNS 筆順／鴈／鬲）、諛已裁決毋須改動。報告：<code>tools/organize_20261113.md</code>、<code>tools/verify8_decomp.md</code>、<code>tools/organize_followup6.md</code>。</p>
+
+  <h3>3.1 （a）8 字已有老師拆字，待筆順核實／重繪</h3>
+  <p>老師已於 2026-11-13 提供以下拆字（權威）。筆順本身未解決——下一步係按拆字逐字核對 EDB 參照，再決定重排或重繪。以下「下一步」只講要做咩，唔代表筆順已定。</p>
+  <table>
+    <thead><tr><th>字</th><th>hex</th><th>老師拆字（2026-11-13）</th><th>下一步（待核實／重繪）</th></tr></thead>
+    <tbody>
+      <tr><td class="hanzi">冪</td><td>51aa</td><td>上下結構，冖＋幕（幕＝莫＋巾）；16 筆</td><td><strong>已解決（本輪整理）：perm</strong>——幕部 #2–15 對 EDB 幕：#6–15 identity，頭四筆兩兩對調（HW 豎、橫、豎、橫 vs EDB 橫、豎、橫、豎），逐筆形狀核實（0.022–0.036 PASS，反向 0.62–0.64 FAIL）。冖部 #0–1 亦 identity。Perm <code>[0,1,3,2,5,4,6,7,8,9,10,11,12,13,14,15]</code>，筆數不變 16。</td></tr>
+      <tr><td class="hanzi">夔</td><td>5914</td><td>獨體／複雜上下結構，止＋巳＋夊（或首＋止＋巳＋夂）；21 筆</td><td><strong>仍待老師：</strong>無 EDB 夔檔；拆字漏咗目，中行次序（目先定止先）無法核實，候選 perm 未驗證。請老師確認中行係目先定止先＋部件切分。</td></tr>
+      <tr><td class="hanzi">齧</td><td>9f67</td><td>左右結構，齒＋丰／丯；21 筆</td><td><strong>仍待老師：</strong>HW 齒部對 EDB 齒無乾淨排列（mean d 84.4），筆畫交錯過邊界；無 EDB 丯／邦／丰參照。請老師確認右部係丰（4 筆）定丯（6 筆）＋其筆順，再重繪。</td></tr>
+      <tr><td class="hanzi">贗</td><td>8d17</td><td>左右結構，貝＋雁（雁＝厂＋隹）；22 筆</td><td><strong>仍待老師：</strong>頂部 15 筆唔係雁（12 筆），唔可以硬套。貝部已確認正確。請老師指出頂部正確部件／參照。</td></tr>
+      <tr><td class="hanzi">鬻</td><td>9b3b</td><td>上下結構，米＋鬲（中間含弓；或粥＋鬲）；22 筆</td><td><strong>仍待老師：</strong>粥部已確認正確（對 EDB 粥 identity）；鬲部（HW #12–21，10 筆）完全無 EDB 參照（鬲無 EDB 檔）。需 CNS 筆順或老師確認鬲部寫法。</td></tr>
+      <tr><td class="hanzi">蠼</td><td>883c</td><td>左右結構，虫＋矍（矍＝瞿＋又）；26 筆</td><td><strong>已解決（本輪整理）：核實正確，毋須改動</strong>——底部 #16–25 對 EDB 瞿隹部 #10–17：7/8 形狀核實通過（唯一 FAIL 係點嘅方向假象，位置／筆形／次序全部吻合）；#24/#25 係又嘅撇＋捺。26 筆經康熙／CUHK／MOE 三方確認。舊報告「配對混亂」係量度方法嘅假象（EDB 隹喺瞿內垂直壓縮）。</td></tr>
+      <tr><td class="hanzi">鬮</td><td>9b2e</td><td>半包圍結構，鬥＋龜；28 筆（老師 2026-11-13 裁決）</td><td><strong>已解決（本輪整理）：龜部重繪</strong>——鬥部 #0–9 不變（對 EDB 鬥 identity）；龜部按 EDB 龜（9f9c，18 筆）重繪，補返缺咗嘅 EDB #2 短撇（新 #12）；重繪後龜部與 EDB 龜逐筆 identity（mean d 0.3，18/18 按次序）。CHAR_DB s 27→28。</td></tr>
+      <tr><td class="hanzi">鱺</td><td>9c7a</td><td>左右結構，魚＋麗（麗＝丽＋鹿）；30 筆</td><td><strong>已解決（本輪整理）：核實正確，毋須改動</strong>——右部 #11–29 對 EDB 麗（9e97）19/19 按次序 identity（mean d 29.4）；老師講麗係啱嘅，舊報告用離做參照先至亂。魚部 #9/#10 對調嘅懷疑被推翻（identity 總距離 88 vs 對調 207）。</td></tr>
+    </tbody>
+  </table>
+  <p class="stat-note">殭（6bad）判咗相同，但請老師確認：EDB 疆／僵兩個田的次序同 HW 標準田次序有出入，EDB 內部都唔一致（薑兩個田都標準，僵兩個都調換，疆第一個調換、第二個標準）。</p>
+
+  <h3>3.2 （b）6 字重繪——本輪整理已全部解決</h3>
+  <table>
+    <thead><tr><th>字</th><th>hex</th><th>重繪原因（一句）</th></tr></thead>
+    <tbody>
+      <tr><td class="hanzi">粼</td><td>7cbc</td><td><strong>已做（本輪整理）：</strong>補巜第 3 筆撇折（EDB 巡巜 #2），14→15 筆；CHAR_DB s 14→15。</td></tr>
+      <tr><td class="hanzi">邃</td><td>9083</td><td><strong>已做（本輪整理）：</strong>拆 HW #15 做 EDB 橫撇＋斜鈎（EDB 遠辶部），辶變 4 筆，17→18 筆；CHAR_DB s 17→18。註：HW 辶 3 筆係全庫系統性問題，今次只修邃一字，唔成批改。</td></tr>
+      <tr><td class="hanzi">覷</td><td>89b7</td><td><strong>已做（本輪整理，後按老師裁決重做）：</strong>虛部先按 HK 11 筆次序重繪（EDB 虛拼合）；老師 2026-11-13 19:07 HKT 確認虛係 12 筆（EDB 865b 為準），虛部已重做做 EDB 12 筆次序（補 EDB #10 短橫，見部不變），CHAR_DB 覷 s 18→19（＝虛 12＋見 7）。shyyp 11 筆碼唔係香港標準，唔再用。</td></tr>
+      <tr><td class="hanzi">鎩</td><td>93a9</td><td><strong>已做（本輪整理）：</strong>補 EDB 殺 #7 豎鈎，18→19 筆；CHAR_DB s 18→19。</td></tr>
+      <tr><td class="hanzi">韙</td><td>97d9</td><td><strong>已解決（本輪整理）：核實正確，毋須改動</strong>——再審計將是／韋掉轉咗：HW #0–8 係是（對 EDB 是 identity，#8 係是嘅末筆捺，唔係韋末筆），#9–17 係韋（對 EDB 韋 identity，#9/#10 係韋嘅［豎、橫折］，跟 EDB 次序）。原建議嘅對調跟 CNS／台灣次序，違反 EDB 金律，唔採用。</td></tr>
+      <tr><td class="hanzi">饗</td><td>9957</td><td><strong>已做（本輪整理）：</strong>拆 HW #9 做 EDB 鄉 #9 橫撇＋#10 捺，20→21 筆；CHAR_DB s 20→21。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.3 （c）25 字數據問題</h3>
+  <p>再審計判 data_problem 25 字，其中 <strong>10 字已於 v2.28 解決</strong>：8 字新建筆順動畫（§2.2：欸、慍、蝟、靚、謐、聵、鐐、纍）＋哌（54cc，median #7 反向，已反轉）＋鯤（9be4，#17 形錯，已改橫，連比、昆一併修）。<strong>餘下 15 字已於 2026-11-13 用拆字法逐字核實（報告 <code>tools/data15_decomp_resolution.md</code>），本輪整理再逐字實施／核實：10 字重繪／更正已做，3 字佈局核實正確毋須改動，1 字（禳）跟 EDB 毋須改動，1 字（諛）待老師裁決。</strong>按種類：</p>
+
+  <h3>缺筆／合併筆（11 字）——perm 加唔到筆，須重繪或換數據</h3>
+  <table>
+    <thead><tr><th>字</th><th>hex</th><th>問題</th><th>需要咩決定</th></tr></thead>
+    <tbody>
+      <tr><td class="hanzi">啷</td><td>5577</td><td>右阝 HW 2 筆合併，EDB 一律 3 筆；HW 11 筆，EDB 規則下應 12 畫</td><td><strong>已做（本輪整理）：</strong>補右阝第 3 筆（EDB 郎 #6/#7），11→12 筆；CHAR_DB s 11→12。</td></tr>
+      <tr><td class="hanzi">骶</td><td>9ab6</td><td>骨部 HW 9 筆，缺 EDB 骨 #3（頂部中央短豎）</td><td><strong>已做（本輪整理）：</strong>補 EDB 骨 #3 短豎，14→15 筆；CHAR_DB s 14→15。</td></tr>
+      <tr><td class="hanzi">鼐</td><td>9f10</td><td>鼎底右 HW #13 將 EDB 兩筆合併做一筆橫折，少一筆（14 vs 15 筆）；乃部次序亦倒轉</td><td><strong>已做（本輪整理）：</strong>拆 HW #13 做 EDB 鼎 #11 橫＋#12 豎；乃部 #0/#1 用 perm 對調；14→15 筆；CHAR_DB s 14→15。</td></tr>
+      <tr><td class="hanzi">糍</td><td>7ccd</td><td>兹部 HW 9 筆 vs EDB 10 筆：HW 頂用台灣䒑，香港寫法係兩個十</td><td><strong>已做（本輪整理）：</strong>兹部頂重繪做兩個十（EDB 滋 #3–#6），15→16 筆；CHAR_DB s 15→16。</td></tr>
+      <tr><td class="hanzi">諛</td><td>8adb</td><td>俞部 HW 8 筆 vs EDB 9 筆，月左豎無對應筆</td><td><strong>仍待老師：</strong>前提同 median 證據衝突——HW 諛 #8 已佔 EDB #3 位置（月左緣豎），#10 係清晰橫折（= EDB #4）；若缺嘅係 #7（右豎），落點有三個候選、互不相容，無法有信心落筆。請老師裁決缺 #3 定 #7，定係 HW 諛係另一種寫法。筆數維持 15。</td></tr>
+      <tr><td class="hanzi">錒</td><td>9312</td><td>左阝 HW 2 筆合併，EDB 3 筆；HW 15 筆 vs CNS 16 畫</td><td><strong>已做（本輪整理）：</strong>拆 HW #8 做 EDB 阿 #0 撇＋#1 捺（左阝補齊 3 筆），15→16 筆；CHAR_DB s 15→16。</td></tr>
+      <tr><td class="hanzi">礴</td><td>7934</td><td>簿部 HW 16 筆 vs EDB 19 筆，缺 3 筆；HW 得 21 筆，標準 24 筆</td><td><strong>已做（本輪整理）：</strong>拆 HW #5 做 EDB 簿 #1/#4 兩橫，刪多餘 HW #6（無 EDB 對應嘅斜線），加 EDB 簿 #0 撇、#2 點、#5 點；21→24 筆；CHAR_DB s 21→24。</td></tr>
+      <tr><td class="hanzi">禳</td><td>79b3</td><td>HW 21 筆；再審計話「標準 22 筆」嘅理據（EDB 神礻 #4 豎）經核實係錯的——EDB 神 #0–#3 先係礻（4 筆），#4 係申首筆；HW 禳 #0–#3 同 EDB 神礻一致</td><td><strong>已裁決（老師 2026-11-13）：跟 EDB，21 畫，毋須改動</strong>（EDB 係金律；跟 MOE／康熙先係 22 畫）</td></tr>
+      <tr><td class="hanzi">驊</td><td>9a4a</td><td>華部中部兩橫併成一長橫，缺 1 筆；首四筆次序亦倒轉</td><td><strong>已做（本輪整理）：</strong>拆 HW #15 做 EDB 華 #5/#7 兩橫；頭四筆用 perm 修正；21→22 筆；CHAR_DB s 21→22。</td></tr>
+      <tr><td class="hanzi">瓤</td><td>74e4</td><td>瓜部位置與 EDB 瓜全不對應，邊界不清；囊部 HW 17 筆 vs EDB 22 筆，缺 5 筆；HW 得 22 筆，標準 27 筆</td><td><strong>已做（本輪整理）：</strong>全重建——EDB 瓜 5 筆（頂 20.7%）＋EDB 囊 22 筆（底 79.3%），22→27 筆；CHAR_DB s 22→27。附註：瓜部垂直壓得好扁（比例由字體實測），請老師目測。</td></tr>
+      <tr><td class="hanzi">穰</td><td>7a70</td><td>囊部 HW 17 筆 vs EDB 22 筆，缺 5 筆；HW 得 22 筆，標準 27 筆</td><td><strong>已做（本輪整理）：</strong>補 EDB 囊 #2 橫＋#7/#9/#10/#12 四點，22→27 筆；CHAR_DB s 22→27。附註：HW 穰 #5（右上一點）無 EDB 對應，已保留，請老師目測核實。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>佈局錯（3 字）——部件位置掉轉，perm 改唔到位置</h3>
+  <table>
+    <thead><tr><th>字</th><th>hex</th><th>問題</th><th>需要咩決定</th></tr></thead>
+    <tbody>
+      <tr><td class="hanzi">飆</td><td>98c6</td><td>HW 數據左右掉轉：猋置左、風置右；正確應風左猋右</td><td><strong>已解決（本輪整理）：核實正確，毋須改動</strong>——HW 已經係 ⿰猋風（猋左風右，猋先寫），同 Wiktionary／CNS IDS ⿰猋風＋筆順一致。原報告「應風左猋右」係錯嘅。</td></tr>
+      <tr><td class="hanzi">鰲</td><td>9c32</td><td>筆集齊全，但佈局係敖上魚下；正確應左魚右敖</td><td><strong>已解決（本輪整理）：核實正確，毋須改動</strong>——HW 已經係 ⿱敖魚（敖上魚下，敖先寫），同 Wiktionary／CNS IDS ⿱敖魚＋筆順一致。原報告「應左魚右敖」係錯嘅。</td></tr>
+      <tr><td class="hanzi">龕</td><td>9f95</td><td>佈局係合上龍下；正確應龍上合下</td><td><strong>已解決（本輪整理）：核實正確，毋須改動</strong>——HW 已經係 ⿱合龍（合上龍下，合先寫），同 Wiktionary／CNS IDS ⿱合龍＋筆順一致。原報告「應龍上合下」係錯嘅。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>筆形錯（1 字）</h3>
+  <table>
+    <thead><tr><th>字</th><th>hex</th><th>問題</th><th>需要咩決定</th></tr></thead>
+    <tbody>
+      <tr><td class="hanzi">醴</td><td>91b4</td><td>酉部 #3 應為撇（EDB 酉 #3），HW 寫成豎；其餘 19 筆正確</td><td><strong>已做（本輪整理）：</strong>#3 按 EDB 酉 #3 重繪做撇，其餘 19 筆不變；筆數維持 20。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.4 本輪整理的新發現（2026-11-13）</h3>
+  <p>以下三項係老師喺整理期間提出，唔屬於原本 839 審計範圍，列出嚟等跟進。</p>
+  <table>
+    <thead><tr><th>項目</th><th>內容</th><th>狀態</th></tr></thead>
+    <tbody>
+      <tr><td class="hanzi">餚</td><td>老師拆字：飠＋肴（肴＝乂＋有），16 畫，部首食。食部 8 筆同 EDB 飠（對 EDB 飯 #0–#7）次序一致；HW 餚 17 筆多一筆喺有部——但核實發現唔係單純多一筆：EDB 有 #1 長撇喺 HW 入面無對應筆，而 HW #15（右下短撇）＋#16（長捺）喺 EDB 入面無對應。正確修法係重繪有部：刪 #15／#16，按 EDB 有 #1 畫返條長撇。</td><td><strong>已做（老師 2026-11-13 19:07 HKT 批准）：</strong>刪 HW #15／#16，按 EDB 有 #1 加長撇；有部同時重排做 EDB 次序（HW #11 橫折鈎同 #14 豎原本調轉咗，現已更正）。CHAR_DB 餚 s 17→16（＝飠 8＋乂 2＋有 6）。</td></tr>
+      <tr><td class="hanzi">飯</td><td>EDB 飯（98ef）第 9 筆（#8，反部首筆撇）median 方向錯：median 由左向右（533,640 → 782,706），但撇應由右上向左下，好似 EDB 反（53cd）#0（605,736 → 317,650）。修正方法：將 #8 median 五點反轉（同一中線，反向行走），輪廓不變。修正檔已備妥（<code>tools/organize_fan98ef_m8.json</code>），並以渲染核實方向正確。</td><td><strong>已做（老師 2026-11-13 19:07 HKT 批准）：</strong>m[8] 五點已反轉寫入 <code>glyphs/98ef.json</code>（s 輪廓不變；原 median 已備份 <code>tools/backup_followup6/98ef_orig_median.json</code>）。現 m[8] 由右上向左下，同 EDB 反 #0 方向一致。</td></tr>
+      <tr><td>食部首</td><td>系統性港台差異：食部首中間，香港係一劃（睇 EDB 飯動畫），台灣標準係一點（睇 HW 餚動畫）。同一部首喺 EDB 同 HW 數據入面寫法唔同，唔係個別字錯，係系統性差異。</td><td><strong>待全庫審計</strong>（見下）。</td></tr>
+    </tbody>
+  </table>
+  <p><strong>全庫再審計（老師已批准，2026-11-13 19:07 HKT；首輪＋第二輪已完成，見 <code>tools/full_audit_20261113.md</code>；方法：老師 2026-11-13 20:10 HKT 重申「拆解文字，對應 EDB 數據反推」）：</strong>「類此的錯誤再次審視全庫」。範圍：(a) EDB 字形 median 方向錯——逐字將每筆 median 方向對照同一筆喺 EDB 部件參照入面嘅方向（好似飯 #8 對反 #0），搵出方向相反嘅筆；(b) 港台筆形差異——逐個共享部首（食、辶、艹、阝等）對照 EDB 同 HW 寫法，列出系統性差異。涉及檔案：<code>glyphs/</code> 4,722 檔（EDB／twpen）＋<code>hanzi-writer-data/</code> 9,511 檔（HW）。<strong>食部檢查已完成（兩輪）</strong>：44 字全查，30 字食部中間由台灣一點改做香港一劃（第一輪 26＋第二輪餐／飧／餮＋餘 #2；HW 數據；餘 #2 老師 2026-11-13 23:38 HKT「全做」批准，aspect 1.68→5.37）；9 字短橫建議留（待老師確認）。<strong>EDB median 方向錯（已全部寫入）</strong>：UP-LEFT 67 旗標全部係真正反向（0 假陽性）；另低於閾值 5 筆＋瘟 #2；第三輪（lexlist 方法）再發現 92 筆反向（含雨部 17 字系統性錯誤），3 條爭議（比 #2、昆 #6、寶 #12）經官網逐筆對照證實全部真反向。<strong>EDB median 累計已寫入 186 筆</strong>：飯 #8＋呈／程／逞／荏 4 筆（5 筆）＋2026-11-13 22:57 HKT 寫入 166 筆（辶 10＋UP-LEFT 53＋短檔 5＋瘟昷 6＋第三輪 92）＋2026-11-13 23:4x HKT 寫入 15 筆（未解決 16 條中 14 條重建／反轉／截斷＋暗 #12 重建；見下段）。待批 0 筆。<strong>HW 辶成批修復已做</strong>：91 檔，92／92 有 HW 檔嘅字而家 HW 筆數＝CHAR_DB s；7 項 CHAR_DB s＋1（逑／逶／遒／遛／遢／邈／邋）老師 2026-11-13 23:38 HKT「全做」批准執行；6 個 perm（迅、透、造、週、過、遐）已入 <code>hk_order.js</code>（760 項）；邐待建檔；邁須老師部件分析。提（尤其氵提）同橫微升係正常，唔係錯。1,007 筆陡升右上清單須再做一輪（偶然發現反向橫／豎，UP-LEFT 捕捉唔到）。</p>
+  <p><strong>未解決 16 條（lexlist 對照，2026-11-13 23:30 HKT 預覽交付；老師同日 23:38 HKT「全做」批准，見 <code>tools/audit_unresolved_lexlist.md</code>、<code>tools/fix_unresolved_lexlist.json</code>；寫入備份 <code>tools/backup_unresolved16_20261113/</code>）：</strong>重建 9（隅 #8、卑 #2 橫折、孿 #16、箏 #7、籌 #19、鹼 #6、齡 #5、齪 #5、齷 #7）、反轉 4（麗 #8、聽 #6、廳 #9、箏 #6）、截斷 1（驀 #9 截到首 6 點），全部寫入；<strong>麗 #8 除咗反轉亦延長</strong>（輪廓對角 104.5，原 median 只有 18.8；沿反轉後方向延長到 56.0，輪廓邊緣止步，唔到官網 64.4；反轉後方向同官網方向差約 25°，如老師想要跟官網角度要另行重畫）。<strong>暗 #12 缺筆已重建</strong>（老師拆字：暗＝日＋音；原 m[12] 係 2 點垂直人工點，真正缺下日底橫；模板取 EDB 音 97f3 #8，affine sx 0.7948／sy 0.9966 貼入，寫入後 m[12] 3 點 (514.9,79.0)→(672.3,84.6)，左→右，51 採樣點全在輪廓內；s[12] 入面 1px 微點子路徑仍保留，清理要另外批准）。<strong>儔條目無效</strong>：審核用錯 hex（5104 係億；儔係 U+5114），將億嘅字形對儔嘅官網動畫比較，先至「發現」缺筆；正確檔案 <code>glyphs/5114.json</code> 已有 16 筆（亻＋壽，口底橫 #12 齊全），逐筆對官網 lexlist 253 全部 16/16 吻合，唔使重建；預覽頁儔嗰項錯將億標籤做儔，係標籤錯，唔係 live 站字形錯。寫入後 <code>tools/check_hw839_hk.js</code> 3094/3094；headless Chrome 抽查 15 字（暗、隅、驀、卑、麗、聽、廳、箏、儔、孿、籌、鹼、齡、齪、齷）動畫全部通過，0 JS 錯誤。<strong>唯一未決：鋥 #11</strong>（HW 墨跡比 3.46，官網 lexlist 3,171／4,762 範圍都無鋥，無數據可裁決）。</p>
+
+  <h2>四、未做／不做</h2>
+  <ul>
+    <li><strong>HW 徽章維持不變</strong>（用戶決定）：HanziWriter 通用字形唔應冒充 EDB／香港標準，保留原徽章，免魚目混珠。見 §1.6 的徽章邏輯。</li>
+    <li><strong>HW 字形風格與 EDB／twpen 不一致，未處理</strong>：HanziWriter 係通用字體，風格同 EDB／台灣字形有別（例如幕／冪，見 §1.1）；全部 839 字按 EDB 風格重畫係大工程——<strong>下一大改版時做，而且係主力</strong>（用戶 2026-11-13 決定）。</li>
+    <li><strong>筆畫名稱、組詞／例句未做</strong>：無可靠數據來源，唔會憑空編造；候選來源為教育局《香港小學學習字詞表》。</li>
+    <li><strong>餚有部重繪已做</strong>：老師 2026-11-13 20:02 HKT 指示右邊參考 EDB 淆，右部 #8–#15 已換做 EDB 淆 #3–#10，長撇 aspect 0.52；老師同日 20:09 HKT 批准全部修正。見 §3.4。</li>
+    <li><strong>網站 HW 數據未同步</strong>：v2.28 的 58 字重繪＋8 字新動畫＋本輪整理嘅 HW 數據修正（91 個辶檔、餘 #2 等）只存在於 App 內置 HW 數據；網站用未修正的 CDN 數據。v2.32 網站提交已包括 <code>data.js</code>（23 個筆數修正）、<code>hk_order.js</code>（760 項）、<code>glyph_sources.json</code>（7352:EDB）＋glyph 包 15 檔；待部署後，再次審計所有資料庫以同步（用戶 2026-11-13 決定）。</li>
+    <li><strong>辶系統性問題已成批處理（v2.32）</strong>：91 個 HW 檔已修復，92／92 筆數一致；6 個 perm 已入 <code>hk_order.js</code>；7 項 CHAR_DB s＋1 已執行。餘下：邐待建檔；邁須老師部件分析。</li>
+  </ul>
+
+  <div class="note">
+    備忘本身存放於工作副本；<code>docs/</code> 不在 Hermes API 交付範圍內，部署途徑待定。本頁只係文件，唔改任何字形數據、<code>hk_order.js</code>、<code>data.js</code> 或 APK。
+  </div>
+
+</div>
+</body>
+</html>
