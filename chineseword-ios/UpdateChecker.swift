@@ -24,7 +24,7 @@ final class UpdateChecker {
     }
 
     func check(manual: Bool, presentOn viewController: UIViewController) {
-        let task = URLSession.shared.dataTask(with: versionURL) { [weak viewController] data, response, _ in
+        let task = URLSession.shared.dataTask(with: Self.versionURL) { [weak viewController] data, response, _ in
             guard let viewController = viewController else { return }
             var remote: (build: Int, version: String, url: String, notes: String)?
             if let data = data,

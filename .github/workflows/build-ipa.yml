@@ -28,9 +28,24 @@ jobs:
 
       - name: Select Xcode
         run: |
-          ls /Applications | grep -i xcode
-          sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          ls /Applications | grep -i xcode || true
+          # 揀最新嘅 Xcode（舊版可能缺 iOS platform，ibtool 會 'Platform Not Installed'）
+          XC=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          echo "using $XC"
+          sudo xcode-select -s "$XC/Contents/Developer"
           xcodebuild -version
+          if ! xcrun --sdk iphoneos --show-sdk-path >/dev/null 2>&1; then
+            echo "iOS platform missing — downloading"
+            sudo xcodebuild -downloadPlatform iOS || true
+          fi
+          xcrun --sdk iphoneos --show-sdk-version || true
+
+      - name: Resolve version
+        id: ver
+        run: |
+          V=$(python3 -c "import json;print(json.load(open('ios-version.json'))['versionName'])")
+          echo "v=$V" >> "$GITHUB_OUTPUT"
+          echo "building v$V"
 
       - name: Prepare bundled site (binary assets + hanzi-writer-data)
         run: bash scripts/prepare-site.sh
@@ -62,12 +77,13 @@ jobs:
       - name: Package unsigned IPA
         run: |
           APP="build/DerivedData/Build/Products/Release-iphoneos/chineseword-ios.app"
-          rm -rf Payload chineseword-ios-v2.31.ipa
+          V="${{ steps.ver.outputs.v }}"
+          rm -rf Payload "chineseword-ios-v$V.ipa"
           mkdir -p Payload
           cp -r "$APP" Payload/
-          zip -r -q chineseword-ios-v2.31.ipa Payload
-          ls -la chineseword-ios-v2.31.ipa
-          unzip -l chineseword-ios-v2.31.ipa | head -5
+          zip -r -q "chineseword-ios-v$V.ipa" Payload
+          ls -la "chineseword-ios-v$V.ipa"
+          unzip -l "chineseword-ios-v$V.ipa" | head -5
           # App icon for the release / AltStore source (1024 PNG from the bundle).
           cp chineseword-ios/Assets.xcassets/AppIcon.appiconset/icon-1024.png icon.png
           ls -la icon.png
@@ -75,21 +91,23 @@ jobs:
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: chineseword-ios-v2.31-unsigned
-          path: chineseword-ios-v2.31.ipa
+          name: chineseword-ios-v${{ steps.ver.outputs.v }}-unsigned
+          path: chineseword-ios-v${{ steps.ver.outputs.v }}.ipa
           if-no-files-found: error
           retention-days: 90
 
-      - name: Create release v2.31 (if missing) and attach IPA + icon
+      - name: Create release (if missing) and attach IPA + icon
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if gh release view v2.31 >/dev/null 2>&1; then
-            echo "Release v2.31 already exists; skipping."
+          V="${{ steps.ver.outputs.v }}"
+          if gh release view "v$V" >/dev/null 2>&1; then
+            echo "Release v$V already exists; re-uploading asset."
+            gh release upload "v$V" "chineseword-ios-v$V.ipa" icon.png --clobber
           else
-            gh release create v2.31 \
-              --title "中文筆順練習簿 v2.31 (iOS)" \
-              --notes "iOS version of 中文筆順練習簿 (matches Android v2.31, build 35). Unsigned IPA for AltStore — install with AltStore using your own Apple ID. See altstore-source.json for the AltStore source." \
-              chineseword-ios-v2.31.ipa icon.png
-            echo "Release v2.31 created."
+            gh release create "v$V" \
+              --title "中文筆順練習簿 v$V (iOS)" \
+              --notes "iOS version of 中文筆順練習簿 (v$V). Unsigned IPA for AltStore — install with AltStore using your own Apple ID. See altstore-source.json for the AltStore source." \
+              "chineseword-ios-v$V.ipa" icon.png
+            echo "Release v$V created."
           fi

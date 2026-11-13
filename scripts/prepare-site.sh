@@ -13,7 +13,12 @@ set -e
 cd "$(dirname "$0")/.."
 
 echo "== decode binary assets bundle =="
-base64 -d assets-binary.tar.gz.b64 > /tmp/assets-binary.tar.gz
+# GNU base64（Linux）讀 stdin；BSD base64（macOS runner）只認 -i/-o
+if [ "$(uname -s)" = "Darwin" ]; then
+  base64 -d -i assets-binary.tar.gz.b64 -o /tmp/assets-binary.tar.gz
+else
+  base64 -d assets-binary.tar.gz.b64 > /tmp/assets-binary.tar.gz
+fi
 tar xzf /tmp/assets-binary.tar.gz
 rm -f /tmp/assets-binary.tar.gz
 echo "fonts: $(ls site/fonts | wc -l) files; bgm: $(ls site/bgm | wc -l)"

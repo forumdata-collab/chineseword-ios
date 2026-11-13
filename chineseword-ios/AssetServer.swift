@@ -96,7 +96,7 @@ final class AssetServer {
         guard let data = try? Data(contentsOf: fileURL) else {
             return httpResponse(status: 404, mime: "text/plain", body: Data("Not Found".utf8))
         }
-        return httpResponse(status: 200, mime: mimeFor(relative), body: data)
+        return httpResponse(status: 200, mime: Self.mimeFor(relative), body: data)
     }
 
     private func httpResponse(status: Int, mime: String, body: Data) -> Data {
