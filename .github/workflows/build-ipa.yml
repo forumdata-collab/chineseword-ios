@@ -28,9 +28,17 @@ jobs:
 
       - name: Select Xcode
         run: |
-          ls /Applications | grep -i xcode
-          sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          ls /Applications | grep -i xcode || true
+          # 揀最新嘅 Xcode（舊版可能缺 iOS platform，ibtool 會 'Platform Not Installed'）
+          XC=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          echo "using $XC"
+          sudo xcode-select -s "$XC/Contents/Developer"
           xcodebuild -version
+          if ! xcrun --sdk iphoneos --show-sdk-path >/dev/null 2>&1; then
+            echo "iOS platform missing — downloading"
+            sudo xcodebuild -downloadPlatform iOS || true
+          fi
+          xcrun --sdk iphoneos --show-sdk-version || true
 
       - name: Prepare bundled site (binary assets + hanzi-writer-data)
         run: bash scripts/prepare-site.sh
