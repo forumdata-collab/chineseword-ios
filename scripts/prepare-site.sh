@@ -14,10 +14,10 @@ cd "$(dirname "$0")/.."
 
 echo "== decode binary assets bundle =="
 # GNU base64（Linux）讀 stdin；BSD base64（macOS runner）只認 -i/-o
-if base64 --version >/dev/null 2>&1; then
-  base64 -d assets-binary.tar.gz.b64 > /tmp/assets-binary.tar.gz
-else
+if [ "$(uname -s)" = "Darwin" ]; then
   base64 -d -i assets-binary.tar.gz.b64 -o /tmp/assets-binary.tar.gz
+else
+  base64 -d assets-binary.tar.gz.b64 > /tmp/assets-binary.tar.gz
 fi
 tar xzf /tmp/assets-binary.tar.gz
 rm -f /tmp/assets-binary.tar.gz
