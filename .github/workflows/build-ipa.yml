@@ -1,0 +1,95 @@
+name: Build unsigned IPA
+
+# Builds the iOS app on a macOS runner with Xcode and produces an UNSIGNED
+# .ipa (AltStore re-signs it with the user's own Apple ID). No signing
+# identity or certificate is used or committed.
+#
+# On push to main it also creates the GitHub Release v2.31 (if it does not
+# already exist) and attaches the IPA + app icon, so the AltStore source can
+# point at a durable public download URL. The release step is idempotent:
+# re-runs skip it when the release already exists.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "tools/build_report_ios.md"
+      - "README.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          ls /Applications | grep -i xcode
+          sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Prepare bundled site (binary assets + hanzi-writer-data)
+        run: bash scripts/prepare-site.sh
+
+      - name: Build (unsigned)
+        run: |
+          xcodebuild -project chineseword-ios.xcodeproj \
+            -scheme chineseword-ios \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            build
+
+      - name: Verify the .app
+        run: |
+          APP="build/DerivedData/Build/Products/Release-iphoneos/chineseword-ios.app"
+          ls -la "$APP"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$APP/Info.plist"
+          echo "site files bundled: $(find "$APP/site" -type f | wc -l)"
+          test -f "$APP/site/index.html"
+          test -f "$APP/site/glyphs/7cf4.json"
+          test -f "$APP/site/hanzi-writer-data/文.json"
+
+      - name: Package unsigned IPA
+        run: |
+          APP="build/DerivedData/Build/Products/Release-iphoneos/chineseword-ios.app"
+          rm -rf Payload chineseword-ios-v2.31.ipa
+          mkdir -p Payload
+          cp -r "$APP" Payload/
+          zip -r -q chineseword-ios-v2.31.ipa Payload
+          ls -la chineseword-ios-v2.31.ipa
+          unzip -l chineseword-ios-v2.31.ipa | head -5
+          # App icon for the release / AltStore source (1024 PNG from the bundle).
+          cp chineseword-ios/Assets.xcassets/AppIcon.appiconset/icon-1024.png icon.png
+          ls -la icon.png
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chineseword-ios-v2.31-unsigned
+          path: chineseword-ios-v2.31.ipa
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Create release v2.31 (if missing) and attach IPA + icon
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v2.31 >/dev/null 2>&1; then
+            echo "Release v2.31 already exists; skipping."
+          else
+            gh release create v2.31 \
+              --title "中文筆順練習簿 v2.31 (iOS)" \
+              --notes "iOS version of 中文筆順練習簿 (matches Android v2.31, build 35). Unsigned IPA for AltStore — install with AltStore using your own Apple ID. See altstore-source.json for the AltStore source." \
+              chineseword-ios-v2.31.ipa icon.png
+            echo "Release v2.31 created."
+          fi
