@@ -14,6 +14,7 @@ on:
     paths-ignore:
       - "tools/build_report_ios.md"
       - "README.md"
+      - "altstore-source.json"
   workflow_dispatch:
 
 permissions:
@@ -110,4 +111,19 @@ jobs:
               --notes "iOS version of 中文筆順練習簿 (v$V). Unsigned IPA for AltStore — install with AltStore using your own Apple ID. See altstore-source.json for the AltStore source." \
               "chineseword-ios-v$V.ipa" icon.png
             echo "Release v$V created."
+          fi
+
+      - name: Sync AltStore source size
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          V="${{ steps.ver.outputs.v }}"
+          SIZE=$(stat -f%z "chineseword-ios-v$V.ipa")
+          python3 -c "import json,sys;v=sys.argv[1];size=int(sys.argv[2]);p='altstore-source.json';d=json.load(open(p));c=d['apps'][0]['versions'][0];c['size']=size if c['version']==v else c['size'];open(p,'w').write(json.dumps(d,ensure_ascii=False,separators=(',',':')));print('altstore size',c['size'])" "$V" "$SIZE"
+          if ! git diff --quiet altstore-source.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add altstore-source.json
+            git commit -m "altstore: sync IPA size for v$V [skip ci]"
+            git push
           fi
