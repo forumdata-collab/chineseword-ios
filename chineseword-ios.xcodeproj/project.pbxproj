@@ -31,7 +31,7 @@
 							ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 							CODE_SIGN_STYLE = Automatic;
 							COPY_PHASE_STRIP = NO;
-							CURRENT_PROJECT_VERSION = 36;
+							CURRENT_PROJECT_VERSION = 39;
 							DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 							ENABLE_NS_ASSERTIONS = NO;
 							INFOPLIST_FILE = chineseword-ios/Info.plist;
@@ -40,7 +40,7 @@
 								"$(inherited)",
 								"@executable_path/Frameworks",
 							);
-							MARKETING_VERSION = 2.32;
+							MARKETING_VERSION = 2.35;
 							MTL_ENABLE_DEBUG_INFO = NO;
 							PRODUCT_BUNDLE_IDENTIFIER = me.we1co.chineseword;
 							PRODUCT_NAME = "$(TARGET_NAME)";
@@ -73,7 +73,7 @@
 			buildSettings = {
 							ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 							CODE_SIGN_STYLE = Automatic;
-							CURRENT_PROJECT_VERSION = 36;
+							CURRENT_PROJECT_VERSION = 39;
 							DEBUG_INFORMATION_FORMAT = dwarf;
 							ENABLE_TESTABILITY = YES;
 							GCC_PREPROCESSOR_DEFINITIONS = (
@@ -86,7 +86,7 @@
 								"$(inherited)",
 								"@executable_path/Frameworks",
 							);
-							MARKETING_VERSION = 2.32;
+							MARKETING_VERSION = 2.35;
 							MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 							ONLY_ACTIVE_ARCH = YES;
 							PRODUCT_BUNDLE_IDENTIFIER = me.we1co.chineseword;

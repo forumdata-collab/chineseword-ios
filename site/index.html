@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>中文筆順練習簿 — 粵音普通話朗讀 · 筆順練習 · 列印練習紙</title>
 <link href="fonts/lxgw.css" rel="stylesheet">
-<script src="data.js?v=1794186217"></script>
-<script src="hk_order.js?v=3"></script>
+<script src="data.js?v=1794746955"></script>
+<script src="hk_order.js?v=1794746956"></script>
 <script src="hw_hk_same.js?v=1"></script>
 <script src="stroke_seq.js?v=3"></script>
-<script src="glyph-engine.js?v=9"></script>
+<script src="glyph-engine.js?v=13"></script>
 <script src="hanzi-writer.min.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>✍️</text></svg>">
 <style>
@@ -325,10 +325,20 @@ body {
 }
 .char-display {
   flex-shrink: 0;
-  width: var(--cell-practice, 96px);
-  height: var(--cell-practice, 96px);
+  width: auto;
+  min-width: var(--cell-practice, 96px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: relative;
   cursor: pointer;
+}
+.char-display .si-note {
+  font-size: 11px;
+  line-height: 1.1;
+  color: #8a8f98;
+  margin-top: 2px;
+  white-space: nowrap;
 }
 .char-cell {
   width: var(--cell-practice, 96px);
@@ -353,8 +363,10 @@ body {
 .reading-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 4px;
+  gap: 5px;
+  row-gap: 0;
+  margin-bottom: 1px;
+  line-height: 1.2;
   align-items: center;
 }
 .reading-label {
@@ -369,9 +381,10 @@ body {
 }
 .reading-label.canto { background: var(--red); }
 .reading-value {
-  font-size: 1.15em;
+  font-size: 1.02em;
   font-weight: 600;
   font-family: inherit;
+  line-height: 1.2;
 }
 .reading-alt {
   font-size: 0.8em;
@@ -379,10 +392,14 @@ body {
 }
 /* 又讀：預設收起，點開才顯示；列印不顯示（顧問 Q6） */
 .alt-readings {
+  display: inline;
   font-size: 0.78em;
   color: #8a8f98;
-  margin-top: 2px;
+  margin-left: 6px;
 }
+.alt-readings:not([open]) > div { display: none !important; }
+.alt-readings[open] { display: block; flex-basis: 100%; margin-left: 0; margin-top: 1px; }
+.alt-readings[open] > div { display: block; margin-top: 1px; white-space: normal; overflow-wrap: anywhere; }
 .alt-readings summary {
   cursor: pointer;
   color: #9a9a9a;
@@ -400,9 +417,9 @@ body {
   background: none;
   border: 1.5px solid #ccc;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  font-size: 16px;
+  width: 27px;
+  height: 27px;
+  font-size: 12px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -1321,7 +1338,7 @@ html.cw-simple .cw-adv-hide { display: none !important; }
 <!-- INPUT SECTION -->
 <div class="input-section screen-only" id="inputSection">
   <label for="inputText">✏️ 輸入中文字或一段文字</label>
-  <textarea id="inputText" placeholder="例如：你好，我是香港人。今天天氣很好。">你好，我是香港人。今天天氣很好。</textarea>
+  <textarea id="inputText" placeholder="例如：天地玄黃，宇宙洪荒。">天地玄黃，宇宙洪荒。</textarea>
   <details class="sample-collapse">
     <summary>🎲 常用範例</summary>
     <div class="quick-btns">
@@ -1737,7 +1754,14 @@ function loadGlyphMeta() {
     fetch('data/variant_pairs.json').then(r => (r.ok ? r.json() : null)).catch(() => null),
   ]).then(([gs, vp]) => {
     if (gs) GLYPH_SOURCES = gs.glyphs || {};
-    if (vp) VARIANT_PAIRS = vp.pairs || {};
+    if (vp) {
+      VARIANT_PAIRS = vp.pairs || {};
+      // 標準寫法對照：輸入字 → 香港教育標準字（秘→祕、羣→群…），供 loader 預設示範標準字形
+      window.CW_STD_FORM = {};
+      for (const [hex, p] of Object.entries(VARIANT_PAIRS)) {
+        if (p && p.standard && p.char && p.standard !== p.char) window.CW_STD_FORM[hex] = p.standard;
+      }
+    }
     // 已產生工作紙就重畫一次，令來源標示／另一寫法即時出現
     if (document.querySelector('.char-card')) renderWorksheet();
   });
@@ -1746,7 +1770,13 @@ loadGlyphMeta();
 
 
 // ===== INIT =====
+// ===== 預設例句（v2.35）：每次載入隨機顯示四句之一；首句為預設 =====
+const CW_DEFAULT_SENTENCES = ['天地玄黃，宇宙洪荒。', '學而時習之，不亦說乎？', '一日之計在於晨，一年之計在於春。', '書山有路勤為徑，學海無涯苦作舟。'];
+function cwPickDefaultSentence() {
+  return CW_DEFAULT_SENTENCES[Math.floor(Math.random() * CW_DEFAULT_SENTENCES.length)];
+}
 document.addEventListener('DOMContentLoaded', () => {
+  { const _ta = document.getElementById('inputText'); const _s = cwPickDefaultSentence(); if (_ta) { _ta.value = _s; _ta.placeholder = '例如：' + _s; } }
   buildGuideStyleSelect();               // 格線樣式選項由 GUIDE_STYLES 生成（要先於還原設定）
   document.getElementById('optDate').value = todayStr();
 
@@ -1961,6 +1991,11 @@ function readOptions() {
 
 function generate() {
   const opts = readOptions();
+  // @page 規則係全局：文章模式設 8mm、其他模式要清空，否則會蓋過一般 12mm 邊界
+  if (opts.layout !== 'article') {
+    const pgs0 = document.getElementById('artPageStyle');
+    if (pgs0) pgs0.textContent = '';
+  }
   // save options to localStorage
   try {
     localStorage.setItem('chinese-ws-settings', JSON.stringify(opts));
@@ -2169,28 +2204,13 @@ function charCardHtml(ch, o, cardIdx) {
   // 彩色天草泥：每卡一個 slice（卡 0/1/2 = 原圖左/中/右），3 張卡併返埋 = 完整原圖
   const slice = (cardIdx == null) ? 0 : (cardIdx % 3);
   html += `<div class="char-cell">${guideSvg(slice)}<span class="char-glyph" data-ch="${esc(ch)}">${esc(ch)}</span></div>`;
+  if (d.si) html += `<div class="si-note">簡體：${esc(d.si)}</div>`;
   html += `</div>`;
   html += `<div class="char-details">`;
 
-  // Canto reading
-  if (o.canto && d.jy) {
-    html += `<div class="reading-row">`;
-    html += `<span class="reading-label canto">粵拼</span>`;
-    html += `<span class="reading-value">${jyutpingHtml(d.jy)}</span>`;
-    html += `<button class="play-btn canto" onclick="event.stopPropagation();speak('${esc(ch)}','canto')" title="粵語朗讀">🔊</button>`;
-    html += `</div>`;
-  }
-
-  // Mandarin reading
-  if (o.pinyin && d.py) {
-    html += `<div class="reading-row">`;
-    html += `<span class="reading-label">拼音</span>`;
-    html += `<span class="reading-value">${esc(d.py)}</span>`;
-    html += `<button class="play-btn" onclick="event.stopPropagation();speak('${esc(ch)}','mand')" title="普通話朗讀">🔊</button>`;
-    html += `</div>`;
-  }
-
   // 又讀：預設收起（顧問 Q6：主讀一行，其餘折叠；列印不顯示）
+  // 只保留摘要 inline 接在最後一行讀音後面，唔另開一行
+  let altHtml = '';
   {
     const alts = [];
     if (o.canto && d.jy2 && d.jy2.length) {
@@ -2200,35 +2220,65 @@ function charCardHtml(ch, o, cardIdx) {
       alts.push(`拼音又讀：${esc(d.py2.join('、'))}`);
     }
     if (alts.length) {
-      html += `<details class="alt-readings"><summary>又讀</summary>`
+      altHtml = `<details class="alt-readings"><summary>又讀</summary>`
         + `<div>${alts.join('　')}</div></details>`;
     }
+  }
+  const hasMand = !!(o.pinyin && d.py);
+  const hasCanto = !!(o.canto && d.jy);
+
+  // Canto reading
+  if (hasCanto) {
+    html += `<div class="reading-row">`;
+    html += `<span class="reading-label canto">粵拼</span>`;
+    html += `<span class="reading-value">${jyutpingHtml(d.jy)}</span>`;
+    html += `<button class="play-btn canto" onclick="event.stopPropagation();speak('${esc(ch)}','canto')" title="粵語朗讀">🔊</button>`;
+    if (!hasMand) html += altHtml;
+    html += `</div>`;
+  }
+
+  // Mandarin reading
+  if (hasMand) {
+    html += `<div class="reading-row">`;
+    html += `<span class="reading-label">拼音</span>`;
+    html += `<span class="reading-value">${esc(d.py)}</span>`;
+    html += `<button class="play-btn" onclick="event.stopPropagation();speak('${esc(ch)}','mand')" title="普通話朗讀">🔊</button>`;
+    html += altHtml;
+    html += `</div>`;
+  }
+  if (altHtml && !hasCanto && !hasMand) {
+    html += `<div class="reading-row">${altHtml}</div>`;
   }
 
   // Meta info
   let metaParts = [];
   if (o.strokes && d.s) {
     const hex = ch.codePointAt(0).toString(16);
+    // 字形與筆數必須一致：未勾「顯示我輸入的寫法」而字形取標準字時（秘→祕），
+    // 畫數／部首要用標準字的資料，否則卡片寫「10畫」但描紅格只畫 9 筆。
+    const _stdCh = (!o.variant && window.CW_STD_FORM && window.CW_STD_FORM[hex]) || null;
+    const dg = (_stdCh && window.CHAR_DB[_stdCh]) || d;
     const src = GLYPH_SOURCES[hex] || (window.CHAR_DB[ch] ? 'HW' : null);
     // HW chars whose stroke order is Hong Kong order (verified 2026-11-12):
     // either reordered via HK_ORDER, or already HK order (HW_HK_SAME).
     const hwHkOrder = src === 'HW' && (window.HK_ORDER[ch] || (window.HW_HK_SAME && window.HW_HK_SAME.has(ch)));
-    const tier = src === 'EDB' ? '香港教育標準' : (src === 'twpen' ? '香港次序' : (src ? (hwHkOrder ? '香港次序' : '參考字形') : ''));
-    metaParts.push(`✏️ ${tier ? tier + ' ' : ''}${d.s}畫`);
-    if (d.r) metaParts.push(`部首：${esc(d.r)}`);
+    const tier = src === 'EDB' ? '香港教育標準' : (src === 'twpen' ? '香港次序' : (src === 'Edb.R' ? 'EDB 修訂' : (src ? (hwHkOrder ? '香港次序' : '參考字形') : '')));
+    metaParts.push(`✏️ ${tier ? tier + ' ' : ''}${dg.s}畫`);
+    if (dg.r) metaParts.push(`部首：${esc(dg.r)}`);
     if (src) {
-      const code = src === 'EDB' ? 'EDB' : (src === 'twpen' ? 'TW' : 'HW');
+      const code = src === 'EDB' ? 'EDB' : (src === 'twpen' ? 'TW' : (src === 'Edb.R' ? 'Edb.R' : 'HW'));
       const label = src === 'EDB'
         ? '字形來源：香港教育局《香港小學學習字詞表》'
-        : (src === 'twpen'
+        : (src === 'Edb.R'
+          ? '字形來源：EDB 字形修補（edb refined），筆順按異體字原則核對'
+          : (src === 'twpen'
           ? '字形源自台灣教育部《筆順字典》，筆順已按香港次序'
           : (hwHkOrder
             ? '字形源自 HanziWriter 通用字形，筆順已按香港次序'
-            : '字形及筆順源自 HanziWriter 通用字形，非香港官方標準'));
+            : '字形及筆順源自 HanziWriter 通用字形，非香港官方標準')));
       metaParts.push(`<span class="src-badge" data-src="${code}" title="${label}">${code}</span>`);
     }
   }
-  if (d.si) metaParts.push(`簡體：${esc(d.si)}`);
   if (metaParts.length) {
     html += `<div class="meta-row">${metaParts.map(m => `<span>${m}</span>`).join('')}</div>`;
   }
@@ -2516,15 +2566,17 @@ function articlePagesHtml(o) {
   const headH = o.showHeader ? 46 : 0;
   const cw = (pw - pad * 2) / cols;
   const ch = (ph - pad * 2 - headH - 16) / rows;
-  const fs = Math.min(cw, ch) * (o.artScale || 0.82);
+  // 每字格要正方形：取可容納邊長，整組格居中（唔再拉長填滿）
+  const cell = Math.floor(Math.min(cw, ch));
+  const fs = cell * (o.artScale || 0.82);
   const tint = artTint(o.artGray == null ? 0.35 : o.artGray);
   const pgs = document.getElementById('artPageStyle');
-  if (pgs) pgs.textContent = '@page{size:A4 ' + (landscape ? 'landscape' : 'portrait') + ';margin:0}';
+  if (pgs) pgs.textContent = '@page{size:A4 ' + (landscape ? 'landscape' : 'portrait') + ';margin:8mm}';
   let html = '';
   for (let p = 0; p < pageCount; p++) {
     html += `<section class="ws-page${vertical ? ' is-vertical' : ''}" style="--pw:${pw}px;--ph:${ph}px;--guide-tint:${tint}">`;
     if (o.showHeader) html += artHeadHtml(o, p + 1, pageCount);
-    html += `<div class="art-grid" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rows},1fr);font-size:${fs.toFixed(1)}px">`;
+    html += `<div class="art-grid" style="grid-template-columns:repeat(${cols},${cell}px);grid-template-rows:repeat(${rows},${cell}px);justify-content:center;align-content:center;font-size:${fs.toFixed(1)}px">`;
     for (let li = 0; li < perPage; li++) {
       const line = lines[p * perPage + li] || [];
       for (let k = 0; k < lineLen; k++) {
@@ -2774,7 +2826,15 @@ function openA4Preview() {
   clone.style.width = '794px';          // A4 width @96dpi (screen px)
   clone.style.maxWidth = 'none';
   clone.style.boxShadow = 'none';
-  clone.style.padding = '45px';         // ≈ 12mm @96dpi
+  clone.style.padding = '45px';         // 每字／整句：@page margin 12mm ≈ 45px
+  if (o.layout === 'article') {
+    // 文章抄寫紙：實際列印係 @page 8mm + .ws-page(10mm 內距 ×0.92 zoom)
+    // → 內容內縮 17.2mm ≈ 65px，預覽要一樣，否則印出嚟會「邊界全失」
+    clone.style.padding = '30px';                      // 8mm 頁邊
+    clone.style.height = '1123px';
+    clone.style.overflow = 'hidden';
+    clone.querySelectorAll('.ws-page').forEach(pg => { pg.style.zoom = '0.92'; });
+  }
   clone.style.setProperty('--cell-practice', ps);
   clone.style.setProperty('--cell-font', `calc(${ps} * ${GLYPH_RATIO})`);
   clone.style.setProperty('--cell-guide-font', `calc(${ps} * ${GLYPH_RATIO})`);
@@ -3124,6 +3184,7 @@ async function strokeUnavailable(ch) {
 // 小字註解：無香港筆順資料時，指向「筆順字典 twpen.com」（台灣教育部標準）作參考。
 // 香港教育局《香港小學學習字詞表》未有此字嘅官方筆順，twpen 有 GIF 動畫可睇寫法。
 function twpenNoteHtml(ch, opts) {
+  if (isPunct(ch)) return '';  // 標點唔顯示筆順參考訊息（v2.35）
   const small = (opts && opts.small);
   const url = `https://www.twpen.com/${encodeURIComponent(ch)}.html`;
   return `<p class="twpen-note${small ? ' small' : ''}">` +
@@ -3141,8 +3202,9 @@ function showStrokeUnavailable(ch, modalId = 'strokeModal', targetId = 'stroke-t
     `<div style="font-size:110px;font-family:var(--cell-guide-font,serif);line-height:1.1;">${esc(ch)}</div>` +
     strokeSeqHtml(ch) +
     twpenNoteHtml(ch) +
+    (isPunct(ch) ? '' :
     `<p style="margin-top:12px;color:#8a8a8a;font-size:13px;line-height:1.6;">` +
-    `未收錄於《香港小學學習字詞表》，暫無官方筆順字形（示範字仍可作字形參考，練習格可正常列印）。</p>`;
+    `未收錄於《香港小學學習字詞表》，暫無官方筆順字形（示範字仍可作字形參考，練習格可正常列印）。</p>`);
   document.querySelectorAll(`#${modalId} button, #${modalId} input`).forEach(el => {
     if (el.classList.contains('modal-close')) return;            // × 一定要撳得
     if (/關閉|close/i.test(el.textContent)) return;
@@ -3424,7 +3486,7 @@ if (document.fonts && document.fonts.ready) {
 }
 </script>
 
-<style id="artPageStyle">@page{size:A4 portrait;margin:12mm}</style>
+<style id="artPageStyle">@page{size:A4 portrait;margin:8mm}</style>
 <style>
 /* ===== 文章抄寫紙 prototype ===== */
 #worksheet.article-mode{padding:0;max-width:none;background:transparent;box-shadow:none}
@@ -3441,7 +3503,8 @@ if (document.fonts && document.fonts.ready) {
 .art-page-no{font-size:10px;color:#999;text-align:right}
 .art-opt output{font-size:.85em;color:#777;margin-left:4px}
 @media print{
-  .ws-page{zoom:1!important}
+  /* @page 有 8mm 邊界，可列印區 194×281mm；794×1123px 畫布要縮 0.92 才不會被裁邊 */
+  .ws-page{zoom:.92!important}
   #worksheet.article-mode{padding:0;margin:0;max-width:none}
   .ws-page{box-shadow:none;margin:0;break-after:page;page-break-after:always}
   .ws-page:last-child{break-after:auto;page-break-after:auto}

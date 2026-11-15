@@ -39,7 +39,10 @@
     background: #fff; border: 1px solid var(--line); font-size: 0.92em;
   }
   th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { background: #f1f5f9; font-weight: 600; white-space: nowrap; }
+  th { background: #f1f5f9; font-weight: 600; white-space: normal; line-height: 1.35; }
+  /* 長表頭（香港教育標準寫法／另一常見寫法）可斷行，令「差異原因」欄有更多空間 */
+  th:nth-child(1), th:nth-child(2) { width: 18%; }
+  @media (max-width: 600px) { th:nth-child(1), th:nth-child(2) { width: 26%; } th, td { padding: 7px 8px; } }
   tr:last-child td { border-bottom: none; }
   .hanzi { font-size: 1.25em; font-weight: 600; white-space: nowrap; }
   .note {
@@ -209,7 +212,7 @@
   </div>
 
   <div class="note">
-    「顯示我輸入的寫法」現時涵蓋 12 個字：兌、囪、悅、戶、敘、稅、脫、臥、說、銳、閱、峰。<br>
+    「顯示我輸入的寫法」現時涵蓋 14 個字：兌、囪、悅、戶、敘、稅、脫、臥、說、銳、閱、峰、羣、秘。<br>
     另有 8 個字暫未提供替代字形：<strong>衛、蔥、蘊、醞、裡、鉤、溫、床</strong>。原因是可用的替代字形（HanziWriter 通用字形）與本站採用的筆畫數不一致（例如「蔥」的替代字形為 15 筆，本站香港教育標準為 13 筆），強行採用會出現「卡片 13 畫、描紅 15 筆」的矛盾。因此勾選時，這 8 個字仍示範香港教育標準寫法。香港教育標準寫法（兑、説、鋭、裏、牀等）在任何情況下都保留教育局字形。
   </div>
 
@@ -265,6 +268,7 @@
       <tr><td class="hanzi">裏</td><td class="hanzi">裡</td><td>衣部（上下包住）vs 衤部（左邊旁），部首不同</td></tr>
       <tr><td class="hanzi">峯</td><td class="hanzi">峰</td><td>「山」在上邊 vs 在左邊（香港標準字形作「峯」）</td></tr>
       <tr><td class="hanzi">羣</td><td class="hanzi">群</td><td>「君」在上邊 vs 在右邊（香港標準字形作「羣」）</td></tr>
+      <tr><td class="hanzi">祕</td><td class="hanzi">秘</td><td>「示」部 vs「禾」部，部首不同；《常用字字形表》註「或作秘，今作祕」，教育局字詞表以「祕」為條目（9 畫），「秘」為 10 畫的通行寫法</td></tr>
       <tr><td class="hanzi">麪</td><td class="hanzi">麵</td><td>「麥」+「丏」（15 畫）vs「麥」+「面」（20 畫），結構不同（香港標準字形作「麪」）</td></tr>
       <tr><td class="hanzi">罵</td><td class="hanzi">駡</td><td>「网（罒）」部 vs「馬」部，部首不同</td></tr>
     </tbody>
