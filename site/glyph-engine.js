@@ -61,7 +61,7 @@ function hkGlyph(ch) {
   // 預設（未勾「顯示我輸入的寫法」）示範香港教育標準寫法：輸入字若有另一寫法而標準不同，
   // 字形取標準字（秘→祕、羣→群），與「字形：」標示一致（跟 web 版）。
   const stdForm = !window.CW_VARIANT_GLYPH && window.CW_STD_FORM ? window.CW_STD_FORM[hex] : null;
-  const fetchGlyph = (c) => fetch(`${glyphDir()}${c.codePointAt(0).toString(16)}.json?v=39`).then(r => (r.ok ? r.json() : null));
+  const fetchGlyph = (c) => fetch(`${glyphDir()}${c.codePointAt(0).toString(16)}.json?v=40`).then(r => (r.ok ? r.json() : null));
   const std = () => (stdForm && stdForm !== ch
     ? fetchGlyph(stdForm).then(rec => rec || fetchGlyph(ch))
     : fetchGlyph(ch));
