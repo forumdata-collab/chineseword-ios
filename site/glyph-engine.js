@@ -61,7 +61,7 @@ function hkGlyph(ch) {
   // 預設（未勾「顯示我輸入的寫法」）示範香港教育標準寫法：輸入字若有另一寫法而標準不同，
   // 字形取標準字（秘→祕、羣→群），與「字形：」標示一致（跟 web 版）。
   const stdForm = !window.CW_VARIANT_GLYPH && window.CW_STD_FORM ? window.CW_STD_FORM[hex] : null;
-  const fetchGlyph = (c) => fetch(`${glyphDir()}${c.codePointAt(0).toString(16)}.json?v=40`).then(r => (r.ok ? r.json() : null));
+  const fetchGlyph = (c) => fetch(`${glyphDir()}${c.codePointAt(0).toString(16)}.json?v=43`).then(r => (r.ok ? r.json() : null));
   const std = () => (stdForm && stdForm !== ch
     ? fetchGlyph(stdForm).then(rec => rec || fetchGlyph(ch))
     : fetchGlyph(ch));
@@ -82,7 +82,7 @@ async function glyphSource(ch) {
   if (!ch) return null;
   if (!_glyphSources) {
     try {
-      const r = await fetch(`${glyphDir()}../data/glyph_sources.json?v=243`);
+      const r = await fetch(`${glyphDir()}../data/glyph_sources.json?v=245`);
       _glyphSources = r.ok ? (await r.json()).glyphs : {};
     } catch (e) { _glyphSources = {}; }
   }
@@ -489,24 +489,39 @@ function addGlyphNumbers(svg, artScale) {
     }
     return null;
   };
+  // Uniform number size per character (2026-11-17): one MEDIAN stroke thickness
+  // for the whole character, so all number circles in it are the same size
+  // (hanziwu look kept, but no per-stroke variation — 匝 #4 was 2–3x the others).
+  // Same thickness measure as before: 2*Area/Perimeter, min-bbox fallback.
+  let medianThick = 0;
+  {
+    const th = [];
+    for (const el of strokeEls) {
+      if (!el) continue;
+      let t = strokeThickness(el);
+      if (!(t > 0)) {
+        try { const b = el.getBBox(); t = Math.min(b.width, b.height); } catch (e) { /* skip */ }
+      }
+      if (t > 0) th.push(t);
+    }
+    th.sort((a, b) => a - b);
+    if (th.length) medianThick = th.length % 2 ? th[(th.length - 1) / 2] : (th[th.length / 2 - 1] + th[th.length / 2]) / 2;
+  }
   const hooks = {
     inside: insideFn,
     inkPoint: inkPointFn,
-    // Cap a digit to its stroke's own TRUE thickness (hanziwu reference: the
-    // number circle is ~1.1x the stroke width, a discreet label, not a disc).
+    // Cap a digit to the character's MEDIAN true thickness (hanziwu reference:
+    // the number circle is ~1.1x the stroke width, a discreet label, not a disc).
+    // Uniform per character: one median thickness sizes ALL digits, so they are
+    // the same size within the character (2026-11-17: 匝 #4 was 2–3x the others).
     // Rendering: font = p.fs x 0.75, circle D = 1.2 x p.fs, so cap p.fs at
     // 0.92x thick -> D = 1.1x thick, digit ink ~0.5x thick, fits inside.
     // thick is 2*Area/Perimeter (min-bbox over-reads diagonal strokes).
     size: (i, digitCount) => {
       // 文章稀疏版面：數字固定為格闊 8%，唔跟筆畫粗幼 cap（否則幼筆數字縮到睇唔到）。
       if (artScale > 0) return articleNumFs(meta.box, artScale);
-      const el = strokeEls[i];
-      if (!el) return fs;
-      let thick = strokeThickness(el);
-      if (!(thick > 0)) {
-        try { const b = el.getBBox(); thick = Math.min(b.width, b.height); } catch (e) { return fs; }
-      }
-      if (!(thick > 0)) return fs;
+      if (!(medianThick > 0)) return fs;
+      const thick = medianThick;
       const fsEff = fs * numberBaseScale(medians.length);
       const byHeight = 0.92 * thick;
       const byWidth = 2.27 * thick / Math.max(digitCount, 1);   // ~0.55 em per digit
@@ -701,13 +716,21 @@ async function overlayStrokeNum(cell) {
     appendStrokeArrows(svg, medPolys, flipC, Math.max(hwW, hwH));
   }
   if (!wantNum) { glyph.appendChild(svg); return; }
+  // Uniform number size per character (2026-11-17): one MEDIAN HW thickness
+  // for the whole character — same rule as the EDB path (no per-stroke variation).
+  let hwMedianThick = 0;
+  {
+    const th = hwThick.filter(t => t > 0).sort((a, b) => a - b);
+    if (th.length) hwMedianThick = th.length % 2 ? th[(th.length - 1) / 2] : (th[th.length / 2 - 1] + th[th.length / 2]) / 2;
+  }
   placeNumberLabels(medPolys, { fs: numFontSize, C: flipC }, {
-    // Same rule as the EDB path: circle D ~1.1x the stroke's own true thickness.
+    // Same rule as the EDB path: circle D ~1.1x the character's MEDIAN true
+    // thickness — uniform within the character (2026-11-17).
     size: (i, digitCount) => {
       // 文章稀疏版面：數字固定為格闊 8%，唔跟筆畫粗幼 cap。
       if (cell.classList.contains('article-cell')) return articleNumFs(hwW + 2 * pad, parseFloat(cell.dataset.artScale) || 0.82);
-      const thick = hwThick[i];
-      if (!(thick > 0)) return numFontSize;
+      if (!(hwMedianThick > 0)) return numFontSize;
+      const thick = hwMedianThick;
       const fsEff = numFontSize * numberBaseScale(medPolys.length);
       const byHeight = 0.92 * thick;
       const byWidth = 2.27 * thick / Math.max(digitCount, 1);
@@ -715,7 +738,7 @@ async function overlayStrokeNum(cell) {
     },
   }).forEach(p => {
     const i = (parseInt(p.label, 10) || 1) - 1;
-    const numSz = (p.fs || numFontSize) * 0.75;   // per-stroke size (thickness-based)
+    const numSz = (p.fs || numFontSize) * 0.75;   // uniform per-character size (median thickness)
     const cy = p.cy - numSz * 0.18;   // 數字視覺中心（同 text y 一致）
     const circle = document.createElementNS(NS, 'circle');
     circle.setAttribute('class', 'stroke-num-circle');
