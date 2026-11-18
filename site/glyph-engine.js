@@ -52,7 +52,44 @@ const VARIANT_GLYPHS = { '514c': 1, '56ea': 1, '5cf0': 1, '6085': 1, '6236': 1, 
 function variantMode(ch) {
   return !!(window.CW_VARIANT_GLYPH && VARIANT_GLYPHS[ch.codePointAt(0).toString(16)]);
 }
-function clearGlyphCache() { _hkGlyphCache.clear(); _hkGlyphData.clear(); }
+
+// ===== 主線程讓出（freeze fix 2026-11-17）=====
+// installHKGlyphs 以前係一個同步迴圈做晒所有字：48 字 ≈ 5.5s 單一 long task，
+// 輸入多字撳「生成」後成頁假死。依家按字分段，每段之間讓出主線程，等輸入／繪製可以插入。
+// （實測瓶頸：strokeThickness 每筆 65 次 getPointAtLength ≈ 7–12ms；
+// getBBox/isPointInFill 只係 ~0.002ms，唔係瓶頸。）
+function yieldUI() { return new Promise(r => setTimeout(r, 0)); }
+// Time-sliced yield：自上次讓出起計未夠 budgetMs 就唔讓，避免每格都 setTimeout 嘅開銷。
+let _yieldLastT = 0;
+async function yieldIfNeeded(budgetMs) {
+  const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  if (now - _yieldLastT >= (budgetMs || 24)) {
+    _yieldLastT = now;
+    await yieldUI();
+  }
+}
+
+// ===== 生成代號（freeze fix 2026-11-17，Part A pile-up）=====
+// 每一次 renderWorksheet 都係新一代；上一代未跑完嘅 async 安裝迴圈
+// （installHKGlyphs / overlay / markNoStrokeData / installStrokePage）
+// 一偵測到代號過期就停 —— 唔再喺已 detach 嘅舊 DOM 上量度／起 SVG，
+// 亦唔再 hold 住舊樹，等 GC 收得返。否則連撳幾次「生成」／連改幾次選項，
+// 舊迴圈會同新迴圈一齊跑，愈積愈多，最後成個 renderer 塞死。
+// gen == null（舊調用，未傳代號）視為有效，唔會誤殺。
+let _cwGlyphGen = 0;
+function cwGlyphGenBegin() { return ++_cwGlyphGen; }
+function cwGlyphGenAlive(gen) { return gen == null || gen === _cwGlyphGen; }
+
+// 每字筆順數字排位快取：排位結果只取決於（字，artScale，字級），同一字喺多格／
+// 多次生成重用，唔使每次重跑 strokeThickness + placeNumberLabels。
+// 值 = { labels }（純數據；圓圈／數字 DOM 每次照舊逐格建立，顏色永遠跟當下模式）。
+const _numPlacementCache = new Map();
+// HanziWriter 後備路徑嘅幾何快取：每字量度一次（bbox + medians + 筆粗），多格重用。
+const _hwGeomCache = new Map();
+function clearGlyphCache() {
+  _hkGlyphCache.clear(); _hkGlyphData.clear();
+  _numPlacementCache.clear(); _hwGeomCache.clear();
+}
 
 function hkGlyph(ch) {
   if (!ch) return Promise.resolve(null);
@@ -61,7 +98,7 @@ function hkGlyph(ch) {
   // 預設（未勾「顯示我輸入的寫法」）示範香港教育標準寫法：輸入字若有另一寫法而標準不同，
   // 字形取標準字（秘→祕、羣→群），與「字形：」標示一致（跟 web 版）。
   const stdForm = !window.CW_VARIANT_GLYPH && window.CW_STD_FORM ? window.CW_STD_FORM[hex] : null;
-  const fetchGlyph = (c) => fetch(`${glyphDir()}${c.codePointAt(0).toString(16)}.json?v=46`).then(r => (r.ok ? r.json() : null));
+  const fetchGlyph = (c) => fetch(`${glyphDir()}${c.codePointAt(0).toString(16)}.json?v=47`).then(r => (r.ok ? r.json() : null));
   const std = () => (stdForm && stdForm !== ch
     ? fetchGlyph(stdForm).then(rec => rec || fetchGlyph(ch))
     : fetchGlyph(ch));
@@ -73,21 +110,6 @@ function hkGlyph(ch) {
     .then(rec => { if (rec) _hkGlyphData.set(ch, rec); return rec; });
   _hkGlyphCache.set(ch, p);
   return p;
-}
-
-// 字形來源（provenance）—— 顯式標記每字 glyph 從邊度嚟。
-// 回 'EDB'（香港教育局字詞表）｜'twpen'（台灣筆順字典逆向）｜null（無字形，fallback 字體）。
-let _glyphSources = null;
-async function glyphSource(ch) {
-  if (!ch) return null;
-  if (!_glyphSources) {
-    try {
-      const r = await fetch(`${glyphDir()}../data/glyph_sources.json?v=245`);
-      _glyphSources = r.ok ? (await r.json()).glyphs : {};
-    } catch (e) { _glyphSources = {}; }
-  }
-  const hex = ch.codePointAt(0).toString(16);
-  return _glyphSources[hex] || null;
 }
 
 // arc-length point at fraction f (0..1) along a polyline [[x,y]…]
@@ -342,25 +364,59 @@ function placeNumberLabels(medians, frame, hooks) {
   return placed;
 }
 
+// Off-screen probe SVG for measuring path geometry (getBBox only works on
+// attached nodes). Shared by glyphInkBBox / overlayStrokeNum — the three
+// copies of this setup used to drift apart. Caller must remove() it.
+function probeSvg() {
+  const probe = document.createElementNS(NS, 'svg');
+  probe.setAttribute('width', '0');
+  probe.setAttribute('height', '0');
+  probe.style.cssText = 'position:absolute;left:-9999px;overflow:hidden';
+  document.body.appendChild(probe);
+  return probe;
+}
+
+// Per-cell trace flags: a cell's own data-arrow / data-num win; otherwise fall
+// back to the page-wide currentOptions (index.html). Single place for the
+// rule — installHKGlyphs and overlayStrokeNum used to duplicate it, so a
+// flag-semantics change needed two edits. The typeof guard also keeps the
+// HanziWriter-fallback path safe on pages without currentOptions (picture/).
+function cellTraceFlags(cell) {
+  const opts = (typeof currentOptions !== 'undefined' && currentOptions) || {};
+  return {
+    arrow: cell && cell.dataset.arrow != null ? cell.dataset.arrow === '1' : !!opts.arrow,
+    num: cell && cell.dataset.num != null ? cell.dataset.num === '1' : opts.strokeNum !== false,
+  };
+}
+
+// Median of an array of numbers (0 when empty). Shared by the EDB and
+// HanziWriter number-sizing paths — both used to inline the same sort +
+// middle-element logic.
+function medianOf(values) {
+  const a = (values || []).slice().sort((x, y) => x - y);
+  if (!a.length) return 0;
+  return a.length % 2 ? a[(a.length - 1) / 2] : (a[a.length / 2 - 1] + a[a.length / 2]) / 2;
+}
+
 /**
  * Ink bounding box of a glyph's stroke paths. getBBox() only works on rendered
  * geometry, so the paths are measured inside an off-screen probe SVG that is removed
  * again straight away. Returns null for a degenerate (empty) record.
  */
 function glyphInkBBox(paths) {
-  const probe = document.createElementNS(NS, 'svg');
-  probe.setAttribute('width', '0'); probe.setAttribute('height', '0');
-  probe.style.cssText = 'position:absolute;left:-9999px;overflow:hidden';
-  document.body.appendChild(probe);
+  const probe = probeSvg();
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-  for (const d of paths) {
-    const p = document.createElementNS(NS, 'path');
-    p.setAttribute('d', d); probe.appendChild(p);
-    const b = p.getBBox();
-    x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y);
-    x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height);
+  try {
+    for (const d of paths) {
+      const p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', d); probe.appendChild(p);
+      const b = p.getBBox();
+      x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y);
+      x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height);
+    }
+  } finally {
+    probe.remove();
   }
-  probe.remove();
   if (!isFinite(x0) || x1 <= x0 || y1 <= y0) return null;
   return { x0, y0, x1, y1 };
 }
@@ -370,7 +426,10 @@ function glyphInkBBox(paths) {
  * Stored space is y-UP, so `C` is the flip axis that turns the display y-down again.
  * The stroke-number font size is 14% of the ink box (unchanged ratio).
  */
+const _glyphFrameCache = new WeakMap();   // frame 只取決於 rec，同一字多格重用
 function glyphFrame(rec) {
+  const cached = _glyphFrameCache.get(rec);
+  if (cached) return cached;
   const b = glyphInkBBox(rec.s);
   if (!b) return null;
   // 字身框（em）固定：以前用「自身墨跡框」做 box，等於每個字都放大到填滿格子，
@@ -379,13 +438,15 @@ function glyphFrame(rec) {
   const EM = 900;
   const box = EM;
   const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
-  return {
+  const frame = {
     ...b, box, cx, cy,
     C: b.y0 + b.y1,
     fs: box * 0.14,
     viewBox: `${(cx - box / 2).toFixed(1)} ${(cy - box / 2).toFixed(1)} `
            + `${box.toFixed(1)} ${box.toFixed(1)}`,
   };
+  _glyphFrameCache.set(rec, frame);
+  return frame;
 }
 
 // Build the display SVG for one glyph record. Ink is ~62% of the box (matches the old
@@ -460,12 +521,41 @@ function centerNumText(t, cx, cy) {
   } catch (e) { /* getBBox 失敗就保持原位 */ }
 }
 
-// Place the stroke numbers. MUST run after the SVG is attached to the document:
-// isPointInFill() returns false for detached nodes (verified), which would silently
-// disable the "stay inside your own stroke" test and let labels float in blank space.
-function addGlyphNumbers(svg, artScale) {
-  const meta = svg && svg._glyphMeta;
-  if (!meta || !meta.medians || !meta.medians.length) return;
+// One stroke-number label: white circle + coloured rim, number in the same
+// colour, ink-centred on its stroke. Shared by the EDB path (addGlyphNumbers)
+// and the HanziWriter fallback path (overlayStrokeNum) — both used to inline
+// this identical ~25-line block, so a rendering tweak needed two edits.
+// p = one entry from placeNumberLabels(); baseFs = that path's fallback size.
+function appendNumberLabel(svg, p, baseFs) {
+  const sz = (p.fs || baseFs) * 0.75;   // 數字縮細（用戶 2026-11-16：數字過大）
+  const i = (parseInt(p.label, 10) || 1) - 1;
+  const cy = p.cy - sz * 0.18;   // 數字視覺中心（同 text y 一致）
+  // 數字圓圈：白底＋彩色邊（單色模式紅，彩虹模式按筆序循環），數字同色。
+  // r = 0.8·sz（貼住數字，唔好成個大圓碟）、邊粗 ≈ 0.13·sz。
+  const circle = document.createElementNS(NS, 'circle');
+  circle.setAttribute('class', 'stroke-num-circle');
+  circle.setAttribute('cx', p.cx.toFixed(1));
+  circle.setAttribute('cy', cy.toFixed(1));
+  circle.setAttribute('r', (sz * 0.8).toFixed(1));
+  circle.setAttribute('fill', '#fff');
+  circle.setAttribute('stroke-width', Math.max(2, sz * 0.13).toFixed(1));
+  circle.setAttribute('data-stroke-i', i);
+  paintStrokeEl(circle, i);
+  svg.appendChild(circle);
+  const t = document.createElementNS(NS, 'text');
+  t.setAttribute('x', p.cx.toFixed(1));
+  t.setAttribute('y', cy.toFixed(1));
+  t.setAttribute('font-size', sz.toFixed(1));
+  t.setAttribute('data-stroke-i', i);
+  paintStrokeEl(t, i);
+  t.textContent = p.label;
+  svg.appendChild(t);
+  centerNumText(t, p.cx, cy);   // 數字墨跡置中（2026-11-16：7 字出圈）
+}
+
+// Number-placement hooks for one glyph SVG (shared by the sync and chunked paths).
+// Pure function of (meta, medianThick, artScale) — see addGlyphNumbers for the rules.
+function buildNumberHooks(meta, medianThick, artScale) {
   const { fs, C, strokeEls, medians } = meta;
   const insideFn = (i, cx, cy) => {
     const el = strokeEls[i];
@@ -489,25 +579,7 @@ function addGlyphNumbers(svg, artScale) {
     }
     return null;
   };
-  // Uniform number size per character (2026-11-17): one MEDIAN stroke thickness
-  // for the whole character, so all number circles in it are the same size
-  // (hanziwu look kept, but no per-stroke variation — 匝 #4 was 2–3x the others).
-  // Same thickness measure as before: 2*Area/Perimeter, min-bbox fallback.
-  let medianThick = 0;
-  {
-    const th = [];
-    for (const el of strokeEls) {
-      if (!el) continue;
-      let t = strokeThickness(el);
-      if (!(t > 0)) {
-        try { const b = el.getBBox(); t = Math.min(b.width, b.height); } catch (e) { /* skip */ }
-      }
-      if (t > 0) th.push(t);
-    }
-    th.sort((a, b) => a - b);
-    if (th.length) medianThick = th.length % 2 ? th[(th.length - 1) / 2] : (th[th.length / 2 - 1] + th[th.length / 2]) / 2;
-  }
-  const hooks = {
+  return {
     inside: insideFn,
     inkPoint: inkPointFn,
     // Cap a digit to the character's MEDIAN true thickness (hanziwu reference:
@@ -541,37 +613,113 @@ function addGlyphNumbers(svg, artScale) {
       return ov && ov[i] != null ? ov[i] : null;
     },
   };
-  placeNumberLabels(medians, { fs, C }, hooks).forEach(p => {
-    const sz = (p.fs || fs) * 0.75;   // 數字縮細（用戶 2026-11-16：數字過大）
-    const i = (parseInt(p.label, 10) || 1) - 1;
-    const cy = p.cy - sz * 0.18;   // 數字視覺中心（同 text y 一致）
-    // 數字圓圈：白底＋彩色邊（單色模式紅，彩虹模式按筆序循環），數字同色。
-    // r = 0.8·sz（貼住數字，唔好成個大圓碟）、邊粗 ≈ 0.13·sz。
-    const circle = document.createElementNS(NS, 'circle');
-    circle.setAttribute('class', 'stroke-num-circle');
-    circle.setAttribute('cx', p.cx.toFixed(1));
-    circle.setAttribute('cy', cy.toFixed(1));
-    circle.setAttribute('r', (sz * 0.8).toFixed(1));
-    circle.setAttribute('fill', '#fff');
-    circle.setAttribute('stroke-width', Math.max(2, sz * 0.13).toFixed(1));
-    circle.setAttribute('data-stroke-i', i);
-    paintStrokeEl(circle, i);
-    svg.appendChild(circle);
-    const t = document.createElementNS(NS, 'text');
-    t.setAttribute('x', p.cx.toFixed(1));
-    t.setAttribute('y', cy.toFixed(1));
-    t.setAttribute('font-size', sz.toFixed(1));
-    t.setAttribute('data-stroke-i', i);
-    paintStrokeEl(t, i);
-    t.textContent = p.label;
-    svg.appendChild(t);
-    centerNumText(t, p.cx, cy);   // 數字墨跡置中（2026-11-16：7 字出圈）
-  });
+}
+
+// Uniform number size per character (2026-11-17): one MEDIAN stroke thickness
+// for the whole character, so all number circles in it are the same size
+// (hanziwu look kept, but no per-stroke variation — 匝 #4 was 2–3x the others).
+// Same thickness measure as before: 2*Area/Perimeter, min-bbox fallback.
+function medianStrokeThickness(strokeEls) {
+  const th = [];
+  for (const el of strokeEls) {
+    if (!el) continue;
+    let t = strokeThickness(el);
+    if (!(t > 0)) {
+      try { const b = el.getBBox(); t = Math.min(b.width, b.height); } catch (e) { /* skip */ }
+    }
+    if (t > 0) th.push(t);
+  }
+  return medianOf(th);
+}
+
+// Chunked version: same numbers, but yields to the event loop roughly every
+// 40ms of measuring (≈50ms max block — strokeThickness is ~7–12ms per stroke).
+// Used by the worksheet path so a long input never freezes the page.
+// Time-based (not every-N-strokes): stroke cost varies with outline complexity.
+async function medianStrokeThicknessChunked(strokeEls, gen) {
+  const th = [];
+  let t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  for (let s = 0; s < strokeEls.length; s++) {
+    const el = strokeEls[s];
+    if (!el) continue;
+    let t = strokeThickness(el);
+    if (!(t > 0)) {
+      try { const b = el.getBBox(); t = Math.min(b.width, b.height); } catch (e) { /* skip */ }
+    }
+    if (t > 0) th.push(t);
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if (now - t0 >= 40) {
+      await yieldUI(); t0 = now;
+      if (!cwGlyphGenAlive(gen)) return null;   // 已被新一代取代：停，唔好再量度
+    }
+  }
+  return medianOf(th);
+}
+
+// Pure number-placement computation for one glyph (no DOM writes).
+function computeGlyphNumbers(meta, artScale) {
+  const { fs, C, medians } = meta;
+  const medianThick = medianStrokeThickness(meta.strokeEls);
+  const labels = placeNumberLabels(medians, { fs, C }, buildNumberHooks(meta, medianThick, artScale));
+  return { labels };
+}
+async function computeGlyphNumbersChunked(meta, artScale, gen) {
+  const { fs, C, medians } = meta;
+  const medianThick = await medianStrokeThicknessChunked(meta.strokeEls, gen);
+  if (medianThick == null) return null;   // 已被新一代取代
+  const labels = placeNumberLabels(medians, { fs, C }, buildNumberHooks(meta, medianThick, artScale));
+  return { labels };
+}
+
+// Render already-placed labels into an SVG (cheap DOM writes only).
+function renderGlyphNumbers(svg, meta, computed) {
+  computed.labels.forEach(p => appendNumberLabel(svg, p, meta.fs));
+}
+
+// Placement cache key: placement depends only on (char, artScale, font size);
+// the geometry itself comes from the glyph record, which clearGlyphCache()
+// invalidates whenever the variant/std-form mapping changes.
+function numPlacementKey(meta, artScale) {
+  return meta.ch + '|' + (artScale || 0) + '|' + meta.fs;
+}
+
+// Place the stroke numbers. MUST run after the SVG is attached to the document:
+// isPointInFill() returns false for detached nodes (verified), which would silently
+// disable the "stay inside your own stroke" test and let labels float in blank space.
+function addGlyphNumbers(svg, artScale) {
+  const meta = svg && svg._glyphMeta;
+  if (!meta || !meta.medians || !meta.medians.length) return;
+  const key = numPlacementKey(meta, artScale);
+  let computed = _numPlacementCache.get(key);
+  if (!computed) {
+    computed = computeGlyphNumbers(meta, artScale);
+    _numPlacementCache.set(key, computed);
+  }
+  renderGlyphNumbers(svg, meta, computed);
+}
+
+// Chunked async twin of addGlyphNumbers (same output, yields while measuring).
+// Used by installHKGlyphs; the sync version stays for picture/ and other callers.
+// Returns false when aborted (superseded generation), true otherwise.
+async function addGlyphNumbersAsync(svg, artScale, gen) {
+  const meta = svg && svg._glyphMeta;
+  if (!meta || !meta.medians || !meta.medians.length) return true;
+  const key = numPlacementKey(meta, artScale);
+  let computed = _numPlacementCache.get(key);
+  if (!computed) {
+    computed = await computeGlyphNumbersChunked(meta, artScale, gen);
+    if (!computed) return false;   // 已被新一代取代：唔畫數字，唔入快取
+    _numPlacementCache.set(key, computed);
+  }
+  renderGlyphNumbers(svg, meta, computed);
+  return true;
 }
 
 // Install HK glyphs into .char-glyph / .guide-glyph spans (font glyph = fallback).
 // Numbers go on the first tracing cell only.
-async function installHKGlyphs(root) {
+// gen = generation token from renderWorksheet: stale generations stop early
+// instead of grinding through detached DOM.
+async function installHKGlyphs(root, gen) {
   const els = [...root.querySelectorAll('.char-glyph[data-ch], .guide-glyph[data-ch]')];
   if (!els.length) return new Set();
   const chars = [...new Set(els.map(e => e.dataset.ch))]
@@ -582,13 +730,17 @@ async function installHKGlyphs(root) {
     const rec = await hkGlyph(ch);
     if (rec && rec.s && rec.s.length) recs.set(ch, rec);
   }));
+  if (!cwGlyphGenAlive(gen)) return new Set();   // 等字形嗰陣已經被新一代取代
   const handled = new Set();
-  els.forEach(el => {
+  // 逐格安裝，中間讓出主線程：以前呢個迴圈係同步一次過做晒所有字，
+  // 筆順數字量度（strokeThickness）令 48 字卡住主線程 ~5.5s，成頁假死。
+  // 依家每格之後按需讓出，數字逐字浮現，輸入／捲動全程可用；最終 DOM 完全一樣。
+  for (const el of els) {
     const rec = recs.get(el.dataset.ch);
-    if (!rec) return;
+    if (!rec) continue;
     const withNum = el.classList.contains('guide-glyph') && !!el.closest('.stroke-num-cell');
     const svg = hkGlyphSvg(rec, el.dataset.ch);
-    if (!svg) return;
+    if (!svg) continue;
     el.textContent = '';
     el.style.transform = '';           // font-based optical normalisation not needed
     el.appendChild(svg);
@@ -596,15 +748,19 @@ async function installHKGlyphs(root) {
       paintGlyphInk(svg);   // 示範格：墨跡按筆序上色（彩虹模式）／淡粉紅（單色）
       // per-cell flags：第一示範格跟示範格格式，其餘格跟練習格格式（唔可以讀全局 currentOptions）
       const cellEl = el.closest('.stroke-num-cell');
-      const wantArrow = cellEl && cellEl.dataset.arrow != null ? cellEl.dataset.arrow === '1' : !!currentOptions.arrow;
-      const wantNum = cellEl && cellEl.dataset.num != null ? cellEl.dataset.num === '1' : currentOptions.strokeNum !== false;
+      const { arrow: wantArrow, num: wantNum } = cellTraceFlags(cellEl);
       if (wantArrow) {
         appendStrokeArrows(svg, rec.m, svg._glyphMeta.C, svg._glyphMeta.box);
       }
-      if (wantNum) addGlyphNumbers(svg, (cellEl && cellEl.classList.contains('article-cell')) ? (parseFloat(cellEl.dataset.artScale) || 0.82) : 0);   // 數字最上層
+      if (wantNum) {
+        const okNum = await addGlyphNumbersAsync(svg, (cellEl && cellEl.classList.contains('article-cell')) ? (parseFloat(cellEl.dataset.artScale) || 0.82) : 0, gen);   // 數字最上層
+        if (!okNum) return handled;   // 已被新一代取代：停
+      }
     }
     handled.add(el.dataset.ch);
-  });
+    await yieldIfNeeded(100);
+    if (!cwGlyphGenAlive(gen)) return handled;   // 已被新一代取代：停
+  }
   return handled;
 }
 
@@ -617,57 +773,78 @@ function _hwCharData(ch) {
   return p;
 }
 
+// Measure one HanziWriter character's geometry (bbox + medians + per-stroke
+// thickness). Pure function of `data`; cached per char so repeated cells reuse
+// it. Yields every 4 strokes — strokeThickness is ~7–12ms per stroke.
+async function measureHwGeom(data, gen) {
+  const probe = probeSvg();
+  let hwX0 = Infinity, hwY0 = Infinity, hwX1 = -Infinity, hwY1 = -Infinity;
+  const medPolys = [];
+  const hwThick = [];   // per-stroke true thickness (2*Area/Perimeter), HW 1024-space
+  let t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  // Number anchor = a point on the stroke's MEDIAN (true centreline). HW `strokes` are
+  // closed ink contours — their geometric midpoint can land on a stroke tip, so the
+  // centreline (medians, already reordered to HK order) is used instead.
+  try {
+    for (let si = 0; si < data.strokes.length; si++) {
+      const d = data.strokes[si];
+      const p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', d); probe.appendChild(p);
+      const b = p.getBBox();
+      let th = strokeThickness(p);
+      if (!(th > 0)) th = Math.min(b.width, b.height);
+      hwThick.push(th);
+      hwX0 = Math.min(hwX0, b.x); hwY0 = Math.min(hwY0, b.y);
+      hwX1 = Math.max(hwX1, b.x + b.width); hwY1 = Math.max(hwY1, b.y + b.height);
+      const med = data.medians && data.medians[si];
+      if (med && med.length > 1) {
+        medPolys.push(med);
+      } else {
+        let pt;
+        try {
+          const len = p.getTotalLength();
+          pt = p.getPointAtLength(len * 0.5);
+        } catch (e) {
+          pt = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+        }
+        medPolys.push([[pt.x, pt.y], [pt.x, pt.y]]);
+      }
+      const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+      if (now - t0 >= 40) {
+        await yieldUI(); t0 = now;
+        if (!cwGlyphGenAlive(gen)) return null;   // 已被新一代取代：停
+      }
+    }
+  } finally {
+    probe.remove();
+  }
+  return { hwX0, hwY0, hwX1, hwY1, medPolys, hwThick };
+}
+
 // Inject numbered SVG strokes into a .stroke-num-cell.
 // The SVG lives INSIDE the .guide-glyph span, so it tracks the glyph's own box
 // (font-size driven) in EVERY media — screen px map, print cm, any size — with
 // no pixel measurement. Numbers are placed in HanziWriter's 1024-space via the
 // viewBox; preserveAspectRatio=meet fits them to the (square, CJK) glyph box.
-async function overlayStrokeNum(cell) {
+async function overlayStrokeNum(cell, gen) {
   const ch = cell.dataset.ch;
   if (!ch) return;
   const data = await _hwCharData(ch);
   if (!data || !data.strokes || !data.strokes.length) return;
+  if (!cwGlyphGenAlive(gen)) return;   // 等資料嗰陣已經被新一代取代
 
   const glyph = cell.querySelector('.guide-glyph');
   if (!glyph) return;
 
   // --- 1. measure HanziWriter stroke bbox + number anchors (in HW 1024-space) ---
-  const probe = document.createElementNS(NS, 'svg');
-  probe.setAttribute('width', '0');
-  probe.setAttribute('height', '0');
-  probe.style.cssText = 'position:absolute;left:-9999px;overflow:hidden';
-  document.body.appendChild(probe);
-  let hwX0 = Infinity, hwY0 = Infinity, hwX1 = -Infinity, hwY1 = -Infinity;
-  const medPolys = [];
-  const hwThick = [];   // per-stroke true thickness (2*Area/Perimeter), HW 1024-space
-  // Number anchor = a point on the stroke's MEDIAN (true centreline). HW `strokes` are
-  // closed ink contours — their geometric midpoint can land on a stroke tip, so the
-  // centreline (medians, already reordered to HK order) is used instead.
-  for (let si = 0; si < data.strokes.length; si++) {
-    const d = data.strokes[si];
-    const p = document.createElementNS(NS, 'path');
-    p.setAttribute('d', d); probe.appendChild(p);
-    const b = p.getBBox();
-    let th = strokeThickness(p);
-    if (!(th > 0)) th = Math.min(b.width, b.height);
-    hwThick.push(th);
-    hwX0 = Math.min(hwX0, b.x); hwY0 = Math.min(hwY0, b.y);
-    hwX1 = Math.max(hwX1, b.x + b.width); hwY1 = Math.max(hwY1, b.y + b.height);
-    const med = data.medians && data.medians[si];
-    if (med && med.length > 1) {
-      medPolys.push(med);
-    } else {
-      let pt;
-      try {
-        const len = p.getTotalLength();
-        pt = p.getPointAtLength(len * 0.5);
-      } catch (e) {
-        pt = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
-      }
-      medPolys.push([[pt.x, pt.y], [pt.x, pt.y]]);
-    }
+  // （每字量度一次，多格／多次生成重用；量度本身按筆分段讓出。）
+  let geom = _hwGeomCache.get(ch);
+  if (!geom) {
+    geom = await measureHwGeom(data, gen);
+    if (!geom) return;   // 已被新一代取代：唔入快取，唔畫 overlay
+    _hwGeomCache.set(ch, geom);
   }
-  probe.remove();
+  const { hwX0, hwY0, hwX1, hwY1, medPolys, hwThick } = geom;
 
   // --- 2. build overlay SVG (viewBox = HW bbox + padding) ---
   const hwW = hwX1 - hwX0, hwH = hwY1 - hwY0;
@@ -709,8 +886,7 @@ async function overlayStrokeNum(cell) {
   }
   svg.appendChild(inkG);
   // per-cell flags（同 installHKGlyphs 一致）：唔可以讀全局 currentOptions
-  const wantArrow = cell.dataset.arrow != null ? cell.dataset.arrow === '1' : !!currentOptions.arrow;
-  const wantNum = cell.dataset.num != null ? cell.dataset.num === '1' : currentOptions.strokeNum !== false;
+  const { arrow: wantArrow, num: wantNum } = cellTraceFlags(cell);
   // 方向箭咀（同一 flip 修正）先畫，數字後畫 = 數字喺最上層
   if (wantArrow) {
     appendStrokeArrows(svg, medPolys, flipC, Math.max(hwW, hwH));
@@ -718,11 +894,7 @@ async function overlayStrokeNum(cell) {
   if (!wantNum) { glyph.appendChild(svg); return; }
   // Uniform number size per character (2026-11-17): one MEDIAN HW thickness
   // for the whole character — same rule as the EDB path (no per-stroke variation).
-  let hwMedianThick = 0;
-  {
-    const th = hwThick.filter(t => t > 0).sort((a, b) => a - b);
-    if (th.length) hwMedianThick = th.length % 2 ? th[(th.length - 1) / 2] : (th[th.length / 2 - 1] + th[th.length / 2]) / 2;
-  }
+  const hwMedianThick = medianOf(hwThick.filter(t => t > 0));
   placeNumberLabels(medPolys, { fs: numFontSize, C: flipC }, {
     // Same rule as the EDB path: circle D ~1.1x the character's MEDIAN true
     // thickness — uniform within the character (2026-11-17).
@@ -737,28 +909,7 @@ async function overlayStrokeNum(cell) {
       return Math.max(26, Math.min(fsEff, byHeight, byWidth));
     },
   }).forEach(p => {
-    const i = (parseInt(p.label, 10) || 1) - 1;
-    const numSz = (p.fs || numFontSize) * 0.75;   // uniform per-character size (median thickness)
-    const cy = p.cy - numSz * 0.18;   // 數字視覺中心（同 text y 一致）
-    const circle = document.createElementNS(NS, 'circle');
-    circle.setAttribute('class', 'stroke-num-circle');
-    circle.setAttribute('cx', p.cx.toFixed(1));
-    circle.setAttribute('cy', cy.toFixed(1));
-    circle.setAttribute('r', (numSz * 0.8).toFixed(1));
-    circle.setAttribute('fill', '#fff');
-    circle.setAttribute('stroke-width', Math.max(2, numSz * 0.13).toFixed(1));
-    circle.setAttribute('data-stroke-i', i);
-    paintStrokeEl(circle, i);
-    svg.appendChild(circle);
-    const t = document.createElementNS(NS, 'text');
-    t.setAttribute('x', p.cx.toFixed(1));
-    t.setAttribute('y', cy.toFixed(1));
-    t.setAttribute('font-size', numSz.toFixed(1));
-    t.setAttribute('data-stroke-i', i);
-    paintStrokeEl(t, i);
-    t.textContent = p.label;
-    svg.appendChild(t);
-    centerNumText(t, p.cx, cy);   // 數字墨跡置中（2026-11-16：7 字出圈）
+    appendNumberLabel(svg, p, numFontSize);
   });
 
   glyph.appendChild(svg);
@@ -900,25 +1051,15 @@ function strokePageHtml(o) {
   return `<div class="stroke-page"><div class="stroke-page-title">🖊️ 筆順工作紙</div>${rows}</div>`;
 }
 
-/** 墨跡框（用離屏 probe 量 paths 嘅 union bbox）+ 翻轉軸 C + 方形 viewBox。 */
+/** 墨跡框（用離屏 probe 量 paths 嘅 union bbox）+ 翻轉軸 C + 方形 viewBox。
+ * 框本身由 glyphInkBBox 量（唔好再複製一次量 bbox 嘅迴圈）。 */
 function measureInkFrame(paths) {
-  const probe = document.createElementNS(NS, 'svg');
-  probe.setAttribute('width', '0');
-  probe.setAttribute('height', '0');
-  probe.style.cssText = 'position:absolute;left:-9999px;overflow:hidden';
-  document.body.appendChild(probe);
-  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  let b;
   try {
-    for (const d of paths) {
-      const p = document.createElementNS(NS, 'path');
-      p.setAttribute('d', d); probe.appendChild(p);
-      const b = p.getBBox();
-      x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y);
-      x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height);
-    }
-  } catch (e) { /* fall through */ }
-  probe.remove();
-  if (!(x1 > x0) || !(y1 > y0)) return null;
+    b = glyphInkBBox(paths);
+  } catch (e) { return null; }
+  if (!b) return null;
+  const { x0, y0, x1, y1 } = b;
   const box = Math.max(x1 - x0, y1 - y0);
   const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
   return {

@@ -5,12 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>中文筆順練習簿 — 粵音普通話朗讀 · 筆順練習 · 列印練習紙</title>
 <link href="fonts/lxgw.css" rel="stylesheet">
-<script src="data.js?v=1794921914"></script>
+<script src="data.js?v=1794962240"></script>
 <script src="hk_order.js?v=1794821673"></script>
 <script src="hw_hk_same.js?v=1"></script>
 <script src="stroke_seq.js?v=3"></script>
-<script src="glyph-engine.js?v=43"></script>
+<script src="glyph-engine.js?v=45"></script>
 <script src="hanzi-writer.min.js"></script>
+<!-- B2-1 (v256): HanziWriter library now loads from the bundled local copy
+     (v3.5.0, same as the CDN build) instead of jsdelivr, so stroke animation
+     and quiz work fully offline. The char DATA for EDB glyphs is already local
+     (glyphs/*.json via hkCharDataLoader); only non-EDB fallback chars still
+     fetch hanzi-writer-data from the CDN, and that path fails safe. -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>✍️</text></svg>">
 <style>
 :root {
@@ -59,13 +64,13 @@ body {
   top: -20px;
   font-size: 200px;
   opacity: 0.07;
-  font-family: "Noto Serif TC", "KaiTi", "STKaiti", serif;
+  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'STKaiti', serif;
 }
 .hero h1 {
   font-size: 1.6em;
   font-weight: 700;
   letter-spacing: 0.08em;
-  font-family: "Noto Serif TC", "Songti TC", "STSong", serif;
+  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'STKaiti', serif;
   margin-bottom: 2px;
 }
 .hero p { opacity: 0.9; margin-top: 2px; font-size: 0.88em; }
@@ -108,7 +113,7 @@ body {
   border: 2px solid #ddd;
   border-radius: 8px;
   font-size: 1.2em;
-  font-family: "Noto Serif TC", "Songti TC", "STSong", "KaiTi", serif;
+  font-family: "LXGW WenKai TC", "KaiTi", "STKaiti", "Noto Serif TC", "Songti TC", serif;
   resize: vertical;
   transition: border-color 0.2s;
   background: white;
@@ -253,7 +258,7 @@ body {
   font-size: 1.6em;
   font-weight: 700;
   color: var(--red);
-  font-family: "Noto Serif TC", "Songti TC", "STSong", serif;
+  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'STKaiti', serif;
   letter-spacing: 0.1em;
   line-height: 1.3;
 }
@@ -1102,7 +1107,7 @@ details.advance-collapse summary:hover { color: var(--red); }
 .preview-heading h2 {
   font-size: 1.15em;
   color: var(--red);
-  font-family: "Noto Serif TC", "Songti TC", serif;
+  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'STKaiti', serif;
   letter-spacing: 0.05em;
 }
 .preview-heading p { font-size: 0.82em; color: #999; margin-top: 2px; }
@@ -1663,6 +1668,7 @@ html.cw-simple .cw-adv-hide { display: none !important; }
   <button onclick="printWorksheet()" title="列印練習紙 (A4)"><span class="pb-ico">🖨️</span><span class="pb-lbl">列印</span></button>
   <button onclick="openA4Preview()" title="列印前先睇 A4 版面效果"><span class="pb-ico">📐</span><span class="pb-lbl">A4<br>預覽</span></button>
   <button id="btnQuizMode" onclick="toggleQuizMode()" title="默書模式：隱藏讀音，只留練習格"><span class="pb-ico">✍️</span><span class="pb-lbl">默書<br>模式</span></button>
+  <button id="btnDictQuiz" onclick="cwQuizStart()" title="默書測驗：按輸入文字逐字試寫，計分（最多 10 字；無輸入文字時用生字冊）"><span class="pb-ico">📝</span><span class="pb-lbl">默書<br>測驗</span></button>
   <button id="btnReadAllCanto" onclick="readAllText('canto')" title="朗讀全文（粵語）"><span class="pb-ico">🔊</span><span class="pb-lbl">粵語<br>朗讀</span></button>
   <button id="btnReadAllMand" onclick="readAllText('mand')" title="朗讀全文（普通話）"><span class="pb-ico">🔊</span><span class="pb-lbl">普通話<br>朗讀</span></button>
 </div>
@@ -1746,6 +1752,7 @@ html.cw-simple .cw-adv-hide { display: none !important; }
     </div>
     <div class="modal-controls">
       <button class="primary" onclick="strokeReplay()">▶ 重播</button>
+      <button id="btnStrokePause" onclick="strokeTogglePause()">⏸ 暫停</button>
       <button onclick="strokeStep()">⏭ 逐筆</button>
       <button onclick="closeModal('strokeModal')">關閉</button>
     </div>
@@ -1802,7 +1809,7 @@ let GLYPH_SOURCES = {};
 let VARIANT_PAIRS = {};
 function loadGlyphMeta() {
   Promise.all([
-    fetch('data/glyph_sources.json?v=245').then(r => (r.ok ? r.json() : null)).catch(() => null),
+    fetch('data/glyph_sources.json?v=246').then(r => (r.ok ? r.json() : null)).catch(() => null),
     fetch('data/variant_pairs.json?v=237').then(r => (r.ok ? r.json() : null)).catch(() => null),
   ]).then(([gs, vp]) => {
     if (gs) GLYPH_SOURCES = gs.glyphs || {};
@@ -1935,7 +1942,7 @@ function isPunct(ch) { return PUNCT_SET.has(ch); }
 
 // parse input into sentences (split by 。！？, keep CJK + full-width punct as cells)
 function parseSentences(text) {
-  const keep = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF，。！？、；：「」『』（）《》〈〉【】〔〕…—–·]/g;
+  const keep = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u{20000}-\u{2FFFF}，。！？、；：「」『』（）《》〈〉【】〔〕…—–·]/gu;
   const cleaned = (text.match(keep) || []).join('');
   const out = [];
   let cur = [];
@@ -1953,7 +1960,7 @@ function parseSentences(text) {
 // ===== CHARACTER PARSING =====
 function parseInput(text) {
   // Keep CJK chars + full-width punctuation (each symbol = one cell)
-  const regex = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF，。！？、；：「」『』（）《》〈〉【】〔〕…—–·]/gu;
+  const regex = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u{20000}-\u{2FFFF}，。！？、；：「」『』（）《》〈〉【】〔〕…—–·]/gu;
   return (text.match(regex) || []);
 }
 
@@ -2041,6 +2048,23 @@ function readOptions() {
   };
 }
 
+// ===== M1-1 (v256): 生成失敗時清走舊練習簿 =====
+// 以前 generate() 喺驗證失敗（空輸入／無中文字）或 renderWorksheet() 拋錯時
+// 直接 return，舊練習簿繼續顯示，令用戶以為新內容已生成。依家失敗時
+// 清走舊內容，回復空狀態，唔再顯示過時練習簿。
+function clearWorksheetDisplay() {
+  const ws = document.getElementById('worksheet');
+  const es = document.getElementById('emptyState');
+  const pb = document.getElementById('printBar');
+  const ph = document.getElementById('previewHeading');
+  const pd = document.getElementById('previewDash');
+  if (ws) { ws.style.display = 'none'; ws.innerHTML = ''; }
+  if (es) es.style.display = '';
+  if (pb) pb.classList.remove('show');
+  if (ph) ph.style.display = 'none';
+  if (pd) pd.style.display = 'none';
+}
+
 function generate() {
   const opts = readOptions();
   // @page 規則係全局：文章模式設 8mm、其他模式要清空，否則會蓋過一般 12mm 邊界
@@ -2054,7 +2078,7 @@ function generate() {
   } catch(e) {}
 
   let raw = document.getElementById('inputText').value.trim();
-  if (!raw) { showToast('請輸入中文字'); return; }
+  if (!raw) { clearWorksheetDisplay(); showToast('請輸入中文字'); return; }
 
   // half-width punctuation → full-width (標點佔一格)
   raw = normalizePunct(raw);
@@ -2067,7 +2091,7 @@ function generate() {
 
   currentArticleText = raw;
   let chars = parseInput(raw);
-  if (chars.length === 0 && (opts.layout || 'word') !== 'article') { showToast('未找到中文字'); return; }
+  if (chars.length === 0 && (opts.layout || 'word') !== 'article') { clearWorksheetDisplay(); showToast('未找到中文字'); return; }
 
   if (opts.dedup) {
     const seen = new Set();
@@ -2127,7 +2151,15 @@ function generate() {
     quizMode: opts.quizMode,
   };
 
-  renderWorksheet();
+  try {
+    renderWorksheet();
+  } catch (err) {
+    // M1-1: render 失敗唔好留低舊練習簿；清走並話畀用戶知
+    clearWorksheetDisplay();
+    showToast('生成失敗，請再試一次');
+    if (window.console && console.error) console.error('generate render failed', err);
+    return;
+  }
   document.getElementById('printBar').classList.add('show');
   document.getElementById('worksheet').style.display = '';
   document.getElementById('emptyState').style.display = 'none';
@@ -2423,7 +2455,7 @@ function sentenceSectionHtml(o) {
 // 字形用同一個 glyph SVG 座標系（viewBox = 墨跡 bbox、C 翻轉），所以螢幕/列印/任何字級自動跟。
 
 
-async function installStrokePage(root) {
+async function installStrokePage(root, gen) {
   const cells = [...root.querySelectorAll('.stroke-step-cell[data-step-ch]')];
   if (!cells.length) return;
   const byChar = new Map();
@@ -2432,16 +2464,20 @@ async function installStrokePage(root) {
     if (!byChar.has(ch)) byChar.set(ch, []);
     byChar.get(ch).push(c);
   });
+  const alive = () => (typeof cwGlyphGenAlive !== 'function') || cwGlyphGenAlive(gen);
   for (const [ch, list] of byChar) {
+    if (!alive()) return;   // 已被新一代取代：停，唔再起筆順工作紙
     let paths = null, medians = null;
     try {
       const rec = await hkGlyph(ch);
       if (rec && rec.s && rec.s.length) { paths = rec.s; medians = rec.m; }
     } catch (e) { /* try HW below */ }
+    if (!alive()) return;
     if (!paths) {
       const d = await _hwCharData(ch);
       if (d && d.strokes && d.strokes.length) { paths = d.strokes; medians = d.medians; }
     }
+    if (!alive()) return;
     if (!paths) continue;                       // 無字形（STROKE_SEQ）→ 留低字體字形
     const frame = measureInkFrame(paths);
     if (!frame) continue;
@@ -2489,20 +2525,29 @@ function setWsFooter(o) {
  *  2) Characters missing from EDB fall back to HanziWriter data + HK stroke order.
  *  3) Characters with neither source get \u7b46\u9806/\u8a66\u5beb greyed out.
  */
-async function installGlyphLayer(content) {
+async function installGlyphLayer(content, gen) {
+  if (gen == null && typeof cwGlyphGenBegin === 'function') gen = cwGlyphGenBegin();
   await new Promise(r => setTimeout(r, 80));
+  if (typeof cwGlyphGenAlive === 'function' && !cwGlyphGenAlive(gen)) return;
   let handled = new Set();
   try {
-    handled = await installHKGlyphs(content);
+    handled = await installHKGlyphs(content, gen);
   } catch (e) { /* fall through to font glyphs */ }
-  // Fire all cells in parallel: the lazy CJK font subsets then load
-  // concurrently instead of one cell serial-blocking the rest.
-  content.querySelectorAll('.stroke-num-cell').forEach(cell => {
-    if (handled.has(cell.dataset.ch)) return;
-    overlayStrokeNum(cell).catch(() => { /* skip broken cell */ });
-  });
+  if (typeof cwGlyphGenAlive === 'function' && !cwGlyphGenAlive(gen)) return;
+  // 逐格順序安裝（中間讓出主線程）：以前一次過 fire 晒全部 overlayStrokeNum，
+  // 每格嘅量度工作喺同一個 microtask 段內連續執行，長文一樣會卡。
+  // 先預熱全部 HanziWriter 資料請求（等佢哋並行下載），再逐格安裝。
+  const numCells = [...content.querySelectorAll('.stroke-num-cell')];
+  const unhandledChars = [...new Set(numCells.map(c => c.dataset.ch).filter(ch => ch && !handled.has(ch)))];
+  unhandledChars.forEach(ch => { try { _hwCharData(ch); } catch (e) { /* overlay 嗰陣再處理 */ } });
+  for (const cell of numCells) {
+    if (handled.has(cell.dataset.ch)) continue;
+    if (typeof cwGlyphGenAlive === 'function' && !cwGlyphGenAlive(gen)) return;
+    try { await overlayStrokeNum(cell, gen); } catch (e) { /* skip broken cell */ }
+    if (typeof yieldIfNeeded === 'function') await yieldIfNeeded(100);
+  }
   // 未收錄字（無教育局字形又無 HanziWriter 資料）→ 灰掉筆順／試寫
-  markNoStrokeData(content).catch(() => { /* non-fatal */ });
+  markNoStrokeData(content, gen).catch(() => { /* non-fatal */ });
 }
 
 
@@ -2674,6 +2719,9 @@ function renderWorksheet() {
   const o = currentOptions;
   const ws = document.getElementById('worksheet');
   const content = document.getElementById('wsContent');
+  // 新一代：上一代未跑完嘅 async 字形安裝迴圈見到代號過期就會停，
+  // 唔會喺舊（已 detach）嘅 #wsContent 上繼續做嘢（Part A pile-up）。
+  const gen = (typeof cwGlyphGenBegin === 'function') ? cwGlyphGenBegin() : null;
 
   // 直出異體字：字形跟着輸入字（峰／峯 各自成形）。模式一變就要清字形 cache，否則會沿用上一模式嘅字形。
   const wantVariant = o.variant === true;
@@ -2690,7 +2738,7 @@ function renderWorksheet() {
     content.innerHTML = articlePagesHtml(o);
     content.classList.toggle('quiz-mode', !!o.quizMode);
     setWsFooter(o);
-    installGlyphLayer(content);
+    installGlyphLayer(content, gen);
     fitArticlePages();
     return;
   } else {
@@ -2718,8 +2766,8 @@ function renderWorksheet() {
   setWsFooter(o);
   normalizeGlyphs();
 
-  installGlyphLayer(content);
-  installStrokePage(content).catch(() => { /* non-fatal */ });
+  installGlyphLayer(content, gen);
+  installStrokePage(content, gen).catch(() => { /* non-fatal */ });
 }
 
 // ===== OPTICAL NORMALIZATION (balance per-char ink size) =====
@@ -2862,7 +2910,7 @@ function openA4Preview() {
   }
   info.textContent = `排版：${o.layout === 'article' ? '文章抄寫紙' : o.layout === 'sentence' ? '整句' : o.layout === 'word+sentence' ? '每字+整句' : '每字'}
     · 印刷格：${o.printSize === 'auto' ? '自動（' + (o.size || '中') + '屏）' : o.printSize}
-    · 導線：${o.guideStyle || '米字格'} · 字數：${(currentChars || []).length}`;
+    · 導線：${(GUIDE_STYLES[o.guideStyle] || GUIDE_STYLES[GUIDE_DEFAULT]).label} · 字數：${(currentChars || []).length}`;
   warn.textContent = perRowNote;
 
   // —— build a print-styled clone: same vars @media print would set ——
@@ -3105,10 +3153,23 @@ function renderStrokeWriter() {
     // CSS shrink scales the character instead of cropping it.
     const svg = target.querySelector('svg');
     if (svg) svg.setAttribute('viewBox', '0 0 ' + size + ' ' + size);
+    strokeResetPauseBtn();   // B2-3: new animation starts un-paused
     const p = strokeWriter.animateCharacter();
     if (p && p.catch) p.catch(() => showStrokeUnavailable(ch));
   } catch(e) {
-    target.innerHTML = `<div style="font-size:120px;font-family:'Noto Serif TC','Songti TC',serif;line-height:1;">${esc(ch)}</div><p style="margin-top:10px;color:#999;">此字暫無筆順數據</p>`;
+    // B2-2 (v256): this catch only runs when the char was already confirmed
+    // to HAVE stroke data (openStrokeModal checked strokeUnavailable first),
+    // so a failure here is a LOAD failure, not missing data. Say so, clear
+    // the (possibly stale) writer, and disable the action buttons so
+    // 重播/逐筆 are not left dead (or replaying a previous character).
+    strokeWriter = null;
+    target.innerHTML = `<div style="font-size:120px;font-family:'LXGW WenKai TC','KaiTi','STKaiti',serif;line-height:1;">${esc(ch)}</div><p style="margin-top:10px;color:#999;">筆順動畫載入失敗，請關閉後再試一次</p>`;
+    document.querySelectorAll(`#strokeModal button, #strokeModal input`).forEach(el => {
+      if (el.classList.contains('modal-close')) return;
+      if (/關閉|close/i.test(el.textContent)) return;
+      if (el.id === 'strokeSpeed') return;
+      el.disabled = true;
+    });
   }
 }
 // If the user rotates while the stroke modal is open, re-render at the
@@ -3189,16 +3250,27 @@ window.addEventListener('resize', function() {
   }, 200);
 });
 
-function openStroke(ch) {
+// Shared open path for the stroke-animation and quiz modals — both used to
+// inline the same guard + availability check + re-enable-controls sequence,
+// so a change to the 「未收錄」 flow needed two edits. The per-modal setup
+// runs in onReady, after the modal is open (same synchronous task as before,
+// so no paint happens between openModal and the title/setup writes).
+function openStrokeModal(ch, modalId, targetId, onReady) {
   if (isPunct(ch)) return;
   strokeUnavailable(ch).then(missing => {
-  if (missing) return showStrokeUnavailable(ch);
-  currentStrokeChar = ch;
-  strokeStepIndex = 0;
-  document.getElementById('strokeModalTitle').textContent = `筆順：${ch}`;
-  openModal('strokeModal');
-  // a previous 「未收錄」 char may have left the controls disabled
-  document.querySelectorAll('#strokeModal button, #strokeModal input').forEach(el => { el.disabled = false; });
+    if (missing) return showStrokeUnavailable(ch, modalId, targetId);
+    openModal(modalId);
+    // a previous 「未收錄」 char may have left the controls disabled
+    document.querySelectorAll(`#${modalId} button, #${modalId} input`).forEach(el => { el.disabled = false; });
+    onReady();
+  });
+}
+
+function openStroke(ch) {
+  openStrokeModal(ch, 'strokeModal', 'stroke-target', () => {
+    currentStrokeChar = ch;
+    strokeStepIndex = 0;
+    document.getElementById('strokeModalTitle').textContent = `筆順：${ch}`;
 
     // v2.9: create the writer at the orientation-aware size (renderStrokeWriter).
     renderStrokeWriter();
@@ -3258,7 +3330,7 @@ function showStrokeUnavailable(ch, modalId = 'strokeModal', targetId = 'stroke-t
   openModal(modalId);
   const target = document.getElementById(targetId);
   target.innerHTML =
-    `<div style="font-size:110px;font-family:var(--cell-guide-font,serif);line-height:1.1;">${esc(ch)}</div>` +
+    `<div style="font-size:110px;font-family:'LXGW WenKai TC','KaiTi','STKaiti',serif;line-height:1.1;">${esc(ch)}</div>` +
     strokeSeqHtml(ch) +
     twpenNoteHtml(ch) +
     (isPunct(ch) ? '' :
@@ -3293,11 +3365,25 @@ function strokeSeqHtml(ch, opts) {
 }
 
 // 未收錄字的卡片：筆順／試寫按鈕變灰並說明，避免用戶撳入去見到空白
-async function markNoStrokeData(root) {
+async function markNoStrokeData(root, gen) {
   const cards = [...root.querySelectorAll('.char-card[data-char]')];
+  const alive = () => (typeof cwGlyphGenAlive !== 'function') || cwGlyphGenAlive(gen);
+  // The .meta-row holder is created on demand; both note insertions below
+  // used to inline this identical find-or-create block.
+  const ensureMetaRow = (details) => {
+    let meta = details.querySelector('.meta-row');
+    if (!meta) {
+      meta = document.createElement('div');
+      meta.className = 'meta-row';
+      details.insertBefore(meta, details.querySelector('.action-bar') || null);
+    }
+    return meta;
+  };
   await Promise.all(cards.map(async card => {
+    if (!alive()) return;   // 已被新一代取代：停，唔改舊卡
     const ch = card.dataset.char;
     if (!(await strokeUnavailable(ch))) return;
+    if (!alive()) return;
     card.querySelectorAll('.action-btn').forEach(b => {
       if (/筆順|試寫/.test(b.textContent)) {
         b.disabled = true;
@@ -3311,31 +3397,43 @@ async function markNoStrokeData(root) {
     const seq = strokeSeqInfo(ch);
     const details = card.querySelector('.char-details');
     if (seq && details && !details.querySelector('.stroke-seq')) {
-      let meta = details.querySelector('.meta-row');
-      if (!meta) {
-        meta = document.createElement('div');
-        meta.className = 'meta-row';
-        details.insertBefore(meta, details.querySelector('.action-bar') || null);
-      }
-      meta.insertAdjacentHTML('beforeend', strokeSeqHtml(ch, { small: true }));
+      ensureMetaRow(details).insertAdjacentHTML('beforeend', strokeSeqHtml(ch, { small: true }));
     }
     // 香港字詞表無資料嘅字 → 加 twpen.com 筆順字典小字註解（台灣教育部標準參考）
     if (details && !details.querySelector('.twpen-note')) {
-      let meta = details.querySelector('.meta-row');
-      if (!meta) {
-        meta = document.createElement('div');
-        meta.className = 'meta-row';
-        details.insertBefore(meta, details.querySelector('.action-bar') || null);
-      }
-      meta.insertAdjacentHTML('beforeend', twpenNoteHtml(ch, { small: true }));
+      ensureMetaRow(details).insertAdjacentHTML('beforeend', twpenNoteHtml(ch, { small: true }));
     }
   }));
 }
 
 
+// ===== B2-3 (v256): 暫停／繼續筆順動畫 =====
+// HanziWriter has pauseAnimation() / resumeAnimation() (see the note in
+// strokeReplay). The button label toggles ⏸ 暫停 ↔ ▶ 繼續.
+let strokePaused = false;
+function strokeTogglePause() {
+  if (!strokeWriter) return;
+  const btn = document.getElementById('btnStrokePause');
+  if (!strokePaused) {
+    try { strokeWriter.pauseAnimation(); } catch (e) {}
+    strokePaused = true;
+    if (btn) btn.textContent = '▶ 繼續';
+  } else {
+    try { strokeWriter.resumeAnimation(); } catch (e) {}
+    strokePaused = false;
+    if (btn) btn.textContent = '⏸ 暫停';
+  }
+}
+function strokeResetPauseBtn() {
+  strokePaused = false;
+  const btn = document.getElementById('btnStrokePause');
+  if (btn) btn.textContent = '⏸ 暫停';
+}
+
 function strokeReplay() {
   if (!strokeWriter) return;
   strokeStepIndex = 0;
+  strokeResetPauseBtn();
   // ⚠️ 呢個 HanziWriter build 冇 cancelAnimation()（實測 prototype 只有 animateCharacter /
   // animateStroke / pauseAnimation / resumeAnimation / setCharacter …）—— 舊寫法會直接
   // throw，令「▶ 重播」靜靜壞掉。用 pauseAnimation + setCharacter 重置再播。
@@ -3368,13 +3466,10 @@ function strokeStep() {
 
 // ===== QUIZ MODAL =====
 function openQuiz(ch) {
-  if (isPunct(ch)) return;
-  strokeUnavailable(ch).then(missing => {
-    if (missing) return showStrokeUnavailable(ch, 'quizModal', 'quiz-target');
+  openStrokeModal(ch, 'quizModal', 'quiz-target', () => {
     currentStrokeChar = ch;
+    quizMistakes = 0;   // B3-1: new quiz session for this char
     document.getElementById('quizModalTitle').textContent = `試寫：${ch}`;
-    openModal('quizModal');
-    document.querySelectorAll('#quizModal button, #quizModal input').forEach(el => { el.disabled = false; });
     startQuiz();
   });
 }
@@ -3383,6 +3478,9 @@ function startQuiz() {
   const target = document.getElementById('quiz-target');
   target.innerHTML = '';
   document.getElementById('quizResult').textContent = '';
+  // (quizMistakes is reset in openQuiz, not here: startQuiz is also the
+  // restart path after a mistake, and the counter must survive a restart
+  // so the 2nd mistake is detected — same pattern as cwQuiz.qMistakes.)
 
   // v2.12: create at the orientation-aware size (quizCanvasSize).
   const size = quizCanvasSize();
@@ -3403,15 +3501,36 @@ function startQuiz() {
         document.getElementById('quizResult').textContent = `✅ 正確！已寫 ${done} / ${total} 筆`;
         document.getElementById('quizResult').style.color = 'var(--green)';
       },
+      // B3-1 (v256): single-char 試寫 previously had no onMistake, so a wrong
+      // stroke was silently ignored. Now: 1st mistake → retry message and
+      // restart the char; 2nd mistake → reveal the character, then restart.
+      onMistake: () => {
+        quizMistakes++;
+        const res = document.getElementById('quizResult');
+        if (quizMistakes === 1) {
+          if (res) {
+            res.textContent = '❌ 寫錯咗，再試一次（仲有 1 次機會）';
+            res.style.color = 'var(--red)';
+          }
+          setTimeout(() => { if (currentStrokeChar) startQuiz(); }, 900);
+        } else {
+          if (res) {
+            res.textContent = `❌ 呢隻字係「${currentStrokeChar}」，再試一次`;
+            res.style.color = 'var(--red)';
+          }
+          setTimeout(() => { if (currentStrokeChar) startQuiz(); }, 1600);
+        }
+      },
       onComplete: () => {
         document.getElementById('quizResult').textContent = `🎉 完成！每一筆都寫對了`;
         document.getElementById('quizResult').style.color = 'var(--green)';
       }
     });
   } catch(e) {
-    target.innerHTML = `<div style="font-size:120px;font-family:'Noto Serif TC','Songti TC',serif;line-height:1;">${esc(currentStrokeChar)}</div><p style="margin-top:10px;color:#999;">此字暫無試寫功能，請用練習格練習</p>`;
+    target.innerHTML = `<div style="font-size:120px;font-family:'LXGW WenKai TC','KaiTi','STKaiti',serif;line-height:1;">${esc(currentStrokeChar)}</div><p style="margin-top:10px;color:#999;">此字暫無試寫功能，請用練習格練習</p>`;
   }
 }
+let quizMistakes = 0;
 
 // ===== UTILITIES =====
 function esc(s) {
@@ -3465,7 +3584,9 @@ function toTraditional(input) {
     // 2) already a traditional/shared character → keep as-is (面/皇后/后 stay).
     //    Exception: 么 is the simplified form of 麼 and is only in CHAR_DB via a
     //    variant reading — it must always convert (什么→什麼, 么→麼).
-    if (window.CHAR_DB[ch] && ch !== '么') { out += ch; i++; continue; }
+    // v2.57: 发／唇 係其他字嘅簡體指標（si），即使加入 CHAR_DB 都要照舊轉換，
+    // 否則「发」唔會變「發」。呢兩個字係唯二同時係 si 又入 CHAR_DB 嘅例外。
+    if (window.CHAR_DB[ch] && !['么', '发', '唇'].includes(ch)) { out += ch; i++; continue; }
     // 3) unambiguous single-char mapping
     const cands = SIM2T[ch];
     if (cands && cands.length === 1) { out += cands[0]; i++; continue; }
@@ -3615,7 +3736,7 @@ function cwDateStr(d){
   return d.getFullYear() + '-' + cwPad(d.getMonth() + 1) + '-' + cwPad(d.getDate());
 }
 function cwTodayStr(){ return cwDateStr(new Date()); }
-function cwIsCJK(ch){ return !!ch && /[\u3400-\u9FFF\uF900-\uFAFF]/.test(ch); }
+function cwIsCJK(ch){ return !!ch && /[\u3400-\u9FFF\uF900-\uFAFF\u{20000}-\u{2FFFF}]/u.test(ch); }
 function cwCharsFromText(text){
   var out = [], seen = {};
   (text || '').split('').forEach(function(c){

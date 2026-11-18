@@ -161,7 +161,7 @@
   <h2>開發邏輯</h2>
   <p>本站是一個純前端靜態網站（主程式為單一 HTML + 靜態資料檔），沒有後端、沒有資料庫、沒有追蹤。核心設計是「香港標準優先」：字形與筆順以香港教育局《香港小學學習字詞表》為準，讀音以粵語審音資料及開放粵語字典為準，其餘來源只作後備。</p>
   <ul>
-    <li><strong>字形與筆順</strong>：香港教育局《香港小學學習字詞表》（edbchinese.hk）官方筆順動畫，逆向提取為向量輪廓（4,837 字）。字詞表未收錄之字，台灣教育部《筆順字典》（twpen.com）有字形者用該字形（194 字），筆順已逐字核對並按香港次序重排；其餘用 HanziWriter（hanziwriter.org）通用字形與筆順（839 字審計對象；2026-11-13 重新審計後，743 字筆順已確認為香港次序，74 字已按教育局邏輯重繪，10 字數據已修正或新建筆順動畫，7 字核實正確毋須改動，0 字未解決；其中獒已獲教育局拼合字形，現時 HanziWriter 後備為 838 字）。詳見<a href="docs/dev-memo-hw839.html">開發備忘</a>。</li>
+    <li><strong>字形與筆順</strong>：香港教育局《香港小學學習字詞表》（edbchinese.hk）官方筆順動畫，逆向提取為向量輪廓（4,837 字，標示 EDB）。字詞表未收錄之字，按教育局原則重建或核對（1,039 字，標示 Edb.R）：以教育局部件拼合，或沿用台灣教育部《筆順字典》（twpen.com）／HanziWriter（hanziwriter.org）墨跡並逐字核對、按香港次序重排。2026-11-13 已完成全部 839 字 HanziWriter 後備字審計，筆順全部確認為香港次序或已重繪／修正，現已全數改標 Edb.R；詳見<a href="docs/dev-memo-hw839.html">開發備忘</a>。</li>
     <li><strong>讀音</strong>：粵拼取自開放粵語字典（kaifangcidian.com，CC-BY 3.0）；普通話拼音取自 pypinyin；筆畫數以實際出貨字形的筆數為準（有字形者跟字形，無字形者跟 HanziWriter 筆數）。</li>
     <li><strong>簡繁轉換</strong>：以 OpenCC 詞組表為基礎，逐字轉換時再做「香港正字歸一化」，將台灣慣用異體統一成香港標準正字（詳見下節）。</li>
     <li><strong>字體</strong>：內建 LXGW WenKai TC（霞鶩文楷）自託管字體，無外部 Google Fonts 依賴。</li>
@@ -174,26 +174,74 @@
   <p>以下為本站的收錄數據（由自動化腳本統計，隨更新而變動）：</p>
 
   <div class="stat-figure">
-    <div class="stat-figure-title">字形與筆順來源（共 5,846 字）</div>
+    <div class="stat-figure-title">字形與筆順來源（共 5,876 字）</div>
     <div class="bar-segmented">
-      <div class="bar-seg bar-edb" style="width:83%"></div>
-      <div class="bar-seg bar-fallback" style="width:14%"></div>
-      <div class="bar-seg bar-twpen" style="width:3%"></div>
+      <div class="bar-seg bar-edb" style="width:82%"></div>
+      <div class="bar-seg bar-fallback" style="width:18%"></div>
     </div>
     <div class="legend">
-      <span><i class="dot-edb"></i>香港教育局官方筆順 4,837 字（83%）</span>
-      <span><i class="dot-fallback"></i>HanziWriter／字體後備 815 字（14%）</span>
-      <span><i class="dot-twpen"></i>台灣筆順字典後備 194 字（3%）</span>
+      <span><i class="dot-edb"></i>香港教育局官方筆順 4,837 字（82%）</span>
+      <span><i class="dot-fallback"></i>按教育局原則重建／核對 1,039 字（18%）</span>
     </div>
-    <p class="stat-note">台灣筆順字典字形的筆順已逐字核對並按香港次序重排（182 字與香港次序相同，11 字重排，1 字重繪）；HanziWriter 後備字 839 字已全部逐字審計：743 字筆順已確認為香港次序（666 字本身已是香港次序，77 字已重排，當中包括本輪整理嘅冪），74 字已按教育局邏輯重繪（58 字 v2.28＋16 字本輪整理），10 字數據已修正或新建筆順動畫，7 字核實正確毋須改動（蠼、鱺、飆、鰲、龕、韙、禳），0 字未解決（夔、齧、贗、鬻、諛已於 2026-11-13 跟進解決；v2.32 再寫入 EDB median 15 筆，詳見開發備忘 §3.4）。詳見<a href="docs/dev-memo-hw839.html">開發備忘</a>。</p>
+    <p class="stat-note">Edb.R 包括 753 個長尾字（字詞表未收錄，依教育局部件邏輯拼合）及 30 個新增字（粵語常用字及詞語用字，如劏、佚、饈、汴等）；原台灣筆順字典（194 字）及 HanziWriter（839 字）墨跡已全部逐字核對並按香港次序重排，現已全數改標 Edb.R，不再以 TW／HW 標示。詳見<a href="docs/dev-memo-hw839.html">開發備忘</a>。</p>
   </div>
 
   <div class="stat-figure">
     <div class="stat-figure-title">讀音與筆畫數覆蓋</div>
     <div class="stat-line">
-      收錄 <b>5,846</b> 個漢字，其中 <b>100%</b> 有粵拼及普通話拼音，<b>100%</b> 有筆畫數。
+      收錄 <b>5,876</b> 個字形，全部附筆畫數及筆順；其中 <b>5,846</b> 字另有粵拼及普通話拼音（其餘 30 個為新增粵語用字字形，讀音待補）。
     </div>
   </div>
+
+  <h2>常用部首的香港筆畫</h2>
+<p>下表列出常用部首的香港筆畫數與筆順，由本站對香港教育局《香港小學學習字詞表》4,804 字的筆順動畫作反向分析歸納而成：每部首取眾數筆順，即該部首在教育局數據中最常見的寫法。凡教育局寫法與課本或常識不符，一律以教育局為準。筆名採用教育局動畫的標籤；同一筆形在不同字或有不同標籤（例如艹第 4 筆標「豎」或「撇」，幾何完全相同），次序則高度一致。</p>
+<table>
+<thead>
+<tr><th>部首</th><th>筆數</th><th>香港筆順</th><th>備註</th></tr>
+</thead>
+<tbody>
+<tr><td class="hanzi">亠</td><td>2</td><td>點，橫</td><td>京、市、高、亮。</td></tr>
+<tr><td class="hanzi">勹</td><td>2</td><td>撇，橫折鈎</td><td>包、句、匈、旬。</td></tr>
+<tr><td class="hanzi">氵</td><td>3</td><td>點，點，提</td><td>江、河、湖、海。最穩定之部首（235/255＝92%）。</td></tr>
+<tr><td class="hanzi">忄</td><td>3</td><td>豎，豎，點</td><td>忖、情、怕、快。第 1 筆為陡左斜筆，課本稱「點」。</td></tr>
+<tr><td class="hanzi">扌</td><td>3</td><td>橫，豎／豎鈎，提</td><td>打、把、找、抱。中間筆為帶小鈎之豎。</td></tr>
+<tr><td class="hanzi">犭</td><td>3</td><td>撇，捺／豎鈎／豎，撇</td><td>狗、貓、豬、狼。中間筆為長豎，標籤不一，次序一致。</td></tr>
+<tr><td class="hanzi">宀</td><td>3</td><td>點，撇／豎，橫鈎</td><td>家、安、字、完。第 2 筆多為撇，第 3 筆為橫鈎。</td></tr>
+<tr><td class="hanzi">广</td><td>3</td><td>點，橫，豎／撇</td><td>店、府、度、座。第 3 筆陡，課本稱撇。</td></tr>
+<tr><td class="hanzi">阝（左）</td><td>3</td><td>點／橫撇／橫折，豎，豎</td><td>陽、陰、陸、陵。第 1 筆為短折。</td></tr>
+<tr><td class="hanzi">阝（右）</td><td>3</td><td>橫折／橫撇／撇，橫折，豎</td><td>郎、都、那、鄰。課本「頂撇＋中豎＋長豎」不成立。</td></tr>
+<tr><td class="hanzi">口</td><td>3</td><td>豎，橫折，橫</td><td>—</td></tr>
+<tr><td class="hanzi">艹</td><td>4</td><td>橫，豎，橫，豎／撇</td><td>花、草、茶、苦。第 4 筆標「豎」或「撇」，幾何完全相同。</td></tr>
+<tr><td class="hanzi">辶</td><td>4</td><td>點，點，豎，橫</td><td>遠、道、過、這。尾筆為平橫，非捺；課本「點，橫折，橫，捺」不符。</td></tr>
+<tr><td class="hanzi">日</td><td>4</td><td>豎，橫折，橫，橫</td><td>—</td></tr>
+<tr><td class="hanzi">月</td><td>4</td><td>豎，撇，橫，橫</td><td>課本「撇，橫折鈎，橫，橫」不符。</td></tr>
+<tr><td class="hanzi">木</td><td>4</td><td>橫，豎，撇，捺</td><td>嵌入複合字時尾筆捺縮短為點（林、森）。</td></tr>
+<tr><td class="hanzi">止</td><td>4</td><td>豎，橫，豎，橫</td><td>企、正、步、此。課本「撇，豎，橫，豎」不符。</td></tr>
+<tr><td class="hanzi">礻</td><td>4</td><td>點，撇／橫撇，豎，點</td><td>祖、神、祝、福。</td></tr>
+<tr><td class="hanzi">灬</td><td>4</td><td>撇／點，點，點，點／捺</td><td>熱、烈、烹、焦。</td></tr>
+<tr><td class="hanzi">心</td><td>4</td><td>撇／豎，豎彎鈎，點，捺／點</td><td>思、想、忘、念。獨立字尾筆為捺，嵌入為點。</td></tr>
+<tr><td class="hanzi">田</td><td>5</td><td>豎，橫折，橫，豎，橫</td><td>—</td></tr>
+<tr><td class="hanzi">目</td><td>5</td><td>豎，橫折，橫，橫，橫</td><td>—</td></tr>
+<tr><td class="hanzi">禾</td><td>5</td><td>撇，橫，豎，撇，點／捺</td><td>秋、種、稻、積。嵌入尾筆為點。</td></tr>
+<tr><td class="hanzi">皿</td><td>5</td><td>豎，橫折，豎，豎，橫</td><td>盤、益、盜、盧。第 4 筆為右豎，非橫折。</td></tr>
+<tr><td class="hanzi">疒</td><td>5</td><td>點，橫，豎／撇，點，提</td><td>病、痛、瘦、癌。</td></tr>
+<tr><td class="hanzi">衤</td><td>5</td><td>點，撇／橫撇，豎，點／撇，點</td><td>被、補、初、裝。</td></tr>
+<tr><td class="hanzi">穴</td><td>5</td><td>點，撇，橫鈎，撇，捺</td><td>穿、窗、窄、空。＝壓縮宀＋八。</td></tr>
+<tr><td class="hanzi">米</td><td>6</td><td>點，點，橫，豎，撇，捺／點</td><td>粉、精、糖、糊。</td></tr>
+<tr><td class="hanzi">糸</td><td>6</td><td>撇折，撇折，點，點，點，點</td><td>紅、綠、給、終。課本期望尾三筆為撇、撇、捺。</td></tr>
+<tr><td class="hanzi">⺮</td><td>6</td><td>撇，橫，點，點／撇，橫，點</td><td>筆、笑、符、第。第 4 筆約半數縮短為點。</td></tr>
+<tr><td class="hanzi">訁</td><td>7</td><td>點，橫，橫，橫，豎，點／橫折，橫</td><td>話、語、請、謝。言獨立字同。</td></tr>
+<tr><td class="hanzi">足</td><td>7</td><td>豎，橫折，橫，豎，橫，豎，捺</td><td>跳、路、跟、跑。</td></tr>
+<tr><td class="hanzi">走</td><td>7</td><td>橫，豎，橫，豎，橫，撇，捺</td><td>趕、起、超、越。</td></tr>
+<tr><td class="hanzi">雨</td><td>8</td><td>橫，豎，橫折鈎，豎，點，點，點，點</td><td>首筆為橫（非點）。第 4 筆為長中豎；複合字中第 4 筆系統性未標示。</td></tr>
+<tr><td class="hanzi">金（釒）</td><td>8</td><td>撇，捺，橫，橫，豎，點，點，橫</td><td>銀、銅、鐵、錢。第 2 筆為長斜捺，非橫。</td></tr>
+<tr><td class="hanzi">食</td><td>9</td><td>撇，捺，橫，橫折，橫，橫，豎提，撇，捺</td><td>食、飯、飲。第 2 筆為長斜捺，非點；旁形飠為 8 筆。</td></tr>
+<tr><td class="hanzi">頁</td><td>9</td><td>橫，點，豎，橫折，橫，橫，橫，撇，點／捺</td><td>頭、顏、題、願。獨立字尾筆為捺。</td></tr>
+</tbody>
+</table>
+<div class="note">
+通則：嵌入複合字的部件，尾筆捺多數縮短為點（木、禾、米、貝、頁、心、魚等），屬壓縮現象，筆順不變；香港計數按部件的標準形，即使寫出來看似縮減（例如瀟 21 畫＝氵 3＋艹 4＋肅 14）。「點」與「丶」：教育局全庫 58,549 筆有標籤的筆畫中，「點」出現 10,406 次，「丶」出現 0 次。門為例外：門框先寫，內部後寫，不「再封口」，且以豎起筆而非點。
+</div>
 
   <h2>自動轉換的字及原因</h2>
   <p>中文有不少字在台灣、香港、大陸有不同寫法（同一字的不同寫法）。本站字形預設示範香港教育標準寫法；輸入簡體字時會轉為繁體。以下按差異原因分類羅列常見情況。</p>
@@ -217,7 +265,7 @@
   </div>
 
   <div class="note">
-    字卡上的 <span class="src-badge">EDB</span>／<span class="src-badge">TW</span>／<span class="src-badge">HW</span> 為字形來源碼：EDB＝香港教育局《香港小學學習字詞表》（標示「香港教育標準」）；TW＝台灣教育部《筆順字典》（字形源自台灣，筆順已按香港次序，標示「香港次序」）；HW＝HanziWriter 通用字形（字形為通用標準；筆順已按香港次序核對嘅字標示「香港次序」，其餘標示「參考字形」）。逐字差異、筆數與讀音對照見<a href="docs/teacher-appendix.html">教師附錄</a>。
+    字卡上的 <span class="src-badge">EDB</span>／<span class="src-badge">Edb.R</span> 為字形來源碼：EDB＝香港教育局《香港小學學習字詞表》（標示「香港教育標準」）；Edb.R＝非教育局數據，但按教育局原則重建或核對（標示「按教育局原則」）。逐字差異、筆數與讀音對照見<a href="docs/teacher-appendix.html">教師附錄</a>。
   </div>
 
   <h3>一、部件寫法不同（字一樣）</h3>
