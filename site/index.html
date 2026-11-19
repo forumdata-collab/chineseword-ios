@@ -6,10 +6,11 @@
 <title>中文筆順練習簿 — 粵音普通話朗讀 · 筆順練習 · 列印練習紙</title>
 <link href="fonts/lxgw.css" rel="stylesheet">
 <script src="data.js?v=1794962240"></script>
+<script src="data/lexlist_words.js?v=1"></script>
 <script src="hk_order.js?v=1794821673"></script>
 <script src="hw_hk_same.js?v=1"></script>
 <script src="stroke_seq.js?v=3"></script>
-<script src="glyph-engine.js?v=45"></script>
+<script src="glyph-engine.js?v=47"></script>
 <script src="hanzi-writer.min.js"></script>
 <!-- B2-1 (v256): HanziWriter library now loads from the bundled local copy
      (v3.5.0, same as the CDN build) instead of jsdelivr, so stroke animation
@@ -476,6 +477,17 @@ body {
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
 }
 /* 同一字的另一寫法（雙軌呈現，不靜默改字） */
+/* 詞語（S1／S2／附表）—— 預設收起，列印時由 beforeprint 展開 */
+.words-section { margin: 8px 0 4px; font-size: 0.85em; }
+.words-section summary { cursor: pointer; list-style: none; font-weight: 700; color: var(--ink); }
+.words-section summary::-webkit-details-marker { display: none; }
+.words-section summary::after { content: " \25be"; font-size: 0.9em; color: var(--red); }
+.words-section[open] summary::after { content: " \25b4"; }
+.words-group { margin-top: 6px; }
+.words-label { font-size: 0.82em; font-weight: 700; color: #777; margin-bottom: 3px; }
+.words-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.word-chip { display: inline-block; padding: 2px 9px; border: 1px solid #ddd; border-radius: 12px; background: #fff; font-size: 0.95em; }
+
 .form-row {
   font-size: 0.78em;
   color: #8a8f98;
@@ -1028,6 +1040,11 @@ body {
   .quiz-mode .action-bar { display: none; }
   .quiz-mode .guide-char { display: none !important; }
 .quiz-mode .stroke-num-svg { display: none !important; }
+  /* 詞語：列印時展開全部內容（beforeprint 會開 details；呢度確保內容唔被裁走） */
+  .words-section { display: block !important; margin-top: 6px; page-break-inside: avoid; }
+  .words-section summary::after { content: " \25b4"; }
+  .words-chips { overflow: visible !important; max-height: none !important; }
+  .word-chip { border-color: #999; }
 }
 
 .green { color: var(--green); }
@@ -1551,6 +1568,12 @@ html.cw-simple .cw-adv-hide { display: none !important; }
         </div>
         <div class="opt-group">
           <div class="toggle-row">
+            <input type="checkbox" id="optWords">
+            <label for="optWords">顯示詞語（S1／S2）</label>
+          </div>
+        </div>
+        <div class="opt-group">
+          <div class="toggle-row">
             <input type="checkbox" id="optDedup">
             <label for="optDedup">去重（只寫一次）</label>
           </div>
@@ -1809,7 +1832,7 @@ let GLYPH_SOURCES = {};
 let VARIANT_PAIRS = {};
 function loadGlyphMeta() {
   Promise.all([
-    fetch('data/glyph_sources.json?v=246').then(r => (r.ok ? r.json() : null)).catch(() => null),
+    fetch('data/glyph_sources.json?v=247').then(r => (r.ok ? r.json() : null)).catch(() => null),
     fetch('data/variant_pairs.json?v=237').then(r => (r.ok ? r.json() : null)).catch(() => null),
   ]).then(([gs, vp]) => {
     if (gs) GLYPH_SOURCES = gs.glyphs || {};
@@ -1862,6 +1885,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('optCanto').checked = saved.canto !== false;
       document.getElementById('optPinyin').checked = saved.pinyin !== false;
       document.getElementById('optStrokes').checked = saved.strokes !== false;
+      document.getElementById('optWords').checked = saved.words === true;   // default 關
       // 描紅格選項三個控件（全部 allow-list；舊存值（無 guideCount 但有 guide=false）→ 'none'）
       const fmtOk = ['plain', 'num', 'num+arrow'];
       const gcOk = ['none', '1', '2', 'all'];
@@ -2019,6 +2043,7 @@ function readOptions() {
     canto: $('optCanto').checked,
     pinyin: $('optPinyin').checked,
     strokes: $('optStrokes').checked,
+    words: $('optWords').checked,
     guide: guideCount !== 'none',   // 「描紅格數 = 無」＝冇描紅（取代舊 #optGuide checkbox）
     demoFormat: $('optDemoFormat').value,
     strokeNum: demo.strokeNum,      // 示範格數字／箭咀
@@ -2122,6 +2147,7 @@ function generate() {
     canto: opts.canto,
     pinyin: opts.pinyin,
     strokes: opts.strokes,
+    words: opts.words === true,
     guide: opts.guide,
     strokeNum: opts.strokeNum,
     arrow: opts.arrow,
@@ -2276,6 +2302,31 @@ function traceCellHtml(ch, cellClass, opts, slice) {
  * One character card: the character, its readings and meta line, and the practice grid
  * underneath. Screen-only action buttons live here too.
  */
+
+// ===== 詞語（S1／S2／附表）=====
+// 資料來源：data/lexlist_words.js（window.CW_LEXLIST_WORDS，離線；EDB《香港小學學習字詞表》詞語）。
+// 格式：{ s1: [...], s2: [...], ap: { "1": [...], "2": [...] } }，只收非空組；無資料嘅字唔出任何嘢。
+function wordsSectionHtml(ch) {
+  if (isPunct(ch)) return '';
+  const w = window.CW_LEXLIST_WORDS && window.CW_LEXLIST_WORDS[ch];
+  if (!w) return '';
+  const s1 = Array.isArray(w.s1) ? w.s1 : [];
+  const s2 = Array.isArray(w.s2) ? w.s2 : [];
+  const ap = (w.ap && typeof w.ap === 'object') ? w.ap : {};
+  const apKeys = Object.keys(ap).filter(k => Array.isArray(ap[k]) && ap[k].length)
+    .sort((a, b) => (+a) - (+b));
+  const total = s1.length + s2.length + apKeys.reduce((n, k) => n + ap[k].length, 0);
+  if (!total) return '';
+  const chips = list => list.map(word => `<span class="word-chip">${esc(word)}</span>`).join('');
+  let inner = '';
+  if (s1.length) inner += `<div class="words-group"><div class="words-label">S1 \u00b7 \u7b2c\u4e00\u5b78\u7fd2\u968e\u6bb5</div><div class="words-chips">${chips(s1)}</div></div>`;
+  if (s2.length) inner += `<div class="words-group"><div class="words-label">S2 \u00b7 \u7b2c\u4e8c\u5b78\u7fd2\u968e\u6bb5</div><div class="words-chips">${chips(s2)}</div></div>`;
+  apKeys.forEach(k => {
+    inner += `<div class="words-group"><div class="words-label">\u9644\u8868${esc(k)}</div><div class="words-chips">${chips(ap[k])}</div></div>`;
+  });
+  return `<details class="words-section"><summary>\u8a5e\u8a9e\uff08${total}\uff09</summary>${inner}</details>`;
+}
+
 function charCardHtml(ch, o, cardIdx) {
   let html = '';
   const d = window.CHAR_DB[ch] || {};
@@ -2406,6 +2457,9 @@ function charCardHtml(ch, o, cardIdx) {
     html += `<button class="action-btn btn-mand" onclick="speak('${esc(ch)}','mand')" title="普通話朗讀">🔊 普</button>`;
     html += `</div>`;
   }
+
+  // 詞語（S1／S2／附表）：選項開咗先出，預設收起；標點／無詞語資料嘅字唔出
+  if (o.words) html += wordsSectionHtml(ch);
 
   // Practice grids
   if (o.practice > 0) {
@@ -2890,6 +2944,30 @@ function toggleQuizMode() {
 function printWorksheet() {
   window.print();
 }
+
+// ===== 詞語列印：列印前展開、列印後還原 =====
+// 只喺詞語選項開咗嗰陣先做；選項關咗就無 .words-section，列印不變。
+// 註冊一次（guard 防重複註冊）。
+let cwWordsPrintState = null;
+function cwWordsBeforePrint() {
+  if (cwWordsPrintState) return;   // 已經為今次列印展開過：唔好覆寫原本開合狀態
+  if (!(currentOptions && currentOptions.words)) return;
+  const secs = [...document.querySelectorAll('.words-section')];
+  if (!secs.length) return;
+  cwWordsPrintState = secs.map(el => ({ el, open: el.open }));
+  secs.forEach(el => { el.open = true; });
+}
+function cwWordsAfterPrint() {
+  if (!cwWordsPrintState) return;
+  cwWordsPrintState.forEach(({ el, open }) => { el.open = open; });
+  cwWordsPrintState = null;
+}
+if (!window.__cwWordsPrintBound) {
+  window.__cwWordsPrintBound = true;
+  window.addEventListener('beforeprint', cwWordsBeforePrint);
+  window.addEventListener('afterprint', cwWordsAfterPrint);
+}
+
 
 // ===== A4 PRINT PREVIEW =====
 // Clone the worksheet and scale it so one screen shows how page 1 fits on A4.

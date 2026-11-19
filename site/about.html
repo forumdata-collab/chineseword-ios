@@ -161,7 +161,7 @@
   <h2>開發邏輯</h2>
   <p>本站是一個純前端靜態網站（主程式為單一 HTML + 靜態資料檔），沒有後端、沒有資料庫、沒有追蹤。核心設計是「香港標準優先」：字形與筆順以香港教育局《香港小學學習字詞表》為準，讀音以粵語審音資料及開放粵語字典為準，其餘來源只作後備。</p>
   <ul>
-    <li><strong>字形與筆順</strong>：香港教育局《香港小學學習字詞表》（edbchinese.hk）官方筆順動畫，逆向提取為向量輪廓（4,837 字，標示 EDB）。字詞表未收錄之字，按教育局原則重建或核對（1,039 字，標示 Edb.R）：以教育局部件拼合，或沿用台灣教育部《筆順字典》（twpen.com）／HanziWriter（hanziwriter.org）墨跡並逐字核對、按香港次序重排。2026-11-13 已完成全部 839 字 HanziWriter 後備字審計，筆順全部確認為香港次序或已重繪／修正，現已全數改標 Edb.R；詳見<a href="docs/dev-memo-hw839.html">開發備忘</a>。</li>
+    <li><strong>字形與筆順</strong>：香港教育局《香港小學學習字詞表》（edbchinese.hk）官方筆順動畫，逆向提取為向量輪廓（4,836 字，標示 EDB）。字詞表未收錄之字，按教育局原則重建或核對（1,040 字，標示 Edb.R）：以教育局部件拼合，或沿用台灣教育部《筆順字典》（twpen.com）／HanziWriter（hanziwriter.org）墨跡並逐字核對、按香港次序重排。2026-11-13 已完成全部 839 字 HanziWriter 後備字審計，筆順全部確認為香港次序或已重繪／修正，現已全數改標 Edb.R；詳見<a href="docs/dev-memo-hw839.html">開發備忘</a>。</li>
     <li><strong>讀音</strong>：粵拼取自開放粵語字典（kaifangcidian.com，CC-BY 3.0）；普通話拼音取自 pypinyin；筆畫數以實際出貨字形的筆數為準（有字形者跟字形，無字形者跟 HanziWriter 筆數）。</li>
     <li><strong>簡繁轉換</strong>：以 OpenCC 詞組表為基礎，逐字轉換時再做「香港正字歸一化」，將台灣慣用異體統一成香港標準正字（詳見下節）。</li>
     <li><strong>字體</strong>：內建 LXGW WenKai TC（霞鶩文楷）自託管字體，無外部 Google Fonts 依賴。</li>
@@ -180,8 +180,8 @@
       <div class="bar-seg bar-fallback" style="width:18%"></div>
     </div>
     <div class="legend">
-      <span><i class="dot-edb"></i>香港教育局官方筆順 4,837 字（82%）</span>
-      <span><i class="dot-fallback"></i>按教育局原則重建／核對 1,039 字（18%）</span>
+      <span><i class="dot-edb"></i>香港教育局官方筆順 4,836 字（82%）</span>
+      <span><i class="dot-fallback"></i>按教育局原則重建／核對 1,040 字（18%）</span>
     </div>
     <p class="stat-note">Edb.R 包括 753 個長尾字（字詞表未收錄，依教育局部件邏輯拼合）及 30 個新增字（粵語常用字及詞語用字，如劏、佚、饈、汴等）；原台灣筆順字典（194 字）及 HanziWriter（839 字）墨跡已全部逐字核對並按香港次序重排，現已全數改標 Edb.R，不再以 TW／HW 標示。詳見<a href="docs/dev-memo-hw839.html">開發備忘</a>。</p>
   </div>
