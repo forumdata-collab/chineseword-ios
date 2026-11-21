@@ -4,10 +4,12 @@ name: Build unsigned IPA
 # .ipa (AltStore re-signs it with the user's own Apple ID). No signing
 # identity or certificate is used or committed.
 #
-# On push to main it also creates the GitHub Release v2.31 (if it does not
-# already exist) and attaches the IPA + app icon, so the AltStore source can
-# point at a durable public download URL. The release step is idempotent:
-# re-runs skip it when the release already exists.
+# On push to main it also creates the GitHub Release for the version in
+# ios-version.json (if it does not already exist) and attaches the IPA +
+# app icon, so the AltStore source can point at a durable public download
+# URL. The release step is idempotent: when the release already exists the
+# run skips the upload entirely — the live release asset is never
+# re-uploaded or overwritten.
 on:
   push:
     branches: [main]
@@ -15,10 +17,18 @@ on:
       - "tools/build_report_ios.md"
       - "README.md"
       - "altstore-source.json"
+      - "site/docs/**"
   workflow_dispatch:
 
 permissions:
   contents: write
+
+# Serialize runs: without this, several pushes in a row start concurrent
+# runs and their AltStore sync pushes race (non-fast-forward failures).
+# Queued runs wait their turn; none is cancelled.
+concurrency:
+  group: build-ipa-main
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -26,6 +36,10 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v4
+        with:
+          # Full history: the AltStore sync step rebases before pushing, and
+          # pull --rebase does not work reliably on a shallow clone.
+          fetch-depth: 0
 
       - name: Select Xcode
         run: |
@@ -103,8 +117,7 @@ jobs:
         run: |
           V="${{ steps.ver.outputs.v }}"
           if gh release view "v$V" >/dev/null 2>&1; then
-            echo "Release v$V already exists; re-uploading asset."
-            gh release upload "v$V" "chineseword-ios-v$V.ipa" icon.png --clobber
+            echo "Release v$V already exists; skipping upload."
           else
             gh release create "v$V" \
               --title "中文筆順練習簿 v$V (iOS)" \
@@ -125,5 +138,20 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add altstore-source.json
             git commit -m "altstore: sync IPA size for v$V [skip ci]"
-            git push
+            # Rebase onto latest main before pushing: another run may have
+            # moved it. Retry up to 3 times, then fail loudly so the size
+            # drift is visible instead of silently skipped.
+            pushed=0
+            for i in 1 2 3; do
+              if git pull --rebase origin main && git push origin HEAD:main; then
+                pushed=1
+                break
+              fi
+              echo "altstore push attempt $i failed; retrying..."
+              sleep 5
+            done
+            if [ "$pushed" != 1 ]; then
+              echo "failed to push altstore sync after 3 attempts"
+              exit 1
+            fi
           fi
