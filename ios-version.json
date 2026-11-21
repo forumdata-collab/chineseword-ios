@@ -1,1 +1,1 @@
-{"versionName":"2.47","versionCode":51,"ipaUrl":"https://github.com/forumdata-collab/chineseword-ios/releases/download/v2.47/chineseword-ios-v2.47.ipa","notes":"iOS v2.47 — 與網站 v260 同步：𨋢 EDB 重建（輯的車＋泣的立）；字形 ?v=49、引擎 ?v=47；docs/landing v261 未包括（未部署）。"}
+{"versionName":"2.48","versionCode":52,"ipaUrl":"https://github.com/forumdata-collab/chineseword-ios/releases/download/v2.48/chineseword-ios-v2.48.ipa","notes":"iOS v2.48 — 與網站 v274 同步：正字參考頁（24 組／48 字）＋迺核實；嘅 12、辶 4（新字形）、隰 17；rescan 9 字；HW 辶 split（hw-split/ 38 檔）；字體改 Noto-first（跟網站 v266，異體字形正確）。"}
