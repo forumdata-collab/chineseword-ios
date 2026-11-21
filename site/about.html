@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="fonts/lxgw.css" rel="stylesheet" media="print">
 <title>開發說明 — 中文筆順練習簿</title>
-<link rel="stylesheet" href="fonts/lxgw.css">
 <style>
   :root {
     --accent: #2563eb;
@@ -138,7 +138,7 @@
   .stroke-no { color: var(--muted); font-weight: 400; margin-right: 3px; font-size: 0.8em; }
   .stroke-example {
     font-size: 1.05em; color: var(--ink); margin-top: 3px; font-weight: 500;
-    font-family: "LXGW WenKai TC", "KaiTi", "STKaiti", "DFKai-SB", "Noto Serif CJK TC", "Songti TC", serif;
+    font-family: "LXGW WenKai TC", "Kaiti TC", "DFKai-SB", "標楷體", "Noto Serif CJK TC", "Songti TC", serif;
   }
   .src-badge { font-size:.82em; padding:0 4px; border:1px solid #cfd6dd; border-radius:3px;
                color:#6a7480; font-family: ui-monospace, Consolas, monospace; }
@@ -158,40 +158,73 @@
   <div class="subtitle">中文筆順練習簿（chineseword.we1co.me）— 開發邏輯與字形標準說明</div>
   <a class="back" href="index.html">← 返回練習簿</a>
 
+  <div class="note">本頁核對至 <strong>v273</strong>（2026-11-20，已部署）：收錄數據、字體安排及版本沿革均以 v273 核對。手機應用程式（APK／iOS）據知仍為 v2.47，未與網站同步，待確認，見「版本沿革」。</div>
+
   <h2>開發邏輯</h2>
   <p>本站是一個純前端靜態網站（主程式為單一 HTML + 靜態資料檔），沒有後端、沒有資料庫、沒有追蹤。核心設計是「香港標準優先」：字形與筆順以香港教育局《香港小學學習字詞表》為準，讀音以粵語審音資料及開放粵語字典為準，其餘來源只作後備。</p>
   <ul>
-    <li><strong>字形與筆順</strong>：香港教育局《香港小學學習字詞表》（edbchinese.hk）官方筆順動畫，逆向提取為向量輪廓（4,836 字，標示 EDB）。字詞表未收錄之字，按教育局原則重建或核對（1,040 字，標示 Edb.R）：以教育局部件拼合，或沿用台灣教育部《筆順字典》（twpen.com）／HanziWriter（hanziwriter.org）墨跡並逐字核對、按香港次序重排。2026-11-13 已完成全部 839 字 HanziWriter 後備字審計，筆順全部確認為香港次序或已重繪／修正，現已全數改標 Edb.R；詳見<a href="docs/dev-memo-hw839.html">開發備忘</a>。</li>
+    <li><strong>字形與筆順</strong>：香港教育局《香港小學學習字詞表》（edbchinese.hk）官方筆順動畫，逆向提取為向量輪廓（4,818 字，標示 EDB）。字詞表未收錄之字，按教育局原則重建或核對（1,061 字，標示 Edb.R）：以教育局部件拼合，或沿用台灣教育部《筆順字典》（twpen.com）／HanziWriter（hanziwriter.org）墨跡並逐字核對、按香港次序重排。2026-11-13 已完成全部 839 字 HanziWriter 後備字審計，筆順全部確認為香港次序或已重繪／修正，現已全數改標 Edb.R；2026-11-18 再完成 16 項教育局筆順規則裁決（門、辶、夊、舟、冖、厂、巾、雨、忄等），納入《EDB 筆順次序規則》v1.1；2026-11-19 再完成 843 字重掃（以台灣筆順字典墨跡為描紅底，按教育局筆劃原理重建：842 字＋嗩，嗩按「吸左＋鎖右」裁決為 13 筆；另 redo-only 夔／瓤 2 字，合共安裝 845 個 glyph 檔），並裁決瓤 22、憋 15、憨 16 三字筆數（v263 已同步數據）；詳見<a href="docs/dev-memo-hw839.html">開發備忘</a>。</li>
     <li><strong>讀音</strong>：粵拼取自開放粵語字典（kaifangcidian.com，CC-BY 3.0）；普通話拼音取自 pypinyin；筆畫數以實際出貨字形的筆數為準（有字形者跟字形，無字形者跟 HanziWriter 筆數）。</li>
-    <li><strong>簡繁轉換</strong>：以 OpenCC 詞組表為基礎，逐字轉換時再做「香港正字歸一化」，將台灣慣用異體統一成香港標準正字（詳見下節）。</li>
-    <li><strong>字體</strong>：內建 LXGW WenKai TC（霞鶩文楷）自託管字體，無外部 Google Fonts 依賴。</li>
+    <li><strong>簡繁轉換</strong>：以 OpenCC 詞組表為基礎，逐字轉換時再做「香港正字歸一化」，將台灣慣用異體統一成香港標準正字（詳見下節）；正字與異體字逐組對照見<a href="standard-reference.html">正字參考</a>。</li>
+    <li><strong>字體</strong>：一般文字用 LXGW WenKai TC 字棧（LXGW WenKai TC、Kaiti TC、DFKai-SB、標楷體、Noto Serif CJK TC、Songti TC、serif），LXGW 字體檔（fonts/，88 個分塊）只於列印時載入（<code>media="print"</code>），螢幕顯示用系統楷書；輸入欄（<code>#inputText</code>）則用宋體字棧，以 Noto Serif CJK TC 行先，令異體字（如温／溫、蘊／藴）顯示有別。無外部 Google Fonts 依賴。</li>
     <li><strong>部署</strong>：Cloudflare Pages + 自訂域名，GitHub 開源（forumdata-collab/chinese-worksheet）。</li>
   </ul>
 
   <p>字形設計的完整邏輯、重繪清單與待決字，見<a href="docs/dev-memo-hw839.html">開發備忘：字形設計邏輯與 HW 839 審計</a>。</p>
 
   <h2>數據統計</h2>
-  <p>以下為本站的收錄數據（由自動化腳本統計，隨更新而變動）：</p>
+  <p>以下為本站的收錄數據（核對至 v273，2026-11-20；由自動化腳本統計，隨更新而變動）：</p>
 
   <div class="stat-figure">
-    <div class="stat-figure-title">字形與筆順來源（共 5,876 字）</div>
+    <div class="stat-figure-title">字形與筆順來源（共 5,879 字）</div>
     <div class="bar-segmented">
       <div class="bar-seg bar-edb" style="width:82%"></div>
       <div class="bar-seg bar-fallback" style="width:18%"></div>
     </div>
     <div class="legend">
-      <span><i class="dot-edb"></i>香港教育局官方筆順 4,836 字（82%）</span>
-      <span><i class="dot-fallback"></i>按教育局原則重建／核對 1,040 字（18%）</span>
+      <span><i class="dot-edb"></i>香港教育局官方筆順 4,818 字（82%）</span>
+      <span><i class="dot-fallback"></i>按教育局原則重建／核對 1,061 字（18%）</span>
     </div>
-    <p class="stat-note">Edb.R 包括 753 個長尾字（字詞表未收錄，依教育局部件邏輯拼合）及 30 個新增字（粵語常用字及詞語用字，如劏、佚、饈、汴等）；原台灣筆順字典（194 字）及 HanziWriter（839 字）墨跡已全部逐字核對並按香港次序重排，現已全數改標 Edb.R，不再以 TW／HW 標示。詳見<a href="docs/dev-memo-hw839.html">開發備忘</a>。</p>
+    <p class="stat-note">Edb.R 共 1,061 字（v262 時 1,040 字；v265 蘊改標＋新增薀各 1 字，v267 新增蕰 1 字，v269 麵改標 1 字，v271 變體修正 15 字＋秘改標 1 字，v272 新增辶 1 字）。以下四數為 2026-11-13 備忘的歷史工作分類，各類互有重疊，不能直接相加得出 1,061，以 1,061 字為準：753 個長尾字（字詞表未收錄，依教育局部件邏輯拼合）及 30 個新增字（粵語常用字及詞語用字，如劏、佚、饈、汴等）；原台灣筆順字典（194 字）及 HanziWriter（839 字）墨跡已全部逐字核對並按香港次序重排，現已全數改標 Edb.R，不再以 TW／HW 標示。出貨數據（data/glyph_sources.json）只按字記錄 EDB／Edb.R，未再分子來源，故上列細分無法由出貨數據重新衍生。詳見<a href="docs/dev-memo-hw839.html">開發備忘</a>。</p>
   </div>
 
   <div class="stat-figure">
     <div class="stat-figure-title">讀音與筆畫數覆蓋</div>
     <div class="stat-line">
-      收錄 <b>5,876</b> 個字形，全部附筆畫數及筆順；其中 <b>5,846</b> 字另有粵拼及普通話拼音（其餘 30 個為新增粵語用字字形，讀音待補）。
+      收錄 <b>5,879</b> 個字形，全部附筆畫數、筆順、粵拼及普通話拼音。
     </div>
   </div>
+
+  <h2>版本沿革</h2>
+  <p>以下為本頁數據所涉的近期版本（核對至 v273，2026-11-20）。舊數字一律保留於所屬版本行內，不另改寫。</p>
+  <table>
+    <thead>
+      <tr><th>版本</th><th>日期</th><th>改動</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>v262</td><td>2026-11-19</td><td>已部署。843 字重掃（842 字＋嗩；另 redo-only 夔／瓤 2 字，合共安裝 845 個 glyph 檔）；收錄 5,876 字（EDB 4,836／Edb.R 1,040）。</td></tr>
+      <tr><td>v263</td><td>2026-11-19</td><td>已部署。瓤 22、憋 15、憨 16 三字筆數裁決同步入 CHAR_DB；教師附錄上線。</td></tr>
+      <tr><td>v264</td><td>2026-11-19</td><td>只更新本頁（about.html）。</td></tr>
+      <tr><td>v265</td><td>2026-11-19 ~16:18（部署 69aed904）</td><td>已部署。蘊 U+860A 重建 20 筆（囚形）Edb.R；薀 U+8580 新增 17 筆 Edb.R；CHAR_DB 5,876→5,877；「顯示我輸入的寫法」新增蘊。</td></tr>
+      <tr><td>v266</td><td>2026-11-19 ~16:54（部署 c685e43f）</td><td>已部署。字體換宋體字棧，fonts/ 刪除。</td></tr>
+      <tr><td>v266a</td><td>2026-11-19 17:05（部署 d37079fb；重新部署 e378bfdb）</td><td>已部署。fonts/ 恢復（88 個 woff2 分塊）；LXGW 只於列印載入，螢幕用系統楷書、列印用自架 LXGW（用戶 17:21 同意）。</td></tr>
+      <tr><td>v267</td><td>2026-11-19（已提交 19:50，id chineseword-v267）</td><td>從未部署，被 v268 取代。蕰 U+8570 新增 16 筆（日形，非囚形）Edb.R；CHAR_DB 5,877→5,878；輸入欄 #inputText 改 Noto Serif CJK TC 行先。</td></tr>
+      <tr><td>v268</td><td>2026-11-19（已提交 20:06，id chineseword-v268；已部署 20:09，部署 12264381）</td><td>已被 v269 取代。每日一句（.cw-daily-char）及生字冊（.cw-wb-char）引導字改站內字形 inline SVG（glyph-engine.js，engine ?v= 50→51）；字卡／描紅底／文章格早已是 SVG；無字形者退回文字。v268 包含 v267 全部改動，v267 毋須另行部署。</td></tr>
+      <tr><td>v269</td><td>2026-11-19（已提交 21:10，id chineseword-v269；已部署 21:14，部署 92c6a0d2）</td><td>已被 v270 取代。本頁（about.html）及開發備忘數字更新（EDB 4,834／Edb.R 1,044）；麵 U+9EB5 重建 20 筆 Edb.R（CHAR_DB 15→20，own_glyph 開）；perm guard（applyHKOrder runtime 驗證，engine ?v= 51→52）；glyph ?v= 52→53、data.js ?v= 1795093736。</td></tr>
+      <tr><td>v270</td><td>2026-11-19（已提交 21:22，id chineseword-v270；已部署 21:24，部署 4bb942ce）</td><td>文件更新：about 第 188 行補返 Edb.R +4 解釋（蘊改標＋薀新增＋蕰新增＋麵改標）；開發備忘分項補麵、v265–v268 行還原真數；兩份文件核對至 v269。無數據／engine 改動，無 ?v= 變動。</td></tr>
+      <tr><td>v271</td><td>2026-11-19（已打包，id chineseword-v271）</td><td>從未提交、從未部署，被 v272 取代。22 組重複字形 shape audit 修正（兌／悅／說／銳／脫／稅 twpen 1:1 重建、閱 Λ-top、床／蔥／衛／醞／溫／媼／鉤 7 新建 Edb.R、戶 perm、羣／群分開顯示、秘改標 Edb.R）；用戶未批准上傳（2026-11-19 22:26 拒絕），故未提交。</td></tr>
+      <tr><td>v272</td><td>2026-11-20（已提交 08:25，id chineseword-v272；已部署 08:31，部署 c922f131）</td><td>已被 v273 取代（文件更新）。辶 U+8FB6 新增 4 筆 Edb.R（CHAR_DB 5,878→5,879）；嘅重建 12 筆（CHAR_DB 14→12）；重掃 9 字修正＋隰還原 17 筆（CHAR_DB 16→17）；蓽按 EDB 重建；10 個錯 perm 重寫＋宓移除＋兩表凍結；HW 辶拆分（hw-split/ 38 字）；CHAR_DB 同步 7 字：媼 12→13、床 8→7、溫 12→13、蔥 13→15、衛 16→15、醞 16→17、鉤 12→13（全部等於新 glyph 筆數）；EDB 4,818／Edb.R 1,061。</td></tr>
+      <tr><td>v273</td><td>2026-11-20（id chineseword-v273）</td><td>已被 v274 取代（文件更新）。只更新本頁（about.html）及開發備忘：補返 v272 CHAR_DB 同步 7 字（媼／床／溫／蔥／衛／醞／鉤，見 v272 行）；兩份文件核對至 v272。無數據／engine 改動，無 ?v= 變動。</td></tr>
+      <tr><td>v274</td><td>2026-11-21（id chineseword-v274）</td><td>現行版本。「正字參考」頁上線：新增 standard-reference.html＋data/standard-reference.json（EDB 正字參考庫 v1.0，24 組／48 字，基線 live v273；D1–D6 已於 v272 修正）；迺 U+8FFA 核實已有 EDB 字形（動畫 4101，10 筆）及 CHAR_DB 入口（naai5／nǎi／10／辵），無需重建，總數維持 5,879；兩份文件核對至 v273。無數據／engine 改動，無 ?v= 變動。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>待跟進事項</h3>
+  <ul>
+    <li><strong>重掃開放問題</strong>：843 字重掃 15 項開放問題已於 2026-11-20 解決（用戶裁決；9 項修正隨 v272 出貨）；筆順 API Tier-2 筆順數據待重新衍生；筆順 API v1.1.1 已暫停，勿自行重啟。</li>
+    <li><strong>手機應用程式</strong>：APK／iOS 據知仍為 v2.47（對應網站 v260），未與網站 v262–v273 同步，同步目標現為 v273，待用戶確認。</li>
+    <li><strong>長遠事項</strong>：Edb.R 字形風格統一，留待下一大改版；HK_ORDER／HW_HK_SAME 已於 2026-11-19 由用戶裁決凍結（留來做參考，唔再維護、唔刪除）；v272 修正 10 個錯 perm＋宓由 HW_HK_SAME 移除，check_perm 0 errors。</li>
+  </ul>
 
   <h2>常用部首的香港筆畫</h2>
 <p>下表列出常用部首的香港筆畫數與筆順，由本站對香港教育局《香港小學學習字詞表》4,804 字的筆順動畫作反向分析歸納而成：每部首取眾數筆順，即該部首在教育局數據中最常見的寫法。凡教育局寫法與課本或常識不符，一律以教育局為準。筆名採用教育局動畫的標籤；同一筆形在不同字或有不同標籤（例如艹第 4 筆標「豎」或「撇」，幾何完全相同），次序則高度一致。</p>
@@ -247,8 +280,8 @@
   <p>中文有不少字在台灣、香港、大陸有不同寫法（同一字的不同寫法）。本站字形預設示範香港教育標準寫法；輸入簡體字時會轉為繁體。以下按差異原因分類羅列常見情況。</p>
 
   <div class="example-box">
-    <p class="example-text">週末清早，小<b>峯</b>起<b>牀</b>，把被子抱到陽<b>台曬</b>好，又把<b>濕</b>毛巾掛上衣<b>鈎</b>，然後到<b>衞</b>生間洗臉。媽媽在廚房<b>温</b>好豆漿，把<b>麪</b>包放在碟上，切<b>葱</b>時發現菜刀不<b>夠鋭</b>利，<b>卻</b>只笑笑，沒有<b>罵</b>人；湯鍋<b>裏藴</b>着薑的香味，熱氣氤<b>氲</b>，窗外那場雨昨夜已在雲<b>裏醖</b>釀。爸爸從<b>卧</b>房出來，<b>脱</b>下外套，坐在<b>牀</b>邊替弟弟<b>閲</b>讀默書範圍，<b>説</b>：「你要<b>敍</b>述一次筆順。」弟弟光着<b>腳</b>跑過來，嘴<b>脣</b>還沾着餅碎，含糊答了兩句，<b>夠</b>鐘便到櫃<b>台</b>前用印花<b>兑</b>換鉛筆。樓上<b>户</b>主的烟<b>囱</b>冒着白烟，巷口的老<b>媪</b>把<b>枴</b>杖靠在車邊賣菜，樹上留下一隻蟬<b>蜕</b>，地上幾處<b>污</b>漬未乾。雨勢轉<b>強</b>，收音機傳來<b>悦</b>耳的琴聲，媽媽把<b>税</b>單夾好，<b>愠</b>怒地望了爸爸一眼——一<b>羣</b>鳥剛好掠過窗邊。</p>
-    <p class="example-cap">全段 37 個標示字都依香港教育標準：部件（説、衞、鈎、敍、兑、卧、户、温、税、脱、葱、藴、醖、鋭、閲、愠、枴、氲、蜕、媪、悦、囱、卻、腳、夠、污、濕、強）、部首／結構（裏、峯、羣、麪、罵）、簡化與俗體（台、脣、牀、曬）。同一段文字用輸入法打出來，往往變成「小峰起牀去麵包店」——意思一樣，字形不同；孩子照着練得越熟，回到課本、默書反而像寫錯。</p>
+    <p class="example-text">週末清早，小<b>峯</b>起<b>牀</b>，把被子抱到陽<b>台曬</b>好，又把<b>濕</b>毛巾掛上衣<b>鈎</b>，然後到<b>衞</b>生間洗臉。媽媽在廚房<b>温</b>好豆漿，把<b>麪</b>包放在碟上，切<b>葱</b>時發現菜刀不<b>夠鋭</b>利，<b>卻</b>只笑笑，沒有<b>罵</b>人；湯鍋<b>裏藴</b>着薑的香味，熱氣氤<b>氲</b>，窗外那場雨昨夜已在雲<b>裏醖</b>釀。爸爸從<b>卧</b>房出來，<b>脱</b>下外套，坐在<b>牀</b>邊替弟弟<b>閲</b>讀默書範圍，<b>説</b>：「你要<b>敍</b>述一次筆順。」弟弟光着<b>腳</b>跑過來，嘴<b>脣</b>還沾着餅碎，含糊答了兩句，<b>夠</b>鐘便到櫃<b>台</b>前用印花<b>兑</b>換鉛筆。樓上<b>户</b>主的烟<b>囱</b>冒着白烟，巷口的老<b>媪</b>把<b>枴</b>杖靠在車邊賣菜，樹上留下一隻蟬<b>蜕</b>，地上幾處<b>污</b>漬未乾。雨勢轉<b>強</b>，收音機傳來<b>悦</b>耳的琴聲，媽媽把<b>税</b>單夾好，<b>愠</b>怒地望了爸爸一眼——一<b>群</b>鳥剛好掠過窗邊。</p>
+    <p class="example-cap">全段 37 個標示字都依香港教育標準：部件（説、衞、鈎、敍、兑、卧、户、温、税、脱、葱、藴、醖、鋭、閲、愠、枴、氲、蜕、媪、悦、囱、卻、腳、夠、污、濕、強）、部首／結構（裏、峯、群、麪、罵）、簡化與俗體（台、脣、牀、曬）。同一段文字用輸入法打出來，往往變成「小峰起牀去麵包店」——意思一樣，字形不同；孩子照着練得越熟，回到課本、默書反而像寫錯。</p>
   </div>
 
   <div class="note">
@@ -260,12 +293,12 @@
   </div>
 
   <div class="note">
-    「顯示我輸入的寫法」現時涵蓋 14 個字：兌、囪、悅、戶、敘、稅、脫、臥、說、銳、閱、峰、羣、秘。<br>
-    另有 8 個字暫未提供替代字形：<strong>衛、蔥、蘊、醞、裡、鉤、溫、床</strong>。原因是可用的替代字形（HanziWriter 通用字形）與本站採用的筆畫數不一致（例如「蔥」的替代字形為 15 筆，本站香港教育標準為 13 筆），強行採用會出現「卡片 13 畫、描紅 15 筆」的矛盾。因此勾選時，這 8 個字仍示範香港教育標準寫法。香港教育標準寫法（兑、説、鋭、裏、牀等）在任何情況下都保留教育局字形。
+    「顯示我輸入的寫法」現時涵蓋 24 個字：兌、囪、悅、戶、敘、稅、脫、臥、說、銳、閱、峰、羣、秘、蘊、群、麵、床、蔥、衛、醞、溫、媼、鉤。<br>
+    另有 9 個字暫未提供替代字形：<strong>衛、蔥、醞、裡、鉤、溫、床、媪、麪</strong>。原因是可用的替代字形（HanziWriter 通用字形）與本站採用的筆畫數不一致（例如「蔥」的替代字形為 15 筆，本站香港教育標準為 13 筆），強行採用會出現「卡片 13 畫、描紅 15 筆」的矛盾。因此勾選時，這 9 個字仍示範香港教育標準寫法。香港教育標準寫法（兑、説、鋭、裏、牀等）在任何情況下都保留教育局字形。
   </div>
 
   <div class="note">
-    字卡上的 <span class="src-badge">EDB</span>／<span class="src-badge">Edb.R</span> 為字形來源碼：EDB＝香港教育局《香港小學學習字詞表》（標示「香港教育標準」）；Edb.R＝非教育局數據，但按教育局原則重建或核對（標示「按教育局原則」）。逐字差異、筆數與讀音對照見<a href="docs/teacher-appendix.html">教師附錄</a>。
+    字卡上的 <span class="src-badge">EDB</span>／<span class="src-badge">Edb.R</span> 為字形來源碼：EDB＝香港教育局《香港小學學習字詞表》（標示「香港教育標準」）；Edb.R＝非教育局數據，但按教育局原則重建或核對（標示「EDB 修訂」）。逐字差異、筆數與讀音對照見<a href="docs/teacher-appendix.html">教師附錄</a>。
   </div>
 
   <h3>一、部件寫法不同（字一樣）</h3>
@@ -315,7 +348,7 @@
     <tbody>
       <tr><td class="hanzi">裏</td><td class="hanzi">裡</td><td>衣部（上下包住）vs 衤部（左邊旁），部首不同</td></tr>
       <tr><td class="hanzi">峯</td><td class="hanzi">峰</td><td>「山」在上邊 vs 在左邊（香港標準字形作「峯」）</td></tr>
-      <tr><td class="hanzi">羣</td><td class="hanzi">群</td><td>「君」在上邊 vs 在右邊（香港標準字形作「羣」）</td></tr>
+      <tr><td class="hanzi">群</td><td class="hanzi">羣</td><td>「君」在左邊 vs 在上邊（香港標準字形作「群」）</td></tr>
       <tr><td class="hanzi">祕</td><td class="hanzi">秘</td><td>「示」部 vs「禾」部，部首不同；《常用字字形表》註「或作秘，今作祕」，教育局字詞表以「祕」為條目（9 畫），「秘」為 10 畫的通行寫法</td></tr>
       <tr><td class="hanzi">麪</td><td class="hanzi">麵</td><td>「麥」+「丏」（15 畫）vs「麥」+「面」（20 畫），結構不同（香港標準字形作「麪」）</td></tr>
       <tr><td class="hanzi">罵</td><td class="hanzi">駡</td><td>「网（罒）」部 vs「馬」部，部首不同</td></tr>

@@ -1,0 +1,2391 @@
+{
+  "name": "EDB 正字參考庫 (chineseword variant reference library)",
+  "version": "1.0",
+  "generated": "2026-11-21",
+  "baseline": "live v273 (chineseword-v273, deployment 6fb55003); D1–D6 修正已於 v272 上線 (deployment c922f131)",
+  "derived_from": "variant-reference-library/reference-library.json (canonical; this file is generated from it, never edited by hand)",
+  "groups": [
+    {
+      "group": "兌/兑",
+      "standard": {
+        "char": "兑",
+        "hex": "5151",
+        "edb_id": "0270",
+        "edb_id_note": "char_id_map: 兑 -> 270; EDB result page id 0270, 儿部 7畫, 「亦作[兌]」 (AUDIT-A.md §1); team decoded animation anim_full_5151.json id 0270, 7 layers",
+        "strokes_hk": 7,
+        "strokes_authority": "EDB 0270 儿部 7畫; hanzipi code 4325135 (len 7); twpen 7 panels S1 丶 S2 丿",
+        "tw_note": "",
+        "char_db_live_v270": 7,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/5151.json",
+        "correct_shape_file_v271": "glyphs/5151.json"
+      },
+      "variant": {
+        "char": "兌",
+        "hex": "514c",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 7,
+        "strokes_authority": "EDB anim anim_full_514c.json id 0270, 7 layers; hanzipi 兌 總畫數 7畫, code 3425135 (AUDIT.md §1 / AUDIT-A.md §1); twpen 7 panels S1 丿 S2 丶",
+        "tw_note": "",
+        "char_db_live_v270": 7,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/variants/514c.json"
+      },
+      "site_standard": "兑",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT — variants/514c.json shows 兑's top (丶+丿) instead of 兌's top (丿+丶); CLEAR for 兑 (AUDIT.md #1, §1)",
+      "byte_identity": "glyphs/514c.json ≡ glyphs/5151.json (md5 01bce161…, 兑's shape, correct for 兑 only); glyphs/variants/514c.json distinct (6ae5cb4b…, 7 strokes, wrong top for 兌)",
+      "serving": {
+        "checkbox_off": "Shows 兑 (glyphs/5151.json via CW_STD_FORM redirect) — correct as the HK standard display",
+        "checkbox_on": "Shows 兑's shape again (glyphs/variants/514c.json, wrong top) — 兌 is NEVER displayed correctly in v270",
+        "enhanced_note": "Checkbox OFF in enhanced fetches glyphs/514c.json (= 兑's shape, same visual as main by accident); checkbox ON same wrong variants file as main"
+      },
+      "files": [
+        {
+          "path": "glyphs/5151.json",
+          "md5": "01bce161bfd7c8d75dace361cbaa63ed",
+          "strokes": 7,
+          "serves": "兑 in both modes (main + enhanced); 兌 checkbox OFF via CW_STD_FORM redirect (main only)",
+          "correct_for_member": true,
+          "evidence": "Matches EDB 0270 (兑, 丶+丿 top); AUDIT-A.md §1 CLEAR for 兑"
+        },
+        {
+          "path": "glyphs/514c.json",
+          "md5": "01bce161bfd7c8d75dace361cbaa63ed",
+          "strokes": 7,
+          "serves": "Never served in main index (variant mode uses variants/, std mode redirects to 5151); in enhanced checkbox OFF it is fetched as 兌's own file",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/5151.json — it is 兑's shape, not 兌's; shows 丶+丿 top"
+        },
+        {
+          "path": "glyphs/variants/514c.json",
+          "md5": "6ae5cb4bf922b518e7ae4bc293f2596f",
+          "strokes": 7,
+          "serves": "兌 checkbox ON (main + enhanced, hex 514c in VARIANT_GLYPHS)",
+          "correct_for_member": false,
+          "evidence": "Renders 丶+丿 (兑's top); first top stroke falls down-right = a dot, never a 丿 (AUDIT.md §1). True 兌 needs 丿+丶"
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "glyphs/variants/514c.json depicts the standard 兑, not the variant 兌 (top two strokes mirrored)",
+          "evidence": "AUDIT.md §1: twpen 兌 S1 丿 S2 丶; hanzipi 兌 3425135 vs 兑 4325135; EDB 0270.gif 丿+丶 vs 0270a.gif 丶+丿; served file renders 丶+丿",
+          "fix_needed": "Redraw/mirror the top two strokes of variants/514c.json to 丿+丶 (v271 redo, see v271_status); relabel Edb.R",
+          "type": "wrong_variant_glyph"
+        },
+        {
+          "description": "glyph_sources.json labels 514c EDB although no EDB-extracted 兌 glyph exists",
+          "evidence": "AUDIT-A.md L13: 514c among six members with no EDB animation; variants file has integer medians, unlike EDB files",
+          "fix_needed": "Relabel 514c Edb.R when the corrected file ships",
+          "type": "misleading_glyph_source_label"
+        },
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM, so the standard-redirect is absent there (visual outcome coincidentally identical here because glyphs/514c.json is a byte-copy of the standard file)",
+          "evidence": "grep: 0 occurrences of CW_STD_FORM in enhanced/index.html; loadGlyphMeta sets only VARIANT_PAIRS",
+          "fix_needed": "Add CW_STD_FORM build to enhanced/index.html (v271 item 15 does this for the 羣 fix; verify it covers all pairs)",
+          "type": "enhanced_no_std_redirect"
+        }
+      ],
+      "student_note": "兌和兑只差頂部兩筆的左右次序：兌是撇加點（丿丶），兑是點加撇（丶丿），其餘筆畫完全一樣。",
+      "confidence": "high",
+      "v271_status": "Group A: position-mirror rebuild (2026-11-19 ~21:57) SUPERSEDED by user ruling 22:00 (no geometric mirroring); redone twpen 1:1描墨跡 + EDB筆劃原理, user approved 22:11 (「6個效果都很好」). Live in v272 (deployed 2026-11-20 08:31, deployment c922f131).",
+      "open_item": ""
+    },
+    {
+      "group": "臥/卧",
+      "standard": {
+        "char": "卧",
+        "hex": "5367",
+        "edb_id": "3361",
+        "edb_id_note": "AUDIT-C §3: EDB 3361 = 卧 (臣+卜); team decoded animation anim_full_5367.json id 3361, 8 layers. char_id_map.json contains NO entry for 卧 (nor for any of the 12 chars in groups 13-18).",
+        "strokes_hk": 8,
+        "strokes_authority": "EDB 3361 = 卧 (臣+卜); anim_full_5367.json id 3361, 8 layers.",
+        "tw_note": "",
+        "char_db_live_v270": 8,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/5367.json",
+        "correct_shape_file_v271": "glyphs/5367.json"
+      },
+      "variant": {
+        "char": "臥",
+        "hex": "81e5",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 8,
+        "strokes_authority": "twpen 8 steps (left 臣 + right 人: step 7 丿, step 8 捺 — AUDIT-C §3); served variants/81e5.json render matches (臣 + 人).",
+        "tw_note": "",
+        "char_db_live_v270": 8,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": "glyphs/variants/81e5.json",
+        "correct_shape_file_v271": "glyphs/variants/81e5.json"
+      },
+      "site_standard": "卧",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "CLEAR",
+      "audit_verdict": "CLEAR — AUDIT.md verdict table #17 and AUDIT-C §3: both files correct for their chars (卧 = 臣+卜, EDB 3361; 臥 = 臣+人, twpen). The differing component is the RIGHT one (卜 vs 人), not the left.",
+      "byte_identity": "glyphs/81e5.json ≡ glyphs/5367.json (md5 99fe0e68041a89fec5b5836bca54f365, 8 strokes); glyphs/variants/81e5.json is distinct (md5 74cd3d4d8fbc57cc0ce67ae3d675927a, 8 strokes).",
+      "serving": {
+        "checkbox_off": "main: glyphs/5367.json (md5 99fe0e68…, 8 strokes) via CW_STD_FORM[81e5]=卧 — shows 卧 (臣+卜), the HK standard form.",
+        "checkbox_on": "main: glyphs/variants/81e5.json (md5 74cd3d4d…, 8 strokes) — shows 臥 (臣+人), correct.",
+        "enhanced": "OFF serves glyphs/81e5.json (same bytes as 5367, so visibly identical to main); ON serves variants/81e5.json. The standard-redirect itself never fires in enhanced (no CW_STD_FORM), but the outcome is the same here because the own-hex file is byte-identical to the standard file."
+      },
+      "files": [
+        {
+          "path": "glyphs/81e5.json",
+          "md5": "99fe0e68041a89fec5b5836bca54f365",
+          "strokes": 8,
+          "serves": "nominally 臥; actually 卧's shape; unserved in main",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/5367.json — the file is 卧's ink (臣+卜); 臥 needs 臣+人. Never served in main (OFF redirects to 5367; ON uses variants/81e5). In enhanced OFF it is served as the own-hex file, same bytes."
+        },
+        {
+          "path": "glyphs/5367.json",
+          "md5": "99fe0e68041a89fec5b5836bca54f365",
+          "strokes": 8,
+          "serves": "卧 in both modes (main OFF via CW_STD_FORM redirect; enhanced OFF own-hex)",
+          "correct_for_member": true,
+          "evidence": "EDB 3361 = 卧 (臣+卜)."
+        },
+        {
+          "path": "glyphs/variants/81e5.json",
+          "md5": "74cd3d4d8fbc57cc0ce67ae3d675927a",
+          "strokes": 8,
+          "serves": "臥 when checkbox ON (81e5 is in hardcoded VARIANT_GLYPHS)",
+          "correct_for_member": true,
+          "evidence": "Right component is 人, not 卜: stroke 7 median starts [602,762] ends [342,-2] (long diagonal down-left = 丿) vs the standard file's stroke 7 (vertical 丨, ends [662,27]); stroke 8 ends [982,22] (long 捺) vs standard [870,320]. Matches twpen's 臥 (AUDIT-C §3)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "glyph_sources.json labels both 81e5 and 5367 'EDB'. The label is true of the shared glyphs file (EDB 3361 = 卧), but 臥 has no EDB id, and the file actually served for 臥 when ON (variants/81e5.json) is twpen-derived (臣+人), not an EDB extraction — and it has no glyph_sources entry.",
+          "evidence": "data/glyph_sources.json glyphs 81e5/5367 = EDB; AUDIT-C §3 (臥 per twpen; served variants file matches twpen).",
+          "fix_needed": "Record the variants file's provenance as twpen (EDB principles) rather than EDB — or at minimum do not present 臥 as having an EDB glyph. No glyph/count change needed.",
+          "type": "glyph_source_label"
+        },
+        {
+          "description": "enhanced/index.html never builds window.CW_STD_FORM (0 occurrences), so the standard-redirect cannot fire in enhanced; checkbox OFF serves glyphs/<own-hex>.json. For this group it is invisible (glyphs/81e5.json is byte-identical to glyphs/5367.json), but the mechanism gap is real.",
+          "evidence": "grep enhanced/index.html CW_STD_FORM = 0; enhanced/glyph-engine.js is md5-identical to the main engine and reads window.CW_STD_FORM.",
+          "fix_needed": "Build CW_STD_FORM in enhanced/index.html (v271 staging notes this as fixed).",
+          "type": "enhanced_loader_gap"
+        }
+      ],
+      "student_note": "臥同卧右邊唔同：臥係人（丿、捺），卧係卜（豎、點）。瞓覺嘅臥字，右邊寫人。",
+      "confidence": "high",
+      "v271_status": "v271: no change (CLEAR — both files already correct for their chars).",
+      "open_item": ""
+    },
+    {
+      "group": "囪/囱",
+      "standard": {
+        "char": "囱",
+        "hex": "56f1",
+        "edb_id": "0725",
+        "edb_id_note": "char_id_map: 囱 -> 725; EDB result page id 0725, 囗部 7畫, 「亦作[囪]」 (AUDIT-A.md §2); team decoded animation anim_full_56f1.json id 0725, 7 layers",
+        "strokes_hk": 7,
+        "strokes_authority": "EDB 0725 囗部 7畫; anim_full_56f1.json 7 layers; twpen 7 panels; hanzipi code 3253541 (len 7, 5th = 5 折/hook)",
+        "tw_note": "",
+        "char_db_live_v270": 7,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/56f1.json",
+        "correct_shape_file_v271": "glyphs/56f1.json"
+      },
+      "variant": {
+        "char": "囪",
+        "hex": "56ea",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 7,
+        "strokes_authority": "EDB 0725 囗部 7畫; twpen 7 panels; hanzipi code 3253341 (len 7, 5th = 3 丿) (AUDIT-A.md §2)",
+        "tw_note": "",
+        "char_db_live_v270": 7,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": "glyphs/variants/56ea.json",
+        "correct_shape_file_v271": "glyphs/variants/56ea.json"
+      },
+      "site_standard": "囱",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "CLEAR",
+      "audit_verdict": "CLEAR — both glyphs correct; inner 5th stroke differs correctly (囪 plain 丿, 囱 hooks right) (AUDIT.md #2)",
+      "byte_identity": "glyphs/56ea.json ≡ glyphs/56f1.json (md5 0406999e…, 囱's shape, correct for 囱 only); glyphs/variants/56ea.json distinct (fcff47e9…, 7 strokes, correct 囪)",
+      "serving": {
+        "checkbox_off": "Shows 囱 (glyphs/56f1.json via CW_STD_FORM redirect) — correct as the HK standard display",
+        "checkbox_on": "Shows 囪 correctly (glyphs/variants/56ea.json, plain-丿 inner stroke)",
+        "enhanced_note": "Checkbox OFF in enhanced fetches glyphs/56ea.json (= 囱's shape, same visual as main by accident); checkbox ON same correct variants file as main"
+      },
+      "files": [
+        {
+          "path": "glyphs/56f1.json",
+          "md5": "0406999eb178db5412c19593466e5663",
+          "strokes": 7,
+          "serves": "囱 in both modes (main + enhanced); 囪 checkbox OFF via CW_STD_FORM redirect (main only)",
+          "correct_for_member": true,
+          "evidence": "Inner 5th stroke hooks right (𠃍-hook), matching twpen 56f1 S5 and EDB 0725 (AUDIT-A.md §2)"
+        },
+        {
+          "path": "glyphs/56ea.json",
+          "md5": "0406999eb178db5412c19593466e5663",
+          "strokes": 7,
+          "serves": "Never served in main index; in enhanced checkbox OFF it is fetched as 囪's own file",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/56f1.json — it is 囱's shape (hook), not 囪's"
+        },
+        {
+          "path": "glyphs/variants/56ea.json",
+          "md5": "fcff47e9ecb5c18962f6fab7f3d06a42",
+          "strokes": 7,
+          "serves": "囪 checkbox ON (main + enhanced, hex 56ea in VARIANT_GLYPHS)",
+          "correct_for_member": true,
+          "evidence": "Inner 5th stroke renders as a plain 丿 (no hook), matching twpen 56ea S5 and hanzipi 3253341 (AUDIT-A.md §2)"
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM, so the standard-redirect is absent there (visual outcome coincidentally identical here because glyphs/56ea.json is a byte-copy of the standard file)",
+          "evidence": "grep: 0 occurrences of CW_STD_FORM in enhanced/index.html",
+          "fix_needed": "Add CW_STD_FORM build to enhanced/index.html (v271 item 15 does this; verify it covers all pairs)",
+          "type": "enhanced_no_std_redirect"
+        }
+      ],
+      "student_note": "囪和囱只差中間第五筆：囪是平撇（丿），囱是向右鈎的折（𠃍），其餘筆畫完全一樣。",
+      "confidence": "high",
+      "v271_status": "No v271 change (CLEAR).",
+      "open_item": ""
+    },
+    {
+      "group": "媪/媼",
+      "standard": {
+        "char": "媪",
+        "hex": "5aaa",
+        "edb_id": "0941",
+        "edb_id_note": "EDB animation id 0941, char 媪, 12 layers, 日-form (anim_full_5aaa.json); 12-stroke 女部 id block 937-943 (13-stroke block starts 944) and 倉頡 女日月廿 (AUDIT.md); variant_pairs standard = 媪",
+        "strokes_hk": 12,
+        "strokes_authority": "EDB animation id 0941, char 媪, 12 layers (anim_full_5aaa.json); hanzipi code 531251125221 len 12; CUHK 媪 12 (cited in AUDIT.md)",
+        "tw_note": "",
+        "char_db_live_v270": 12,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/5aaa.json",
+        "correct_shape_file_v271": "glyphs/5aaa.json"
+      },
+      "variant": {
+        "char": "媼",
+        "hex": "5abc",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 13,
+        "strokes_authority": "twpen 媼 13 panels viewed (steps 11-15 build 囚: 囗 with 人 inside, bottom horizontal closes at step 8 of the 囚 part — full 13-panel grid viewed); hanzipi code 5312534125221 len 13; CUHK 女 38-10 (13) and 倉頡 女田人廿 (cited in AUDIT.md); 《說文》从女𥁕聲",
+        "tw_note": "TW also 13 (twpen 13 panels; hanzipi len 13). No EDB animation for 媼 — teacher confirmation was still open at audit time for the count, but twpen + hanzipi + CUHK + 倉頡 all agree on 13.",
+        "char_db_live_v270": 12,
+        "char_db_correct": false,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/5abc.json"
+      },
+      "site_standard": "媪",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT — 媼 (12→13, 囚-form; EDB 0941 is really 媪's) (from AUDIT.md). Verified independently here: twpen 媼 13 panels viewed, served file is the 12-stroke 日-form.",
+      "byte_identity": "glyphs/5aaa.json and glyphs/5abc.json are byte-identical (md5 c0096833573354bd4371a2b509eb86b7, 12 strokes). No variants/ file exists for either hex. The shared file is correct for 媪 only; it is WRONG for 媼.",
+      "serving": {
+        "checkbox_off": "Main: 媼 and 媪 both show glyphs/5aaa.json (12-stroke 日-form) — 媼 via CW_STD_FORM redirect, 媪 via own file. Correct for 媪, wrong for 媼. Enhanced: same visible file (no redirect; 媼 not in HK_VARIANT rewrite).",
+        "checkbox_on": "Both sites: 媼 shows glyphs/5abc.json, 媪 shows glyphs/5aaa.json — byte-identical files, same 12-stroke 日-form. Correct for 媪, wrong for 媼."
+      },
+      "files": [
+        {
+          "path": "glyphs/5aaa.json",
+          "md5": "c0096833573354bd4371a2b509eb86b7",
+          "strokes": 12,
+          "serves": "Checkbox OFF (main): both 媼 (via CW_STD_FORM redirect) and 媪 (own file). Checkbox ON: 媪. Enhanced: 媪 in both modes.",
+          "correct_for_member": true,
+          "evidence": "Rendered glyphs/5aaa.json to PNG: 日-form over 皿, 12 strokes — matches EDB 0941 animation (12 layers) and twpen 媪 / hanzipi 12."
+        },
+        {
+          "path": "glyphs/5abc.json",
+          "md5": "c0096833573354bd4371a2b509eb86b7",
+          "strokes": 12,
+          "serves": "Checkbox ON (both sites): 媼. Checkbox OFF (main): not served — 媼 redirects to glyphs/5aaa.json (same bytes). Enhanced checkbox OFF: 媼's own file (same bytes, no redirect). All modes show the wrong shape for 媼.",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/5aaa.json; render shows 日-form, 12 strokes. True 媼 is 囚-form, 13 strokes (twpen 13 panels viewed). The file is 媪's shape, not 媼's."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "CHAR_DB 媼 s=12 is wrong; should be 13. The 12 leaked from 媪 (shared file).",
+          "evidence": "data.js: \"媼\":{\"jy\":\"ou2\",\"py\":\"ǎo\",\"s\":12,...}; twpen 媼 13 panels viewed; hanzipi code len 13.",
+          "fix_needed": "CHAR_DB 媼 12→13 (staged in v271, live in v272).",
+          "type": "char-db-count"
+        },
+        {
+          "description": "Served file for 媼 is the 日-form (12 strokes), not the 囚-form (13). Rendered glyphs/5abc.json to PNG: top component is 日 (box with one inner horizontal), 皿 below — identical to 媪. True 媼 (twpen final viewed) has 囚 (囗 enclosing 人, bottom horizontal closing last) over 皿.",
+          "evidence": "md5 glyphs/5abc.json == glyphs/5aaa.json (c0096833573354bd4371a2b509eb86b7); render viewed; twpen-step-5abc.png 13 panels viewed (step 6 red 丿 inside 囗, step 8 bottom horizontal).",
+          "fix_needed": "New 13-stroke 囚-form own-glyph for 媼 (twpen 1:1, Edb.R) + own_glyph True (staged in v271, user-approved 22:01; live in v272).",
+          "type": "wrong-shape-for-member"
+        },
+        {
+          "description": "glyph_sources labels 5abc 'EDB', but 媼 has no EDB id and the file is a copy of 媪's EDB glyph. The label is wrong on two counts (wrong shape + no EDB source).",
+          "evidence": "data/glyph_sources.json: \"5abc\": \"EDB\"; anim id 0941 belongs to 媪 (12-layer 日-form animation); char_id_map.json has 媪→941 and no 媼 entry.",
+          "fix_needed": "Relabel 5abc Edb.R when the new glyph is built (staged in v271, live in v272).",
+          "type": "wrong-label"
+        },
+        {
+          "description": "EDB-id misassignment in the pipeline metadata: anim_crosscheck_full/anim_full_5abc.json carries id \"0941\" and anim_crosscheck_id_map.json lists 5abc id 0941 with id_source \"char_id_map\" — but char_id_map.json maps 0941 to 媪 only and has no 媼 entry, so that id_source claim is false. The same id_map entry for 5aaa claims std_form \"媼\", contradicting variant_pairs (standard = 媪) and the EDB evidence (0941 is the 12-stroke 日-form = 媪). EDB 0941 belongs to 媪; 媼 has no EDB id. (Third variant-misassignment instance after 蘊/藴 and 麵/麪.)",
+          "evidence": "anim_crosscheck_id_map.json: 5aaa {id 0941, id_source variant_standard, std_form 媼}, 5abc {id 0941, id_source char_id_map}; char_id_map.json map: 媪→941, 媼 absent; anim_full_5aaa.json and anim_full_5abc.json both id 0941, 12 layers, differing only in layer 0 path (same tx/ty) — both decode the same 媪 animation.",
+          "fix_needed": "Correct char_id_map / anim id_map: 0941→媪 only; remove the 0941 assignment from 媼 (staged in v271 per STAGING_v271.md; live in v272).",
+          "type": "char-id-map-error"
+        },
+        {
+          "description": "Enhanced version lacks CW_STD_FORM (0 occurrences; loadGlyphMeta only sets VARIANT_PAIRS). No visible difference for this group (both files byte-identical), but the redirect mechanism is absent; 媼 is NOT in enhanced HK_VARIANT text rewrite, so enhanced checkbox-OFF serves 媼's own (wrong) file rather than redirecting — same wrong shape either way.",
+          "evidence": "grep CW_STD_FORM: enhanced/index.html 0; enhanced HK_VARIANT list (line 3275) has no 媼.",
+          "fix_needed": "v271 staging adds CW_STD_FORM to enhanced — verify it lands; no group-specific fix beyond the 媼 rebuild.",
+          "type": "enhanced-no-std-redirect"
+        }
+      ],
+      "student_note": "「媪」同「媼」讀音唔同，寫法差一畫：媪係「日」字頭，十二畫；媼係「囚」字頭（人喺口入面），十三畫，唔好撈亂。",
+      "confidence": "high",
+      "v271_status": "Live in v272: 媼 rebuilt 13-stroke 囚-form Edb.R own-glyph (glyphs/5abc.json), CHAR_DB 12→13, own_glyph True, glyph_sources 5abc EDB→Edb.R, char_id_map 0941 corrected to 媪. User approved the 7 new glyphs (incl. 媼) 2026-11-19 22:01. Deployed 2026-11-20 08:31, deployment c922f131. Note: v272 handoff lists all glyphs/ files as differ-excluded — Hermes applied manually.",
+      "open_item": ""
+    },
+    {
+      "group": "峯/峰",
+      "standard": {
+        "char": "峯",
+        "hex": "5cef",
+        "edb_id": "1107",
+        "edb_id_note": "EDB result page id 1107: 山部 10畫, 「亦作峰」; team's decoded animation anim_full_5cef.json id 1107, 10 layers; full render is 山-on-top.",
+        "strokes_hk": 10,
+        "strokes_authority": "EDB 1107, 10 layers decoded; twpen 5cef 10 steps (s1 = 山 middle 丨 top-centre); hanzipi agrees.",
+        "tw_note": "",
+        "char_db_live_v270": 10,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/5cef.json",
+        "correct_shape_file_v271": "glyphs/5cef.json"
+      },
+      "variant": {
+        "char": "峰",
+        "hex": "5cf0",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 10,
+        "strokes_authority": "twpen 5cf0 10 steps (s1 = 山 left 丨); hanzipi agrees; EDB 1107 is 10 strokes and the pair shares the count.",
+        "tw_note": "",
+        "char_db_live_v270": 10,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": "glyphs/variants/5cf0.json",
+        "correct_shape_file_v271": "glyphs/variants/5cf0.json"
+      },
+      "site_standard": "峯",
+      "site_standard_note": null,
+      "relation_verified": "部件位置變體",
+      "relation_live_v270": "部件位置變體",
+      "verdict": "CLEAR",
+      "audit_verdict": "CLEAR - layouts correct each way: 峯 = 山 on top centred over 夆 (EDB 1107); 峰 = 山 on the left, 夆 on the right (YiTiZi 1107a.gif). (AUDIT.md group 11; AUDIT-B G4.)",
+      "byte_identity": "glyphs/5cef.json ≡ glyphs/5cf0.json (md5 6d77371d551ff8415a6816f90ce4eced). glyphs/variants/5cf0.json is distinct (md5 5cd1e01e9aee08876e7c9a553487a2e2).",
+      "serving": {
+        "checkbox_off": "Main index.html: 峰 -> CW_STD_FORM[5cf0]=峯 -> glyphs/5cef.json (峯 layout, deliberate standard display). 峯 -> glyphs/5cef.json (correct).",
+        "checkbox_on": "Main index.html: 峰 (5cf0 in VARIANT_GLYPHS) -> variants/5cf0.json (山-left, correct). 峯 -> glyphs/5cef.json (correct).",
+        "enhanced_checkbox_off": "CW_STD_FORM never built -> serves glyphs/5cf0.json for 峰 (byte-identical to 5cef, same 峯 visual as main; mechanism differs).",
+        "enhanced_checkbox_on": "Same as main: variants/5cf0.json for 峰 (correct), glyphs/5cef.json for 峯."
+      },
+      "files": [
+        {
+          "path": "glyphs/5cef.json",
+          "md5": "6d77371d551ff8415a6816f90ce4eced",
+          "strokes": 10,
+          "serves": "峯 in both modes; 峰 with checkbox OFF (standard redirect)",
+          "correct_for_member": true,
+          "evidence": "Shows 山-on-top (s1 median (463,829) top-centre) - right file for the standard member 峯; matches EDB 1107. As the standard display for 峰 with checkbox OFF it is the intended HK-standard form."
+        },
+        {
+          "path": "glyphs/5cf0.json",
+          "md5": "6d77371d551ff8415a6816f90ce4eced",
+          "strokes": 10,
+          "serves": "never served on main (checkbox OFF redirects 峰 -> 5cef; checkbox ON uses variants/5cf0.json); served directly in enhanced checkbox-OFF (same visual as 5cef)",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/5cef.json = 山-on-top (峯's layout), not 峰's 山-left layout."
+        },
+        {
+          "path": "glyphs/variants/5cf0.json",
+          "md5": "5cd1e01e9aee08876e7c9a553487a2e2",
+          "strokes": 10,
+          "serves": "峰 with checkbox ON (5cf0 is in VARIANT_GLYPHS)",
+          "correct_for_member": true,
+          "evidence": "Shows 山-left (s1 median (179,727)); median starts match twpen steps for 峰; matches EDB YiTiZi 1107a.gif."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "5cf0 labelled EDB, but the file served for 峰 (variants/5cf0.json) is not EDB-derived.",
+          "evidence": "No EDB animation for 峰; variants/5cf0.json is a distinct file (md5 5cd1e01e...).",
+          "fix_needed": "Relabel 5cf0 EDB -> Edb.R (or record the variants file's true provenance).",
+          "type": "glyph_sources label wrong"
+        },
+        {
+          "description": "anim_full_5cf0.json carries id 1107 (峯's animation) under 峰's hex.",
+          "evidence": "anim_full_5cf0.json: char 峰, id 1107, 10 layers; anim_full_5cef.json identical id/layers.",
+          "fix_needed": "Correct the anim/id mapping.",
+          "type": "anim file misfiled"
+        },
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM (0 occurrences).",
+          "evidence": "grep: CW_STD_FORM 3x in main index.html, 0x in enhanced/index.html. For this group the visual outcome is unchanged (twin files).",
+          "fix_needed": "Build CW_STD_FORM in enhanced (v271 staging notes say this is fixed in v271).",
+          "type": "enhanced loader gap"
+        }
+      ],
+      "student_note": "峯嘅山喺上邊，峰嘅山喺左邊；峯係香港教育標準寫法。",
+      "confidence": "high",
+      "v271_status": "No change - CLEAR group, not in v271 scope.",
+      "open_item": ""
+    },
+    {
+      "group": "悅/悦",
+      "standard": {
+        "char": "悦",
+        "hex": "60a6",
+        "edb_id": "1341",
+        "edb_id_note": "Team decoded animations anim_full_60a6.json / anim_full_6085.json both id 1341, 10 layers; AUDIT-A.md §3: EDB result page id 1341, 心部 10畫, 「亦作[悅]」. NOTE: char_id_map has NO entry for either 悅 or 悦 (verified by grep + dict lookup) — the id comes from the decoded-animation data, not char_id_map",
+        "strokes_hk": 10,
+        "strokes_authority": "hanzipi code 4424325135 (len 10, positions 4-5 = 丶、丿) (AUDIT-A.md §3); EDB 1341 anim 10 layers; twpen 10 panels",
+        "tw_note": "",
+        "char_db_live_v270": 10,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/60a6.json",
+        "correct_shape_file_v271": "glyphs/60a6.json"
+      },
+      "variant": {
+        "char": "悅",
+        "hex": "6085",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 10,
+        "strokes_authority": "hanzipi 悅 總畫數 10畫, code 4423425135 (verified by browser.open 2026-11-19; positions 4-5 = 3 丿, 4 丶); twpen 10 panels, right top S4 丿 S5 丶 (AUDIT-A.md §3); EDB 1341 心部 10畫",
+        "tw_note": "",
+        "char_db_live_v270": 10,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/variants/6085.json"
+      },
+      "site_standard": "悦",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT — variants/6085.json shows 悦's (兑's) top; CLEAR for 悦 (AUDIT.md #3)",
+      "byte_identity": "glyphs/6085.json ≡ glyphs/60a6.json (md5 0b7cf634…, 悦's shape, correct for 悦 only); glyphs/variants/6085.json distinct (427e1270…, 10 strokes, wrong top for 悅)",
+      "serving": {
+        "checkbox_off": "Shows 悦 (glyphs/60a6.json via CW_STD_FORM redirect) — correct as the HK standard display",
+        "checkbox_on": "Shows 悦's shape again (glyphs/variants/6085.json, wrong top) — 悅 is NEVER displayed correctly in v270",
+        "enhanced_note": "Checkbox OFF in enhanced fetches glyphs/6085.json (= 悦's shape, same visual as main by accident); checkbox ON same wrong variants file as main"
+      },
+      "files": [
+        {
+          "path": "glyphs/60a6.json",
+          "md5": "0b7cf634a4a1d0146077cd18efa111e3",
+          "strokes": 10,
+          "serves": "悦 in both modes (main + enhanced); 悅 checkbox OFF via CW_STD_FORM redirect (main only)",
+          "correct_for_member": true,
+          "evidence": "Right-part top 丶+丿 (兑-form), matching EDB 1341 and twpen/hanzipi 悦; AUDIT-A.md §3 CLEAR for 悦"
+        },
+        {
+          "path": "glyphs/6085.json",
+          "md5": "0b7cf634a4a1d0146077cd18efa111e3",
+          "strokes": 10,
+          "serves": "Never served in main index; in enhanced checkbox OFF it is fetched as 悅's own file",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/60a6.json — it is 悦's shape, not 悅's"
+        },
+        {
+          "path": "glyphs/variants/6085.json",
+          "md5": "427e127013295dc322114b6b32f5f9d8",
+          "strokes": 10,
+          "serves": "悅 checkbox ON (main + enhanced, hex 6085 in VARIANT_GLYPHS)",
+          "correct_for_member": false,
+          "evidence": "Renders right-part top as 丶+丿 (悦/兑's top); true 悅 needs 丿+丶 (AUDIT-A.md §3). Side note (order, not shape): its s-array follows hanzipi's 忄 order (丶、丶、丨) while 60a6 follows twpen/EDB order (丶、丨、丶)"
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "glyphs/variants/6085.json depicts the standard 悦, not the variant 悅 (right-part top mirrored)",
+          "evidence": "AUDIT-A.md §3: twpen 6085 S4 丿 S5 丶; hanzipi 悅 4423425135 vs 悦 4424325135; served file renders 丶+丿",
+          "fix_needed": "Redraw/mirror the top two strokes of the right part to 丿+丶 (v271 redo); relabel Edb.R",
+          "type": "wrong_variant_glyph"
+        },
+        {
+          "description": "glyph_sources.json labels 6085 EDB although no EDB-extracted 悅 glyph exists",
+          "evidence": "AUDIT-A.md L13 lists 6085 among six members with no EDB animation",
+          "fix_needed": "Relabel 6085 Edb.R when the corrected file ships",
+          "type": "misleading_glyph_source_label"
+        },
+        {
+          "description": "char_id_map has no entry for 悅 or 悦, although EDB id 1341 exists (per decoded animations + EDB result page)",
+          "evidence": "Dict lookup + raw grep for \"悅\"/\"悦\" keys in char_id_map.json return nothing; anim_full_6085.json and anim_full_60a6.json both carry id 1341",
+          "fix_needed": "Add 悅/悦 -> 1341 to char_id_map (verify against EDB result page first; do not blindly trust the map elsewhere)",
+          "type": "char_id_map_gap"
+        },
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM (visual outcome coincidentally identical here because glyphs/6085.json is a byte-copy of the standard file)",
+          "evidence": "grep: 0 occurrences of CW_STD_FORM in enhanced/index.html",
+          "fix_needed": "Add CW_STD_FORM build to enhanced/index.html",
+          "type": "enhanced_no_std_redirect"
+        }
+      ],
+      "student_note": "悅和悦左邊忄一樣，只差右邊兌／兑的頂部：悅是撇加點（丿丶），悦是點加撇（丶丿）。",
+      "confidence": "high",
+      "v271_status": "Group A: position-mirror rebuild (2026-11-19 ~21:57) SUPERSEDED by user ruling 22:00 (no geometric mirroring); redone twpen 1:1描墨跡 + EDB筆劃原理, user approved 22:11 (「6個效果都很好」). Live in v272 (deployed 2026-11-20 08:31, deployment c922f131).",
+      "open_item": ""
+    },
+    {
+      "group": "戶/户",
+      "standard": {
+        "char": "户",
+        "hex": "6237",
+        "edb_id": "1474",
+        "edb_id_note": "AUDIT-B G6: EDB 1474, 户部 4畫, 「或作戶，今作户」; team decoded animation anim_full_6237.json id 1474, 4 layers. char_id_map.json (2,161 entries) contains NO entry for 户 (nor for any of the 12 chars in groups 13-18), so this id rests on the anim file + AUDIT EDB page check, not on char_id_map.",
+        "strokes_hk": 4,
+        "strokes_authority": "EDB 1474: 户部 4畫, 「或作戶，今作户」, order 丶,橫折,一,丿 (AUDIT-B G6); anim_full_6237.json id 1474, 4 layers.",
+        "tw_note": "",
+        "char_db_live_v270": 4,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/6237.json",
+        "correct_shape_file_v271": "glyphs/6237.json"
+      },
+      "variant": {
+        "char": "戶",
+        "hex": "6236",
+        "edb_id": null,
+        "edb_id_note": "No headword id; EDB YiTiZi GIF cited (1474a (YiTiZi GIF, not a headword id)).",
+        "strokes_hk": 4,
+        "strokes_authority": "EDB 1474 YiTiZi GIF 1474a (戶, dot above/separate) + twpen/hanzipi order 丿,丶,橫折,一 (AUDIT-B G6); team anim_full_6236.json id 1474, 4 layers (headword animation).",
+        "tw_note": "",
+        "char_db_live_v270": 4,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": "glyphs/variants/6236.json",
+        "correct_shape_file_v271": "glyphs/variants/6236.json"
+      },
+      "site_standard": "户",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "CLEAR",
+      "audit_verdict": "CLEAR (shape) — AUDIT.md §6 / AUDIT-B G6: the ink is 戶's for 戶 and 户's for 户; ORDER FLAG (not a shape verdict): variants/6236.json carries 户's stroke order, not 戶's.",
+      "byte_identity": "glyphs/6236.json ≡ glyphs/6237.json (md5 7784dc99e8bfd13c745a222c8d82cea2, 4 strokes); glyphs/variants/6236.json is distinct (md5 748fca04ba34f830e63e167f77ec98a0, 4 strokes).",
+      "serving": {
+        "checkbox_off": "main: glyphs/6237.json (md5 7784dc99…, 4 strokes) via CW_STD_FORM[6236]=户 — shows 户, the HK standard form.",
+        "checkbox_on": "main: glyphs/variants/6236.json (md5 748fca04…, 4 strokes) — shows 戶's shape (dot above/separate) but with 户's stroke order.",
+        "enhanced": "OFF serves glyphs/6236.json (same bytes as 6237, so visibly identical to main); ON serves variants/6236.json. The standard-redirect itself never fires in enhanced (no CW_STD_FORM), but the outcome is the same here because the own-hex file is byte-identical to the standard file."
+      },
+      "files": [
+        {
+          "path": "glyphs/6236.json",
+          "md5": "7784dc99e8bfd13c745a222c8d82cea2",
+          "strokes": 4,
+          "serves": "nominally 戶; actually 户's shape; unserved in main",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/6237.json (户's EDB file); shape is 户's (dot inside/touching the 橫折), not 戶's. Never served in main (OFF redirects to 6237; ON uses variants/6236). In enhanced OFF it is served as the own-hex file, but the bytes are 户's shape."
+        },
+        {
+          "path": "glyphs/6237.json",
+          "md5": "7784dc99e8bfd13c745a222c8d82cea2",
+          "strokes": 4,
+          "serves": "户 in both modes (main OFF via CW_STD_FORM redirect; main ON fallback; enhanced OFF own-hex)",
+          "correct_for_member": true,
+          "evidence": "EDB 1474 = 户; dot inside/touching, order 丶,橫折,一,丿 (AUDIT-B G6 medians)."
+        },
+        {
+          "path": "glyphs/variants/6236.json",
+          "md5": "748fca04ba34f830e63e167f77ec98a0",
+          "strokes": 4,
+          "serves": "戶 when checkbox ON (6236 is in hardcoded VARIANT_GLYPHS)",
+          "correct_for_member": true,
+          "evidence": "Shape correct for 戶 (dot above/separate — AUDIT-B G6); order wrong (see discrepancies: stroke-order entry)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "variants/6236.json (戶, served when checkbox ON) uses 户's stroke order 丶,橫折,一,丿 instead of 戶's 丿,丶,橫折,一. Verified from the file's own medians: stroke 1 starts [467,832] ends [597,737] (dx +130, falls down-right = a dot 丶, not a 丿); stroke 4 starts [307,600] ends [97,-46] (dx -210 = the long 丿, placed last). The file is glyphs/6237.json with only the dot moved up; the order was never permuted.",
+          "evidence": "glyphs/variants/6236.json medians s1/s4 (v270 work copy); AUDIT-B G6 per-stroke renders (s1=dot, s4=long 丿).",
+          "fix_needed": "Perm fix only, no rebuild: variants/6236.json perm [3,0,1,2] (丿 first) — v271 Group D.",
+          "type": "stroke_order"
+        },
+        {
+          "description": "glyph_sources.json labels both 6236 and 6237 'EDB'. The label is true of the shared file (EDB 1474 = 户), but 戶 has no EDB headword id — only the YiTiZi GIF 1474a — and the file actually served for 戶 when ON (variants/6236.json) is a hand-modified copy of the EDB 户 file, not an EDB extraction, and has no glyph_sources entry at all.",
+          "evidence": "data/glyph_sources.json glyphs 6236/6237 = EDB; AUDIT-B G6 (戶 'no EDB id').",
+          "fix_needed": "After the v271 perm fix, the variants file is still not an EDB extraction; label the 戶 entry Edb.R (or keep EDB only for the shared 户 file and record the variants file separately).",
+          "type": "glyph_source_label"
+        },
+        {
+          "description": "enhanced/index.html never builds window.CW_STD_FORM (0 occurrences; its loadGlyphMeta loads variant_pairs.json but does not build the map), while its glyph-engine.js copy (md5-identical to main, 30eaec32…) reads window.CW_STD_FORM in hkGlyph/std(). The standard-redirect therefore cannot fire in enhanced; checkbox OFF serves glyphs/<own-hex>.json. For this group it is invisible (glyphs/6236.json is byte-identical to glyphs/6237.json), but the mechanism gap is real.",
+          "evidence": "grep enhanced/index.html CW_STD_FORM = 0; enhanced/glyph-engine.js references CW_STD_FORM once (stdForm, L133) and is md5-identical to the main engine.",
+          "fix_needed": "Build CW_STD_FORM in enhanced/index.html (v271 staging notes this as fixed).",
+          "type": "enhanced_loader_gap"
+        }
+      ],
+      "student_note": "戶同户係同一個字嘅兩種寫法：戶嘅點喺橫折上面、獨自分開，筆順係丿先、點第二；户嘅點喺橫折入面，丿寫到最尾。香港標準寫法係户。",
+      "confidence": "high",
+      "v271_status": "Group D: perm fix only — variants/6236.json perm [3,0,1,2] (丿 first); no rebuild. Live in v272 (deployed 2026-11-20 08:31, deployment c922f131).",
+      "open_item": ""
+    },
+    {
+      "group": "敘/敍",
+      "standard": {
+        "char": "敍",
+        "hex": "654d",
+        "edb_id": "1716",
+        "edb_id_note": "EDB result page id 1716: 攴部 11畫, 「亦作[1715a.gif]、敘」; team's decoded animation anim_full_654d.json id 1716, 11 layers, stroke 8 VERTICAL = 攴-form (AUDIT.md §2, coordinator-verified from EDB itself).",
+        "strokes_hk": 11,
+        "strokes_authority": "EDB 1716, 11 layers decoded; twpen 654d 11 steps (s8 丨, s9 一, s10 丿, s11 捺); hanzipi agrees.",
+        "tw_note": "",
+        "char_db_live_v270": 11,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/654d.json",
+        "correct_shape_file_v271": "glyphs/654d.json"
+      },
+      "variant": {
+        "char": "敘",
+        "hex": "6558",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 11,
+        "strokes_authority": "EDB 1716 is 11 strokes and the pair shares the count; twpen 6558 11 steps (s8 丿, s9 一, s10 丿, s11 捺); hanzipi agrees.",
+        "tw_note": "",
+        "char_db_live_v270": 11,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": "glyphs/variants/6558.json",
+        "correct_shape_file_v271": "glyphs/variants/6558.json"
+      },
+      "site_standard": "敍",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "CLEAR",
+      "audit_verdict": "CLEAR - each served file shows its own member's form (AUDIT.md §2). Reasoning corrected: Worker B claimed EDB 1716 (敍) is 攵-form; the coordinator verified from EDB itself that 1716 is 攴-form (decoded anim stroke 8 vertical; twpen 敍 panel 8 = vertical 丨, 敘 panel 8 = slanting 丿). The verdict stands, B's reason was wrong. NOTE: AUDIT-B G1 used the brief's swapped hexes (敘 654d / 敍 6558); corrected in AUDIT.md hex-corrections table - no visual impact since the glyphs/ files are byte-identical twins.",
+      "byte_identity": "glyphs/6558.json ≡ glyphs/654d.json (md5 3bdafcbe1131ac8b7d2f21d19b2c2f19). glyphs/variants/6558.json is distinct (md5 180d6ac38680d4c0c5efacbe5aa68293).",
+      "serving": {
+        "checkbox_off": "Main index.html: 敘 -> CW_STD_FORM[6558]=敍 -> glyphs/654d.json (敍's 攴 shape - deliberate standard display). 敍 -> glyphs/654d.json (correct).",
+        "checkbox_on": "Main index.html: 敘 (6558 in VARIANT_GLYPHS) -> variants/6558.json (敘's own 攵 shape, correct). 敍 -> glyphs/654d.json (correct).",
+        "enhanced_checkbox_off": "CW_STD_FORM never built -> serves glyphs/6558.json for 敘 (byte-identical to 654d, same 攴 visual as main; mechanism differs).",
+        "enhanced_checkbox_on": "Same as main: variants/6558.json for 敘 (correct), glyphs/654d.json for 敍."
+      },
+      "files": [
+        {
+          "path": "glyphs/6558.json",
+          "md5": "3bdafcbe1131ac8b7d2f21d19b2c2f19",
+          "strokes": 11,
+          "serves": "never served on main (checkbox OFF redirects 敘 -> 654d; checkbox ON uses variants/6558.json); served directly in enhanced checkbox-OFF (same visual as 654d)",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/654d.json, which shows 攴 (vertical first stroke) = 敍's shape, not 敘's 攵-form."
+        },
+        {
+          "path": "glyphs/654d.json",
+          "md5": "3bdafcbe1131ac8b7d2f21d19b2c2f19",
+          "strokes": 11,
+          "serves": "敍 in both modes; 敘 with checkbox OFF (standard redirect)",
+          "correct_for_member": true,
+          "evidence": "Shows 攴 (vertical s8) = correct for 敍; matches EDB 1716 stroke-for-stroke (AUDIT-B G1, §2-corrected). As the standard display for 敘 with checkbox OFF it is the intended HK-standard form."
+        },
+        {
+          "path": "glyphs/variants/6558.json",
+          "md5": "180d6ac38680d4c0c5efacbe5aa68293",
+          "strokes": 11,
+          "serves": "敘 with checkbox ON (6558 is in VARIANT_GLYPHS)",
+          "correct_for_member": true,
+          "evidence": "Shows 攵 (slanting first stroke); matches twpen's 敘 step diagram (s8 slanting 丿)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "6558 labelled EDB, but the file served for 敘 (variants/6558.json) is not EDB-derived.",
+          "evidence": "No EDB animation for 敘; variants/6558.json is a distinct file (md5 180d6ac3...).",
+          "fix_needed": "Relabel 6558 EDB -> Edb.R (or record the variants file's true provenance).",
+          "type": "glyph_sources label wrong"
+        },
+        {
+          "description": "anim_full_6558.json carries id 1716 (敍's animation) under 敘's hex.",
+          "evidence": "anim_full_6558.json: char 敘, id 1716, 11 layers; anim_full_654d.json identical id/layers.",
+          "fix_needed": "Correct the anim/id mapping.",
+          "type": "anim file misfiled"
+        },
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM (0 occurrences).",
+          "evidence": "grep: CW_STD_FORM 3x in main index.html, 0x in enhanced/index.html. For this group the visual outcome is unchanged (twin files).",
+          "fix_needed": "Build CW_STD_FORM in enhanced (v271 staging notes say this is fixed in v271).",
+          "type": "enhanced loader gap"
+        }
+      ],
+      "student_note": "兩字右邊唔同：敘用攵，第一畫係斜撇；敍用攴，第一畫係直豎。敍係香港教育標準寫法。",
+      "confidence": "high",
+      "v271_status": "No change - CLEAR group, not in v271 scope.",
+      "open_item": ""
+    },
+    {
+      "group": "温/溫",
+      "standard": {
+        "char": "温",
+        "hex": "6e29",
+        "edb_id": "2261",
+        "edb_id_note": "AUDIT-C §4: EDB 2261 = 温; team decoded animation anim_full_6e29.json id 2261, 12 layers, 日-form (L6/L7 horizontals); id-block check 2261 in the 12-stroke 氵部 block. char_id_map.json contains NO entry for 温 (nor for any of the 12 chars in groups 13-18).",
+        "strokes_hk": 12,
+        "strokes_authority": "EDB 2261 (anim_full_6e29.json, 12 layers; right component 日-form — layers L6/L7 are horizontals, AUDIT-C §4); id-block check: 2261 sits in the 12-stroke 氵部 block (2252-2259 all 12; 2262 溯 13).",
+        "tw_note": "Mainland 簡体 温 is also 12 — no divergence for 温 itself.",
+        "char_db_live_v270": 12,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/6e29.json",
+        "correct_shape_file_v271": "glyphs/6e29.json"
+      },
+      "variant": {
+        "char": "溫",
+        "hex": "6eab",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 13,
+        "strokes_authority": "twpen 13 steps (囚-form: step 4 丨, 5 𠃍, 6 丿, 7 捺, 8 一); hanzipi 13 steps, same; CUHK 漢語多功能字庫 溫 = 水 85-10 (13), 倉頡 水田人廿, 《說文》「从水，𥁕聲」, 繁簡對應 温 (AUDIT-C §4) — CUHK entry independently re-verified by web search 2026-11-19 (humanum.arts.cuhk.edu.hk Lexis: 水 85-10 (13), U+6EAB, 倉頡 水田人廿).",
+        "tw_note": "twpen (TW) 13 — agrees with HK 13; no TW/HK divergence.",
+        "char_db_live_v270": 12,
+        "char_db_correct": false,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/6eab.json"
+      },
+      "site_standard": "温",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT — AUDIT.md verdict table #18 and AUDIT-C §4: 溫 is 囚-form 13 strokes; the served 12-stroke 日-form ink is wrong for 溫 on both shape and count. Highest impact of all 21 groups — 溫 is a very common character.",
+      "byte_identity": "glyphs/6e29.json ≡ glyphs/6eab.json (md5 9fc14b7fe99dee4d203a04069be8b8fe, 12 strokes); NO variants file exists for either hex. This is the airtight core of the finding: one 12-stroke file serves both members.",
+      "serving": {
+        "checkbox_off": "main: glyphs/6e29.json (md5 9fc14b7f…, 12 strokes) via CW_STD_FORM[6eab]=温 — shows 温 (日-form), the HK standard form. Correct for 温, wrong for 溫.",
+        "checkbox_on": "main: glyphs/6eab.json (md5 9fc14b7f…, 12 strokes) — byte-identical to the standard file, so 溫 still shows 温's 日-form ink. The checkbox has NO effect for 溫 (6eab not in VARIANT_GLYPHS, no variants file).",
+        "enhanced": "OFF serves glyphs/6eab.json and ON serves the same file (no variants file, no CW_STD_FORM) — 温's ink in both modes, identical to main."
+      },
+      "files": [
+        {
+          "path": "glyphs/6eab.json",
+          "md5": "9fc14b7fe99dee4d203a04069be8b8fe",
+          "strokes": 12,
+          "serves": "溫 in checkbox ON (own-hex); identical bytes to the standard file",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/6e29.json — the file is 温's 12-stroke 日-form ink; 溫 needs 13-stroke 囚-form. Served for 溫 whenever checkbox ON (6eab not in VARIANT_GLYPHS, so std() fetches own-hex)."
+        },
+        {
+          "path": "glyphs/6e29.json",
+          "md5": "9fc14b7fe99dee4d203a04069be8b8fe",
+          "strokes": 12,
+          "serves": "温 in both modes; also 溫 in main checkbox OFF via CW_STD_FORM redirect (wrong for 溫)",
+          "correct_for_member": true,
+          "evidence": "EDB 2261 = 温; 12 layers, 日-form (AUDIT-C §4 layer geometry)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "CHAR_DB 溫 s=12 is wrong: the true HK count is 13 (囚-form: 氵3 + 囚5 + 皿5). The 12 leaked from 温 (日-form). Both members' CHAR_DB values are 12, so the site labels 溫 '12畫' and serves it a 12-stroke file.",
+          "evidence": "data.js CHAR_DB 溫 s=12; glyphs/6eab.json has 12 strokes (len(s)=12) and is md5-identical to glyphs/6e29.json (9fc14b7f…); AUDIT-C §4 (twpen 13, hanzipi 13, CUHK 水85-10 (13)); CUHK re-verified by independent web search 2026-11-19.",
+          "fix_needed": "CHAR_DB 溫 12→13; build 溫 its own 13-stroke 囚-form glyph (twpen 1:1, Edb.R); own_glyph True — v271 Group C.",
+          "type": "count_and_shape"
+        },
+        {
+          "description": "variant_pairs.json says 溫 (6eab) own_glyph=False, so the loader has no own-glyph path for 溫; and 6eab is NOT in the hardcoded VARIANT_GLYPHS list, so checkbox ON cannot serve a variants file either. 溫 is served 温's file in every mode — the checkbox has no effect for this character.",
+          "evidence": "data/variant_pairs.json pairs 6eab own_glyph=False; glyph-engine.js VARIANT_GLYPHS has no 6eab; no glyphs/variants/6eab.json on disk; md5(glyphs/6e29.json) = md5(glyphs/6eab.json) = 9fc14b7fe99dee4d203a04069be8b8fe.",
+          "fix_needed": "v271 Group C sets own_glyph True and adds the new glyph (loader wiring per v271).",
+          "type": "serving_no_own_glyph"
+        },
+        {
+          "description": "glyph_sources.json labels both 6e29 and 6eab 'EDB'. The label is true for 温 (EDB 2261), but 溫 has no EDB id at all — the file labelled EDB for 6eab is 温's EDB extraction, not 溫's form.",
+          "evidence": "data/glyph_sources.json glyphs 6e29/6eab = EDB; AUDIT-C §4 (溫 'no EDB id').",
+          "fix_needed": "After the v271 rebuild, label the 6eab entry Edb.R.",
+          "type": "glyph_source_label"
+        },
+        {
+          "description": "enhanced/index.html never builds window.CW_STD_FORM (0 occurrences), so the standard-redirect cannot fire in enhanced; checkbox OFF serves glyphs/<own-hex>.json. For this group it is invisible (glyphs/6eab.json is byte-identical to glyphs/6e29.json), but the mechanism gap is real.",
+          "evidence": "grep enhanced/index.html CW_STD_FORM = 0; enhanced/glyph-engine.js is md5-identical to the main engine and reads window.CW_STD_FORM.",
+          "fix_needed": "Build CW_STD_FORM in enhanced/index.html (v271 staging notes this as fixed).",
+          "type": "enhanced_loader_gap"
+        }
+      ],
+      "student_note": "溫同温右上分別係囚同日：溫係囚（入面有人），一共13畫；温係日，一共12畫。香港標準寫法係温，但繁體溫字要寫囚形、13畫。",
+      "confidence": "high",
+      "v271_status": "Group C: new 13-stroke 囚-form glyph (twpen 1:1, Edb.R) + CHAR_DB 12→13 + own_glyph True; user approved 22:01 ('全ok' among the 7 new glyphs). Live in v272 (deployed 2026-11-20 08:31, deployment c922f131). Highest-impact fix (very common character).",
+      "open_item": ""
+    },
+    {
+      "group": "床/牀",
+      "standard": {
+        "char": "牀",
+        "hex": "7240",
+        "edb_id": "2462",
+        "edb_id_note": "Team decoded animations anim_full_7240.json / anim_full_5e8a.json both id 2462, 8 layers; AUDIT.md: EDB 2462 = 牀, 「或作床，今作牀」. NOTE: char_id_map has NO entry for either 床 or 牀 — the id comes from the decoded-animation data, not char_id_map",
+        "strokes_hk": 8,
+        "strokes_authority": "EDB 2462 anim 8 layers (爿+木); CHAR_DB 8; twpen/hanzipi agree 牀 is 8 (AUDIT.md)",
+        "tw_note": "",
+        "char_db_live_v270": 8,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/7240.json",
+        "correct_shape_file_v271": "glyphs/7240.json"
+      },
+      "variant": {
+        "char": "床",
+        "hex": "5e8a",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 7,
+        "strokes_authority": "hanzipi 床 總畫數 7畫, code 4131234 (verified by browser.open 2026-11-19); twpen 7 panels; CUHK 7畫 list; 广3 + 木4 = 7 (AUDIT.md). CHAR_DB says 8 — WRONG, leaked from 牀",
+        "tw_note": "No TW/HK difference here: hanzipi (TW-based) and CUHK (HK) both give 7",
+        "char_db_live_v270": 8,
+        "char_db_correct": false,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/5e8a.json"
+      },
+      "site_standard": "牀",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT — shared glyphs/7240.json is 牀 (爿+木, 8); 床 = 广+木 = 7 (AUDIT.md #6)",
+      "byte_identity": "glyphs/5e8a.json ≡ glyphs/7240.json (md5 22d56718…, 牀's shape, 8 strokes, correct for 牀 only); no variants files exist for either member",
+      "serving": {
+        "checkbox_off": "Shows 牀 (glyphs/7240.json via CW_STD_FORM redirect) — 床 displays the wrong character form AND the wrong stroke count (8 instead of 7)",
+        "checkbox_on": "Shows 牀 again (5e8a not in VARIANT_GLYPHS, so variant mode never applies; std() still redirects to 7240) — 床 is NEVER displayed correctly in v270",
+        "enhanced_note": "Enhanced same visual: checkbox OFF fetches glyphs/5e8a.json (= 牀's shape, same bytes); checkbox ON same, since variant mode does not apply"
+      },
+      "files": [
+        {
+          "path": "glyphs/7240.json",
+          "md5": "22d56718d3374d43ce44d311a8950489",
+          "strokes": 8,
+          "serves": "牀 in both modes (main + enhanced); 床 in both modes via CW_STD_FORM redirect (main) or own-file fetch (enhanced)",
+          "correct_for_member": true,
+          "evidence": "爿+木, 8 strokes, matches EDB 2462 (AUDIT.md); correct for 牀, wrong for 床"
+        },
+        {
+          "path": "glyphs/5e8a.json",
+          "md5": "22d56718d3374d43ce44d311a8950489",
+          "strokes": 8,
+          "serves": "Never served in main index (5e8a not in VARIANT_GLYPHS; checkbox OFF redirects to 7240); in enhanced checkbox OFF it is fetched as 床's own file",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/7240.json — it is 牀's shape (爿+木, 8 strokes), not 床's (广+木, 7 strokes)"
+        },
+        {
+          "path": "glyphs/variants/5e8a.json",
+          "md5": null,
+          "strokes": null,
+          "serves": "Does not exist in v270",
+          "correct_for_member": false,
+          "evidence": "Absent from disk (ls confirms); 5e8a not in VARIANT_GLYPHS and own_glyph=false in variant_pairs, so no variants file is ever consulted"
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "床 is served 牀's glyph (爿+木, 8 strokes) in every mode; CHAR_DB 床 s=8 is wrong (should be 7)",
+          "evidence": "md5 identity above; hanzipi 床 7畫 code 4131234 (verified by browser.open); twpen 7 panels; CUHK 7畫; EDB 2462 = 牀 「或作床，今作牀」 (AUDIT.md)",
+          "fix_needed": "New 7-stroke 广+木 own-glyph for 床 (twpen 1:1, Edb.R) + CHAR_DB 床 8 → 7 + own_glyph true — v271 Group C does this; user approved 22:01",
+          "type": "wrong_variant_glyph_and_count"
+        },
+        {
+          "description": "glyph_sources.json labels 5e8a EDB although glyphs/5e8a.json is a copy of EDB 7240 (牀) data",
+          "evidence": "AUDIT-A.md L13 lists 5e8a among six members with no EDB animation; md5 identity above",
+          "fix_needed": "Relabel 5e8a Edb.R when the new glyph ships (v271 does this)",
+          "type": "misleading_glyph_source_label"
+        },
+        {
+          "description": "char_id_map has no entry for 床 or 牀, although EDB id 2462 exists (per decoded animations)",
+          "evidence": "Dict lookup + raw grep for \"床\"/\"牀\" keys in char_id_map.json return nothing; anim_full_5e8a.json and anim_full_7240.json both carry id 2462",
+          "fix_needed": "Add 床/牀 -> 2462 to char_id_map after verifying against the EDB result page",
+          "type": "char_id_map_gap"
+        },
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM (visual outcome identical here because glyphs/5e8a.json is a byte-copy of the standard file)",
+          "evidence": "grep: 0 occurrences of CW_STD_FORM in enhanced/index.html",
+          "fix_needed": "Add CW_STD_FORM build to enhanced/index.html",
+          "type": "enhanced_no_std_redirect"
+        }
+      ],
+      "student_note": "床和牀左邊不同：床是广（點、橫、撇，共七畫），牀是爿（多一筆，共八畫）；右邊木完全一樣。",
+      "confidence": "high",
+      "v271_status": "Group C: 床 rebuilt twpen 1:1, 7 strokes, Edb.R; CHAR_DB 8→7; own_glyph true. User approved the 7 new Group C glyphs 22:01 ('全ok'). Live in v272 (deployed 2026-11-20 08:31, deployment c922f131).",
+      "open_item": ""
+    },
+    {
+      "group": "秘/祕",
+      "standard": {
+        "char": "祕",
+        "hex": "7955",
+        "edb_id": "2866",
+        "edb_id_note": "EDB animation id 2866, char 祕, 9 layers (anim_full_7955.json); variant_pairs standard = 祕 for both members",
+        "strokes_hk": 9,
+        "strokes_authority": "EDB animation id 2866, char 祕, 9 layers (anim_full_7955.json); hanzipi code 452445434 len 9; component arithmetic 礻 4 + 必 5 = 9",
+        "tw_note": "TW also 9.",
+        "char_db_live_v270": 9,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/7955.json",
+        "correct_shape_file_v271": "glyphs/7955.json"
+      },
+      "variant": {
+        "char": "秘",
+        "hex": "79d8",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 10,
+        "strokes_authority": "twpen 秘 10 panels viewed (禾 5 + 必 5); hanzipi code 3123445434 len 10; component arithmetic 禾 5 + 必 5 = 10. No EDB animation for 秘.",
+        "tw_note": "TW also 10 (twpen 10 panels; hanzipi len 10).",
+        "char_db_live_v270": 10,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": "glyphs/79d8.json",
+        "correct_shape_file_v271": "glyphs/79d8.json"
+      },
+      "site_standard": "祕",
+      "site_standard_note": null,
+      "relation_verified": "偏旁變體",
+      "relation_live_v270": "偏旁變體",
+      "verdict": "NOT AUDITED",
+      "audit_verdict": "NOT AUDITED — full check done here (this group was not one of the 21 audited groups).",
+      "byte_identity": "Distinct files: glyphs/79d8.json (md5 42aee20da65acef7317d6d6632dbed1a, 10 strokes) vs glyphs/7955.json (md5 1f63df475bd1decc1e5fed31aabd5540, 9 strokes). No variants/ file exists for either hex. No byte-sharing problem in this group.",
+      "serving": {
+        "checkbox_off": "Main: 秘 and 祕 both show glyphs/7955.json (9-stroke 祕) — 秘 via CW_STD_FORM redirect, 祕 via own file. This is the intended HK-standard default (loader comment: 秘→祕). Enhanced: 秘 shows its OWN glyphs/79d8.json (10-stroke 秘) — NO redirect (CW_STD_FORM never built) and no HK_VARIANT rewrite for 秘 — so enhanced default disagrees with main.",
+        "checkbox_on": "Both sites: 秘 shows glyphs/79d8.json (10-stroke 禾+必), 祕 shows glyphs/7955.json (9-stroke 示+必). Both correct. (Neither hex is in VARIANT_GLYPHS, so ON serves the own glyphs/ file directly.)"
+      },
+      "files": [
+        {
+          "path": "glyphs/79d8.json",
+          "md5": "42aee20da65acef7317d6d6632dbed1a",
+          "strokes": 10,
+          "serves": "Checkbox ON (both sites): 秘, via glyphs/<own-hex>.json — 79d8 is NOT in the hardcoded VARIANT_GLYPHS list (13 hexes) and there is no variants/79d8.json, so the loader's variantMode is false and std() serves the own file. Checkbox OFF (main): not served — 秘 redirects to glyphs/7955.json. Enhanced checkbox OFF: 秘's own file (no redirect).",
+          "correct_for_member": true,
+          "evidence": "Rendered glyphs/79d8.json to PNG: 禾 left + 必 right, 10 strokes — matches twpen 秘 final (10 panels viewed, 禾+必) and hanzipi 10. Median check of the 必 strokes (s5-s9) in the file: s5 丿 (down-left), s6 豎鈎 (down then right with hook), s7 丶, s8 短捺 (short down-right), s9 長丿 (long down-left sweep) — exactly the EDB 必 order (丿、豎鈎、丶、短捺 4th、長丿 5th). The hk_order.js perm for 秘 [0,1,2,3,4,5,6,7,9,8] applies to the HanziWriter fallback data (where HW swaps 必's last two strokes), not to this glyph file, which is already in HK order."
+        },
+        {
+          "path": "glyphs/7955.json",
+          "md5": "1f63df475bd1decc1e5fed31aabd5540",
+          "strokes": 9,
+          "serves": "Checkbox OFF (main): both 秘 (via CW_STD_FORM redirect) and 祕 (own file). Checkbox ON: 祕. Enhanced: 祕 in both modes.",
+          "correct_for_member": true,
+          "evidence": "Rendered glyphs/7955.json to PNG: 示 (礻) left + 必 right, 9 strokes — matches the EDB 2866 animation (9 layers) and hanzipi 9. Median check of 必 strokes (s4-s8): same 丿、豎鈎、丶、短捺、長丿 order as 秘. hk_order.js 祕 perm [0,1,2,3,4,5,6,8,7] is the HanziWriter-fallback reorder, not a glyph-file issue."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "glyph_sources labels 79d8 'EDB', but 秘 has no EDB id — EDB 2866 is 祕 (9-layer animation). The served 10-stroke 秘 file is a rebuild (禾+必, EDB 必 order), not an EDB extraction. Label should be Edb.R. This label error was NOT fixed by v265/v269 and was NOT in staged v271 scope; fixed in v272.",
+          "evidence": "data/glyph_sources.json: \"79d8\": \"EDB\"; anim_full_79d8.json id 2866 with 9 layers (the 祕 animation, borrowed via variant_standard); glyphs/79d8.json has 10 strokes; char_id_map.json has no 秘 entry.",
+          "fix_needed": "Relabel glyph_sources 79d8 EDB→Edb.R (docs-only; shape and count are already correct).",
+          "type": "wrong-label"
+        },
+        {
+          "description": "Pipeline metadata assigns EDB id 2866 to both members (anim_full_79d8.json id 2866, 9 layers; anim_crosscheck_id_map.json 79d8 id_source variant_standard, std_form 祕). The borrowing is correctly labelled, but the two anim files are NOT byte-identical: layer 1 differs (path len 152 vs 161, same tx/ty) — likely decode/fetch variance on the same 祕 animation, not a different character. Layer counts are both 9.",
+          "evidence": "anim_full_79d8.json vs anim_full_7955.json layer comparison: diff layers [1] only.",
+          "fix_needed": "None; note only. Do not present 2866 as 秘's own EDB id.",
+          "type": "edb-id-shared-with-standard"
+        },
+        {
+          "description": "Enhanced version lacks CW_STD_FORM (0 occurrences in enhanced/index.html; loadGlyphMeta only sets VARIANT_PAIRS; glyph-engine.js byte-identical to main, so stdForm is always null). Consequence for THIS group is visible and unmasked: 秘 is NOT in enhanced HK_VARIANT text rewrite, so enhanced checkbox-OFF serves glyphs/79d8.json (own 10-stroke 秘) instead of redirecting to 祕 — the opposite of the main site's default (show 祕). The checkbox label still promises the standard form.",
+          "evidence": "grep CW_STD_FORM: main index.html 3 hits, enhanced/index.html 0; enhanced HK_VARIANT (line 3275) contains no 秘; hkGlyph() in glyph-engine.js:133 reads window.CW_STD_FORM.",
+          "fix_needed": "Add CW_STD_FORM construction to enhanced/index.html (v271 staging says this is included — verify it lands). Until then, enhanced default display of 秘 disagrees with the main site.",
+          "type": "enhanced-no-std-redirect"
+        }
+      ],
+      "student_note": "「秘」同「祕」讀音一樣，左邊偏旁唔同：秘係禾字旁，十畫；祕係示字旁，九畫。香港標準寫法係祕。",
+      "confidence": "high",
+      "v271_status": "No v271 action. Shape and counts correct since the 2026-11-15 rebuild (禾+必 10 strokes, EDB 必 order). D6 label fix (glyph_sources 79d8 EDB→Edb.R) live in v272 (deployed 2026-11-20 08:31, deployment c922f131). Also note: 宓 (U+5B93) shares the 必 component but is NOT in this pair set — it has its own glyphs/5b93.json (8 strokes, Edb.R), CHAR_DB 8, and hk_order.js perm [0,1,2,3,4,5,7,6] for the HanziWriter fallback; verified it does not interact with 秘/祕 serving (not in variant_pairs, no CW_STD_FORM entry).",
+      "open_item": ""
+    },
+    {
+      "group": "稅/税",
+      "standard": {
+        "char": "税",
+        "hex": "7a0e",
+        "edb_id": "2908",
+        "edb_id_note": "AUDIT-B G7: EDB 2908, 禾部 12畫, 「右偏旁亦作[0270.gif]」; team decoded animation anim_full_7a0e.json id 2908, 12 layers. char_id_map.json contains NO entry for 税 (nor for any of the 12 chars in groups 13-18).",
+        "strokes_hk": 12,
+        "strokes_authority": "EDB 2908: 禾部 12畫, 「右偏旁亦作[0270.gif]」 (AUDIT-B G7); anim_full_7a0e.json id 2908, 12 layers.",
+        "tw_note": "",
+        "char_db_live_v270": 12,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/7a0e.json",
+        "correct_shape_file_v271": "glyphs/7a0e.json"
+      },
+      "variant": {
+        "char": "稅",
+        "hex": "7a05",
+        "edb_id": null,
+        "edb_id_note": "No headword id; EDB YiTiZi GIF cited (2908a (YiTiZi GIF, not a headword id)).",
+        "strokes_hk": 12,
+        "strokes_authority": "EDB 2908 YiTiZi GIF 2908a (稅): 丿 starts at the 口's bottom-left corner (AUDIT-B G7); count 12 same as 税 (禾5 + 兌7); twpen/hanzipi distinguish the two tops (cf. AUDIT.md §1: 兌 3425135 vs 兑 4325135).",
+        "tw_note": "",
+        "char_db_live_v270": 12,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/variants/7a05.json"
+      },
+      "site_standard": "税",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT — AUDIT.md verdict table #14 and §1: 稅's variant file shows 税's top (top mirror 丶+丿 instead of 丿+丶). NOTE: worker B (AUDIT-B G7) originally called this CLEAR; the coordinator overturned that in AUDIT.md §1 on the top-mirror evidence (EDB YiTiZi 2908a.gif + median directions for variants/7a05.json). The consolidated SUSPECT verdict stands.",
+      "byte_identity": "glyphs/7a05.json ≡ glyphs/7a0e.json (md5 860a7b1337787e97e6c8487538dfc3cd, 12 strokes); glyphs/variants/7a05.json is distinct (md5 70c7afbfab79a36e7c415b9232202384, 12 strokes).",
+      "serving": {
+        "checkbox_off": "main: glyphs/7a0e.json (md5 860a7b13…, 12 strokes) via CW_STD_FORM[7a05]=税 — shows 税, the HK standard form.",
+        "checkbox_on": "main: glyphs/variants/7a05.json (md5 70c7afbf…, 12 strokes) — shows 税's top (丶+丿), wrong for 稅.",
+        "enhanced": "OFF serves glyphs/7a05.json (same bytes as 7a0e, so visibly identical to main); ON serves variants/7a05.json. The standard-redirect itself never fires in enhanced (no CW_STD_FORM), but the outcome is the same here because the own-hex file is byte-identical to the standard file."
+      },
+      "files": [
+        {
+          "path": "glyphs/7a05.json",
+          "md5": "860a7b1337787e97e6c8487538dfc3cd",
+          "strokes": 12,
+          "serves": "nominally 稅; actually 税's shape; unserved in main",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/7a0e.json (税's EDB file); shows 税's top (丶+丿). Never served in main (OFF redirects to 7a0e; ON uses variants/7a05). In enhanced OFF it is served as the own-hex file, same bytes."
+        },
+        {
+          "path": "glyphs/7a0e.json",
+          "md5": "860a7b1337787e97e6c8487538dfc3cd",
+          "strokes": 12,
+          "serves": "税 in both modes (main OFF via CW_STD_FORM redirect; enhanced OFF own-hex)",
+          "correct_for_member": true,
+          "evidence": "EDB 2908 = 税; top is 丶+丿 (medians s6 dx +64, s7 dx -90)."
+        },
+        {
+          "path": "glyphs/variants/7a05.json",
+          "md5": "70c7afbfab79a36e7c415b9232202384",
+          "strokes": 12,
+          "serves": "稅 when checkbox ON (7a05 is in hardcoded VARIANT_GLYPHS)",
+          "correct_for_member": false,
+          "evidence": "Top two 兌 strokes are 丶 (s6 dx +85) then 丿 (s7 dx -108) = 税's top; true 稅 needs 丿 then 丶 (AUDIT.md §1; EDB YiTiZi 2908a.gif)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "variants/7a05.json (稅, served when checkbox ON) shows 税's top: the 兌-top strokes (overall strokes 6-7) are 丶 then 丿, not 稅's 丿 then 丶. Verified from the file's own medians: s6 starts [504,733] ends [589,636] (dx +85, falls down-right = dot 丶); s7 starts [763,797] ends [655,593] (dx -108, falls down-left = 丿). glyphs/7a0e.json shows the identical pattern (s6 dx +64, s7 dx -90). True 稅 needs s6 falling left (丿) and s7 falling right (丶).",
+          "evidence": "glyphs/variants/7a05.json medians s6/s7 vs glyphs/7a0e.json medians s6/s7 (v270 work copy); AUDIT.md §1 (median directions for variants/7a05.json; EDB 0270.gif vs 0270a.gif); AUDIT-B G7 (EDB YiTiZi 2908a.gif: 丿 at 口's bottom-left corner).",
+          "fix_needed": "Redraw/mirror the top two strokes of variants/7a05.json to 丿+丶 — v271 Group A (see v271_status: position-mirror rejected by user, twpen 1:1 redo ordered). Count stays 12; CHAR_DB unchanged.",
+          "type": "shape_top_mirror"
+        },
+        {
+          "description": "glyph_sources.json labels both 7a05 and 7a0e 'EDB'. The label is true of the shared file (EDB 2908 = 税), but 稅 has no EDB headword id (only YiTiZi GIF 2908a), and the variants file actually served for 稅 is not an EDB extraction — it reproduces 税's top.",
+          "evidence": "data/glyph_sources.json glyphs 7a05/7a0e = EDB; AUDIT-B G7 (稅 'no EDB id').",
+          "fix_needed": "After the v271 rebuild, label the 7a05 entry Edb.R (twpen 1:1 + EDB principles, same production rule as the 843 rescan).",
+          "type": "glyph_source_label"
+        },
+        {
+          "description": "enhanced/index.html never builds window.CW_STD_FORM (0 occurrences), so the standard-redirect cannot fire in enhanced; checkbox OFF serves glyphs/<own-hex>.json. For this group it is invisible (glyphs/7a05.json is byte-identical to glyphs/7a0e.json), but the mechanism gap is real.",
+          "evidence": "grep enhanced/index.html CW_STD_FORM = 0; enhanced/glyph-engine.js is md5-identical to the main engine and reads window.CW_STD_FORM.",
+          "fix_needed": "Build CW_STD_FORM in enhanced/index.html (v271 staging notes this as fixed).",
+          "type": "enhanced_loader_gap"
+        }
+      ],
+      "student_note": "稅同税上面嗰個兌唔同：稅係丿先、點後，税係點先、丿後。認住稅嘅左上角係一撇先落筆。",
+      "confidence": "high",
+      "v271_status": "Group A: the staged position-mirror redo was REJECTED by the user 2026-11-19 22:00 (no geometric mirroring); redone twpen 1:1 + EDB principles, user approved 22:11. Live in v272 (deployed 2026-11-20 08:31, deployment c922f131). Old mirror file kept as backup only.",
+      "open_item": ""
+    },
+    {
+      "group": "羣/群",
+      "standard": {
+        "char": "羣",
+        "hex": "7fa3",
+        "edb_id": "3203",
+        "edb_id_note": "Team decoded animations anim_full_7fa3.json / anim_full_7fa4.json both id 3203, 13 layers; AUDIT.md §5: EDB's headword is 羣 with 「亦作群」 — the REVERSE of the site's standard choice (site standard = 群). NOTE: char_id_map has NO entry for either 羣 or 群 — the id comes from the decoded-animation data, not char_id_map",
+        "strokes_hk": 13,
+        "strokes_authority": "hanzipi 羣 總畫數 13畫, code 5113251431112 (verified by browser.open 2026-11-19); EDB 3203 anim 13 layers; twpen 13 steps (AUDIT.md §5)",
+        "tw_note": "",
+        "char_db_live_v270": 13,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": "glyphs/7fa3.json",
+        "correct_shape_file_v271": "glyphs/7fa3.json"
+      },
+      "variant": {
+        "char": "群",
+        "hex": "7fa4",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 13,
+        "strokes_authority": "EDB 3203 anim 13 layers (same id as 羣); CHAR_DB 13; twpen 13 steps (AUDIT.md §5). Hanzipi 群 page not re-fetched by this worker — count rests on EDB animation + CHAR_DB + audit render check",
+        "tw_note": "",
+        "char_db_live_v270": 13,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": "glyphs/variants/7fa4.json",
+        "correct_shape_file_v271": "glyphs/7fa4.json"
+      },
+      "site_standard": "群",
+      "site_standard_note": "EDB headword is 羣 (id 3203), but the site's Hong Kong standard is 群 (user ruling 2026-11-19 21:42: default shows 群; checkbox shows 羣).",
+      "relation_verified": "部件位置變體",
+      "relation_live_v270": "部件位置變體",
+      "verdict": "CLEAR",
+      "audit_verdict": "CLEAR as glyphs (both shapes exist and are correct) — with serving caveat §5: glyphs/7fa3.json is NEVER served in main; the loader redirects 羣→glyphs/7fa4.json in all modes (deliberate HK normalisation). AUDIT.md notes EDB's headword is 羣, the reverse of the site's standard choice. The audit MISSED the glyphs/7fa4.json copy error (it compared variants/7fa4.json, never rendered glyphs/7fa4.json) — found later by the v271 coordinator",
+      "byte_identity": "glyphs/7fa3.json ≡ glyphs/7fa4.json (md5 1f1a8eb3…, 羣's shape, correct for 羣 only); glyphs/variants/7fa4.json distinct (3523a86e…, 13 strokes, true 群); glyphs/variants/7fa3.json does not exist",
+      "serving": {
+        "checkbox_off": "BOTH 羣 and 群 show 羣's shape (glyphs/7fa4.json): 羣 via CW_STD_FORM redirect to 群's file (which wrongly holds 羣's shape), 群 via its own file. 群 is displayed WRONG by default; 羣 is displayed right only by accident of the copy error",
+        "checkbox_on": "羣 still shows 羣's shape (via glyphs/7fa4.json — variant mode does not apply, 7fa3 not in VARIANT_GLYPHS); 群 shows true 群 shape (glyphs/variants/7fa4.json). The two CAN be told apart only with the checkbox ON",
+        "enhanced_note": "Enhanced differs from main: no CW_STD_FORM, so 羣 checkbox OFF fetches glyphs/7fa3.json (true 羣 shape — correct by accident) and 群 checkbox OFF fetches glyphs/7fa4.json (羣 shape — wrong). Checkbox ON: same as main"
+      },
+      "files": [
+        {
+          "path": "glyphs/7fa3.json",
+          "md5": "1f1a8eb38923cfcc4c1638eec0a3bb1c",
+          "strokes": 13,
+          "serves": "Never served in main index (7fa3 not in VARIANT_GLYPHS; checkbox OFF redirects 羣 to glyphs/7fa4.json); in enhanced checkbox OFF it is fetched as 羣's own file",
+          "correct_for_member": true,
+          "evidence": "EDB 3203 data, 君-over-羊 = true 羣 shape (AUDIT.md §5; v271 staging confirms)"
+        },
+        {
+          "path": "glyphs/7fa4.json",
+          "md5": "1f1a8eb38923cfcc4c1638eec0a3bb1c",
+          "strokes": 13,
+          "serves": "群 checkbox OFF (main: no CW_STD_FORM entry since standard == char, so std() fetches own file); 羣 in BOTH modes (main: via CW_STD_FORM redirect to 群's file)",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/7fa3.json — it is 羣's shape (君-over-羊), NOT 群's. This is the audit-missed copy error found by the v271 coordinator (STAGING_v271.md item 15): live v270 群 itself displays 羣's shape in checkbox-OFF mode"
+        },
+        {
+          "path": "glyphs/variants/7fa4.json",
+          "md5": "3523a86ea2c5c14535a2422f329d9227",
+          "strokes": 13,
+          "serves": "群 checkbox ON (main + enhanced, hex 7fa4 in VARIANT_GLYPHS)",
+          "correct_for_member": true,
+          "evidence": "君-left + 羊-right = true 群 shape (AUDIT.md §5; v271 staging confirms). NOTE: no glyphs/variants/7fa3.json exists in v270 — 7fa3 is not in VARIANT_GLYPHS, so 羣 has no own-glyph file and can never be served from variants/"
+        },
+        {
+          "path": "glyphs/variants/7fa3.json",
+          "md5": null,
+          "strokes": null,
+          "serves": "Does not exist in v270",
+          "correct_for_member": false,
+          "evidence": "Absent from disk (ls confirms); v271 creates it as a copy of glyphs/7fa3.json"
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "glyphs/7fa4.json is a byte-copy of glyphs/7fa3.json, so 群's own file holds 羣's shape; 群 displays 羣's shape in checkbox-OFF mode (the default) in main index",
+          "evidence": "md5 1f1a8eb3… for both files, verified by this worker; confirmed in STAGING_v271.md item 15. The 21-group audit compared variants/7fa4.json and never rendered glyphs/7fa4.json, so it missed this",
+          "fix_needed": "Replace glyphs/7fa4.json with the true 群形 (copy of variants/7fa4.json) — v271 item 15 does this; do not touch (another coordinator's item)",
+          "type": "copy_error_standard_file"
+        },
+        {
+          "description": "羣 can never display its own variants/ file (none exists, 7fa3 not in VARIANT_GLYPHS) and is always redirected to 群's file; only the copy error makes that look right",
+          "evidence": "VARIANT_GLYPHS list (glyph-engine.js L84) has 7fa4 but not 7fa3; ls confirms no variants/7fa3.json",
+          "fix_needed": "v271 item 15: create variants/7fa3.json + add 7fa3 to VARIANT_GLYPHS (user ruling 21:42: separate display, default 群, checkbox 羣)",
+          "type": "serving_caveat"
+        },
+        {
+          "description": "Site standard is 群, but EDB's headword is 羣 with 「亦作群」",
+          "evidence": "AUDIT.md §5; variant_pairs 7fa3/7fa4 standard=群",
+          "fix_needed": "None — site choice is deliberate HK normalisation (user ruling 21:42 confirms default 群). Record only",
+          "type": "standard_choice_reversed_vs_edb"
+        },
+        {
+          "description": "glyph_sources.json labels 7fa4 EDB although its glyphs file is 羣's data and its true 群 shape file (variants/7fa4.json) is not EDB-derived",
+          "evidence": "AUDIT-A.md L13 lists 7fa4 among six members with no EDB animation; md5 identity above",
+          "fix_needed": "Relabel 7fa4 Edb.R in v271 (STAGING_v271.md: 15 labels EDB→Edb.R including 7fa4)",
+          "type": "misleading_glyph_source_label"
+        },
+        {
+          "description": "char_id_map has no entry for 羣 or 群, although EDB id 3203 exists (per decoded animations)",
+          "evidence": "Dict lookup + raw grep for \"羣\"/\"群\" keys in char_id_map.json return nothing; anim_full_7fa3.json and anim_full_7fa4.json both carry id 3203",
+          "fix_needed": "Add 羣/群 -> 3203 to char_id_map after verifying against the EDB result page",
+          "type": "char_id_map_gap"
+        },
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM, so 羣 is NOT redirected to 群 there — enhanced default shows 羣's own shape instead of the standard 群",
+          "evidence": "grep: 0 occurrences of CW_STD_FORM in enhanced/index.html; v271 staging confirms this finding",
+          "fix_needed": "v271 item 15 patches enhanced/index.html (mirrors main L1850-1852); do not touch",
+          "type": "enhanced_no_std_redirect"
+        }
+      ],
+      "student_note": "羣和群只差君和羊的位置：羣是君在上、羊在下（上下結構），群是君在左、羊在右（左右結構）。",
+      "confidence": "high",
+      "v271_status": "Item 15 (user ruling 21:42, separate display): glyphs/7fa4.json replaced with true 群形 (copy of variants/7fa4.json), variants/7fa3.json created (copy of glyphs/7fa3.json), VARIANT_GLYPHS += 7fa3, engine ?v= 52→53, variants ?v= 1→2, enhanced CW_STD_FORM added. Live in v272 (deployed 2026-11-20 08:31, deployment c922f131).",
+      "open_item": ""
+    },
+    {
+      "group": "脫/脱",
+      "standard": {
+        "char": "脱",
+        "hex": "8131",
+        "edb_id": "3309",
+        "edb_id_note": "EDB result page id 3309: 肉部 11畫, 「右偏旁亦作[0270.gif]」; team's decoded animation anim_full_8131.json id 3309, 11 layers; 兌 strokes 5-11, 兒's 丿 tip 48 units right of the 口's bottom-horizontal left edge (inset, standard form).",
+        "strokes_hk": 11,
+        "strokes_authority": "EDB 3309, 11 layers decoded; twpen 8131 11 steps; hanzipi 11.",
+        "tw_note": "",
+        "char_db_live_v270": 11,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/8131.json",
+        "correct_shape_file_v271": "glyphs/8131.json"
+      },
+      "variant": {
+        "char": "脫",
+        "hex": "812b",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 11,
+        "strokes_authority": "EDB 3309 is 11 strokes and the pair shares the count; twpen 812b 11 steps; hanzipi 11.",
+        "tw_note": "",
+        "char_db_live_v270": 11,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/variants/812b.json"
+      },
+      "site_standard": "脱",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT - top mirror: served variants/812b.json shows the standard's top (丶+丿); true 脫 is 丿+丶 (AUDIT.md §1). Coordinator OVERTURNED Worker B's CLEAR on the same evidence as 銳/鋭: twpen 兌 S1=丿+S2=丶 vs 兑 S1=丶+S2=丿; hanzipi codes 兌 3425135 vs 兑 4325135; EDB 0270.gif (兌, 丿+丶) vs 0270a.gif (兑, 丶+丿). Counts unchanged (11).",
+      "byte_identity": "glyphs/812b.json ≡ glyphs/8131.json (md5 6e7a8515dc28c3ac3cb8129309a2ec41). glyphs/variants/812b.json is distinct (md5 d2cacf5815df77fa18f0792f904bf870) but shows the wrong (standard) top.",
+      "serving": {
+        "checkbox_off": "Main index.html: 脫 -> CW_STD_FORM[812b]=脱 -> glyphs/8131.json (脱 top, deliberate standard display). 脱 -> glyphs/8131.json (correct).",
+        "checkbox_on": "Main index.html: 脫 (812b in VARIANT_GLYPHS) -> variants/812b.json (shows 脱's top 丶+丿 - WRONG for 脫, should be 丿+丶). 脱 -> glyphs/8131.json (correct).",
+        "enhanced_checkbox_off": "CW_STD_FORM never built -> serves glyphs/812b.json for 脫 (byte-identical to 8131, same 脱-top visual as main).",
+        "enhanced_checkbox_on": "Same as main: variants/812b.json for 脫 (wrong top), glyphs/8131.json for 脱."
+      },
+      "files": [
+        {
+          "path": "glyphs/812b.json",
+          "md5": "6e7a8515dc28c3ac3cb8129309a2ec41",
+          "strokes": 11,
+          "serves": "never served on main (checkbox OFF redirects 脫 -> 8131; checkbox ON uses variants/812b.json); served directly in enhanced checkbox-OFF (same visual as 8131)",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/8131.json = standard 脱 top (丶+丿), not 脫's 丿+丶."
+        },
+        {
+          "path": "glyphs/8131.json",
+          "md5": "6e7a8515dc28c3ac3cb8129309a2ec41",
+          "strokes": 11,
+          "serves": "脱 in both modes; 脫 with checkbox OFF (standard redirect)",
+          "correct_for_member": true,
+          "evidence": "Matches EDB 3309 (丿 tip +32 - inset). Correct for 脱; as the standard display for 脫 with checkbox OFF it is the intended HK-standard form."
+        },
+        {
+          "path": "glyphs/variants/812b.json",
+          "md5": "d2cacf5815df77fa18f0792f904bf870",
+          "strokes": 11,
+          "serves": "脫 with checkbox ON (812b is in VARIANT_GLYPHS)",
+          "correct_for_member": false,
+          "evidence": "AUDIT.md §1: median directions - first top stroke falls down-right = a dot, i.e. it shows the STANDARD top (丶+丿), not 脫's 丿+丶. Worker B measured its 丿 tip -18 (at the corner, variant-like) but §1 re-verified the TOP is the deciding feature and the top is the standard's; B's 兒丿 discriminator was spot-checked and agreed in direction for 812b, but does not affect the verdict."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "variants/812b.json shows the standard top (丶+丿) for 脫; true 脫 top is 丿+丶.",
+          "evidence": "AUDIT.md §1 (twpen steps, hanzipi codes 3425135 vs 4325135, EDB 0270.gif vs 0270a.gif, median direction of first top stroke).",
+          "fix_needed": "Mirror/redraw the top two strokes of variants/812b.json to 丿+丶. v271 A-group: user 2026-11-19 22:00 ruled OUT the position-mirror fix; rebuild twpen 1:1 + EDB principles instead (new coordinator; old mirror files kept as backup).",
+          "type": "glyph wrong for member"
+        },
+        {
+          "description": "812b labelled EDB with no EDB data for 脫.",
+          "evidence": "No EDB animation for 脫; served variant file is not EDB-derived.",
+          "fix_needed": "Relabel 812b EDB -> Edb.R after rebuild.",
+          "type": "glyph_sources label wrong"
+        },
+        {
+          "description": "anim_full_812b.json carries id 3309 (脱's animation) under 脫's hex.",
+          "evidence": "anim_full_812b.json: char 脫, id 3309, 11 layers; anim_full_8131.json identical id/layers.",
+          "fix_needed": "Correct the anim/id mapping.",
+          "type": "anim file misfiled"
+        },
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM (0 occurrences).",
+          "evidence": "grep: CW_STD_FORM 3x in main index.html, 0x in enhanced/index.html. For this group the visual outcome is unchanged (twin files).",
+          "fix_needed": "Build CW_STD_FORM in enhanced (v271 staging notes say this is fixed in v271).",
+          "type": "enhanced loader gap"
+        }
+      ],
+      "student_note": "兩字右邊兌嘅頭兩畫次序相反：脫先寫撇、後寫點，脱先寫點、後寫撇。脱係香港教育標準寫法。",
+      "confidence": "high",
+      "v271_status": "A-group redo: position-mirror fix ruled OUT by the user 2026-11-19 22:00; rebuilt twpen 1:1 as tracing base + EDB stroke principles, user approved 22:11. Live in v272 (deployed 2026-11-20 08:31, deployment c922f131). Counts unchanged (11).",
+      "open_item": ""
+    },
+    {
+      "group": "蔥/葱",
+      "standard": {
+        "char": "葱",
+        "hex": "8471",
+        "edb_id": "3504",
+        "edb_id_note": "EDB result page id 3504: 艸部 13畫, 「或作蔥、[…]，今作葱」; team's decoded animation anim_full_8471.json id 3504, 13 layers (艹4 + 匆5 + 心4), verified layer-by-layer in AUDIT-A",
+        "strokes_hk": 13,
+        "strokes_authority": "EDB 3504, 13 layers (艹4 + 匆5 + 心4).",
+        "tw_note": "twpen 8471-step 12 panels and hanzipi 葱 12 (both TW/mainland 3-stroke 艹); HK 13 with 4-stroke 艹. Difference is only the 艹.",
+        "char_db_live_v270": 13,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/8471.json",
+        "correct_shape_file_v271": "glyphs/8471.json"
+      },
+      "variant": {
+        "char": "蔥",
+        "hex": "8525",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 15,
+        "strokes_authority": "twpen 8525-step 15 panels (艹4 + 悤7 + 心4); CNS11643 蔥 U+8525 筆畫15, stroke order 丨一一丨丿丨㇕丿丿丶一丶㇕丶丶; MOE 重編國語辭典 蔥 [艸部-11畫-共15畫]. HK 15 uses the EDB-style 4-stroke 艹 (same 艹 as EDB's 葱). OPEN ITEM: teacher confirmation of HK 15 still pending (no EDB animation for 蔥).",
+        "tw_note": "hanzipi 蔥 14畫, code 12232535414544 (mainland 3-stroke 艹; re-verified live 2026-11-19: hanzipi.com/蔥.html 總畫數 14畫). TW twpen 8525 = 15 (4-stroke 艹). Do NOT 'fix' HK 15 to hanzipi's 14.",
+        "char_db_live_v270": 13,
+        "char_db_correct": false,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/8525.json"
+      },
+      "site_standard": "葱",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT - shared file is EDB 3504's 葱 (middle 匆 5 strokes); 蔥 needs 悤 7 strokes, 15 total. CLEAR for 葱. (AUDIT.md group 7; AUDIT-A section 7.)",
+      "byte_identity": "shared file: glyphs/8525.json ≡ glyphs/8471.json (md5 3585f07a2e76a65d9c4d7f06cd8a78d3). No variants/8525.json exists. Highest-risk pattern (same as 麵/麪).",
+      "serving": {
+        "checkbox_off": "Main index.html: 蔥 -> CW_STD_FORM[8525]=葱 -> glyphs/8471.json (葱 shape, 13 strokes; deliberate standard display). 葱 -> glyphs/8471.json (correct).",
+        "checkbox_on": "Main index.html: 蔥 NOT in VARIANT_GLYPHS -> std() with stdForm null -> glyphs/8525.json (same bytes as 8471, still 葱 shape - WRONG for 蔥 even with the checkbox on). 葱 -> glyphs/8471.json (correct).",
+        "enhanced_checkbox_off": "CW_STD_FORM never built -> serves glyphs/8525.json for 蔥 (byte-identical to 8471, so same 葱 visual as main; mechanism differs).",
+        "enhanced_checkbox_on": "Same as main: glyphs/8525.json for 蔥 (wrong), glyphs/8471.json for 葱."
+      },
+      "files": [
+        {
+          "path": "glyphs/8525.json",
+          "md5": "3585f07a2e76a65d9c4d7f06cd8a78d3",
+          "strokes": 13,
+          "serves": "both members in every mode (shared file)",
+          "correct_for_member": false,
+          "evidence": "Stroke-by-stroke identification in AUDIT-A: s0-s3 艹4, s4-s8 匆5, s9-s12 心4 - exactly EDB 3504's 葱. Correct for 葱, wrong for 蔥 (needs 悤 7 strokes: extra 丶+丨 at top of middle and 一 at bottom of middle, visible in twpen panels S5, S6, S11)."
+        },
+        {
+          "path": "glyphs/8471.json",
+          "md5": "3585f07a2e76a65d9c4d7f06cd8a78d3",
+          "strokes": 13,
+          "serves": "葱 (and 蔥 via standard redirect / byte identity)",
+          "correct_for_member": true,
+          "evidence": "Faithful EDB 3504 (13 layers, same stroke sequence and arrangement)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "CHAR_DB 蔥 s=13, should be 15.",
+          "evidence": "twpen 15, CNS11643 15, MOE 15; hanzipi 14 explained by mainland 3-stroke 艹.",
+          "fix_needed": "CHAR_DB 蔥 13 -> 15 (in v271 Group C).",
+          "type": "CHAR_DB count wrong"
+        },
+        {
+          "description": "Shared file shows 葱's form for 蔥 in every mode (checkbox on and off, main and enhanced).",
+          "evidence": "md5 3585f07a... serves both; 13 strokes vs 15 needed.",
+          "fix_needed": "New 15-stroke 悤 glyph (twpen 1:1, Edb.R) as glyphs/variants/8525.json + own_glyph true (in v271 Group C).",
+          "type": "glyph wrong for member"
+        },
+        {
+          "description": "8525 labelled EDB with no EDB data.",
+          "evidence": "No EDB animation for 蔥; file is a byte-copy of EDB 3504.",
+          "fix_needed": "Relabel 8525 EDB -> Edb.R after rebuild.",
+          "type": "glyph_sources label wrong"
+        },
+        {
+          "description": "anim_full_8525.json carries id 3504 (葱's animation) under 蔥's hex.",
+          "evidence": "anim_full_8525.json: char 蔥, id 3504, 13 layers; anim_full_8471.json identical id/layers.",
+          "fix_needed": "Correct the anim/id mapping (variant members must not inherit the standard's EDB id).",
+          "type": "anim file misfiled"
+        },
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM (0 occurrences); checkbox-OFF standard redirect does not work there.",
+          "evidence": "grep: CW_STD_FORM 3x in main index.html, 0x in enhanced/index.html; enhanced glyph-engine.js is byte-identical (md5 30eaec32...). For this group the visual outcome is unchanged (twin files), but the mechanism is broken.",
+          "fix_needed": "Build CW_STD_FORM in enhanced (v271 staging notes say this is fixed in v271).",
+          "type": "enhanced loader gap"
+        }
+      ],
+      "student_note": "蔥中間係七畫嘅悤，比葱中間五畫嘅匆多兩畫，總共十五畫；葱係香港教育標準寫法，十三畫。",
+      "confidence": "high",
+      "v271_status": "Group C rebuild (new 15-stroke 悤 glyph, twpen 1:1, Edb.R; CHAR_DB 13->15; own_glyph true). User approved all 7 new glyphs 2026-11-19 22:01 ('全ok'). Live in v272 (deployed 2026-11-20 08:31, deployment c922f131). HK count 15 SETTLED by the user 22:15 (no longer awaiting teacher).",
+      "open_item": "SETTLED by the user 2026-11-19 22:15: HK count 15 confirmed; no longer awaiting teacher."
+    },
+    {
+      "group": "蘊/藴",
+      "standard": {
+        "char": "藴",
+        "hex": "85f4",
+        "edb_id": "3564",
+        "edb_id_note": "EDB animation id 3564, char 藴, 19 layers, 日-form (anim_full_85f4.json); variant_pairs standard = 藴 for both members",
+        "strokes_hk": 19,
+        "strokes_authority": "EDB animation id 3564, char 藴, 19 layers (anim_full_85f4.json); hanzipi code 122554444251125221 len 18 mainland (= 19 HK, 4-stroke 艹); component arithmetic 艹 4 + 糸 6 + 日 4 + 皿 5 = 19",
+        "tw_note": "hanzipi mainland total is 18 (3-stroke 艹); HK 19.",
+        "char_db_live_v270": 19,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/85f4.json",
+        "correct_shape_file_v271": "glyphs/85f4.json"
+      },
+      "variant": {
+        "char": "蘊",
+        "hex": "860a",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 20,
+        "strokes_authority": "twpen 蘊 20 panels viewed (steps 11-15 build 囚: 囗 with 人 inside, bottom horizontal closes at step 15); hanzipi code 1225544442534125221 len 19 mainland (= 20 HK: mainland 艹 is 3 strokes, HK 艹 is 4); component arithmetic 艹 4 + 糸 6 + 囚 5 + 皿 5 = 20. No EDB animation for 蘊.",
+        "tw_note": "hanzipi mainland total is 19 (3-stroke 艹); HK 20. TW dictionaries also give 20 for the 囚-form (twpen 20 panels).",
+        "char_db_live_v270": 20,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "Edb.R",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": "glyphs/860a.json",
+        "correct_shape_file_v271": "glyphs/860a.json"
+      },
+      "site_standard": "藴",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "NOT AUDITED",
+      "audit_verdict": "NOT AUDITED — full check done here (this group was not one of the 21 audited groups).",
+      "byte_identity": "Distinct files: glyphs/860a.json (md5 36b243c1ebb28513385a2a6933070ef7, 20 strokes) vs glyphs/85f4.json (md5 d64b863d8620518d068b6b39477f9fad, 19 strokes). No variants/ file exists for either hex. No byte-sharing problem in this group.",
+      "serving": {
+        "checkbox_off": "Main: 蘊 and 藴 both show glyphs/85f4.json (19-stroke 日-form 藴) — 蘊 via CW_STD_FORM redirect, 藴 via own file. Intended HK-standard default. Enhanced: same visible shape (input 蘊 rewritten to 藴 by HK_VARIANT), but the loader redirect itself is absent.",
+        "checkbox_on": "Both sites: 蘊 shows glyphs/860a.json (20-stroke 囚-form), 藴 shows glyphs/85f4.json (19-stroke 日-form). Both correct. (Neither hex is in VARIANT_GLYPHS, so ON serves the own glyphs/ file directly.)"
+      },
+      "files": [
+        {
+          "path": "glyphs/860a.json",
+          "md5": "36b243c1ebb28513385a2a6933070ef7",
+          "strokes": 20,
+          "serves": "Checkbox ON (both sites): 蘊, via glyphs/<own-hex>.json — 860a is NOT in the hardcoded VARIANT_GLYPHS list and there is no variants/860a.json, so the loader serves the own file directly. Checkbox OFF (main): not served — 蘊 redirects to glyphs/85f4.json. Enhanced checkbox OFF: 蘊 rewritten to 藴 by HK_VARIANT, then 藴's file.",
+          "correct_for_member": true,
+          "evidence": "Rendered glyphs/860a.json to PNG: 艹 + 糸 + 囚 (囗 enclosing 人) + 皿, 20 strokes — matches twpen 蘊 final (20 panels viewed, 囚 built at steps 11-15) and the v265 rebuild record. Distinct from 藴's 日-form."
+        },
+        {
+          "path": "glyphs/85f4.json",
+          "md5": "d64b863d8620518d068b6b39477f9fad",
+          "strokes": 19,
+          "serves": "Checkbox OFF (main): both 蘊 (via CW_STD_FORM redirect) and 藴 (own file). Checkbox ON: 藴. Enhanced: 藴 in both modes (OFF via HK_VARIANT text rewrite).",
+          "correct_for_member": true,
+          "evidence": "Rendered glyphs/85f4.json to PNG: 艹 + 糸 + 日 + 皿, 19 strokes — matches the EDB 3564 animation (19 layers) and hanzipi 19 (HK-adjusted)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "Stale note in lexlist_db metadata: anim_full_860a.json has note \"animation is for standard form 藴 (id 3564); 蘊 glyph has same 19 strokes\" — the glyph is now 20 strokes after the v265 rebuild, so \"same 19 strokes\" is wrong. (Site data itself is correct; only the lexlist_db note is stale.)",
+          "evidence": "anim_full_860a.json note field vs glyphs/860a.json 20 strokes and CHAR_DB 蘊 s=20.",
+          "fix_needed": "Update the note to 20 strokes (lexlist_db housekeeping; not site-facing, not in v271 scope).",
+          "type": "stale-metadata-note"
+        },
+        {
+          "description": "Pipeline metadata assigns EDB id 3564 to both members (anim_full_860a.json id 3564, 19 layers; anim_crosscheck_id_map.json 860a id_source variant_standard, std_form 藴). The borrowing is correctly labelled, but the two anim files are NOT byte-identical: layer 13 differs (path len 101 both, same tx/ty) — likely decode/fetch variance on the same 藴 animation. Layer counts are both 19, i.e. the animation is 藴's, not 蘊's.",
+          "evidence": "anim_full_860a.json vs anim_full_85f4.json layer comparison: diff layers [13] only.",
+          "fix_needed": "None; note only. Do not present 3564 as 蘊's own EDB id.",
+          "type": "edb-id-shared-with-standard"
+        },
+        {
+          "description": "Enhanced version lacks CW_STD_FORM (0 occurrences). For THIS group the visible result is masked: enhanced rewrites input 蘊→藴 via HK_VARIANT (line 3275), so enhanced checkbox-OFF still shows 藴's file — but via text conversion, not via the loader redirect, and the label/count logic that reads CW_STD_FORM (main index.html:2400) cannot work in enhanced.",
+          "evidence": "grep CW_STD_FORM: enhanced/index.html 0; enhanced HK_VARIANT contains 蘊:'藴'; main index.html:2400 uses CW_STD_FORM for the displayed stroke count.",
+          "fix_needed": "Add CW_STD_FORM construction to enhanced/index.html (v271 staging says this is included — verify it lands).",
+          "type": "enhanced-no-std-redirect"
+        }
+      ],
+      "student_note": "「蘊」同「藴」中間唔同：蘊係「囚」字（人喺口入面），二十畫；藴係「日」字，十九畫。香港標準寫法係藴。",
+      "confidence": "high",
+      "v271_status": "Already fixed in v265 (蘊 rebuilt 20-stroke 囚-form Edb.R, own_glyph True, CHAR_DB 20). No v271 action. Stale lexlist_db note ('glyph 19 == std 19 strokes') is not covered by v271.",
+      "open_item": ""
+    },
+    {
+      "group": "衛/衞",
+      "standard": {
+        "char": "衞",
+        "hex": "885e",
+        "edb_id": "3677",
+        "edb_id_note": "EDB result page id 3677: 行部 16畫, 「中或作韋，今作[10-10.gif]」; team's decoded animation anim_full_885e.json id 3677, 16 layers; s11-s13 combined render the 衞 巾 shape (horizontal + left short 丨 + centre long 丨 + right 丨-hook).",
+        "strokes_hk": 16,
+        "strokes_authority": "EDB 3677, 16 layers decoded; twpen 885e 16 steps; hanzipi 885e 16 steps.",
+        "tw_note": "",
+        "char_db_live_v270": 16,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/885e.json",
+        "correct_shape_file_v271": "glyphs/885e.json"
+      },
+      "variant": {
+        "char": "衛",
+        "hex": "885b",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 15,
+        "strokes_authority": "twpen 885b 15 steps (4 rows; cell 16 is the logo); hanzipi 885b 15 steps; CUHK 漢語多功能字庫 15畫 index lists 衛 (行部) and 成語字元索引（筆畫） lists 衛 under 15畫 - independently re-verified by me via CUHK search 2026-11-19 (humanum.arts.cuhk.edu.hk stroke.php?str=15, 行部: 衝衛衚; entry 行 144-9 (15) 衛). OPEN ITEM: teacher confirmation of HK 15 still pending (no EDB animation for 衛).",
+        "tw_note": "twpen 885b = 15 steps; no TW/mainland divergence cited - the 15 vs 16 difference is the 口 left-wall stroke, not a 艹-type difference.",
+        "char_db_live_v270": 16,
+        "char_db_correct": false,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/885b.json"
+      },
+      "site_standard": "衞",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT - the shared file is correct for 衞 (standard, EDB 3677) but wrong for 衛: a user typing 衛 gets the 16-stroke 衞 glyph, one extra stroke (the 口's left wall) that 衛 does not have. CHAR_DB 衛=16 disagrees with twpen + hanzipi + CUHK (all 15); the shape difference stands regardless of the count dispute. (AUDIT.md group 10; AUDIT-B G3.)",
+      "byte_identity": "shared file: glyphs/885b.json ≡ glyphs/885e.json (md5 5664c542a99c709c0d1d410bb57fd55c). No variants/885b.json exists. Highest-risk pattern (same as 麵/麪).",
+      "serving": {
+        "checkbox_off": "Main index.html: 衛 -> CW_STD_FORM[885b]=衞 -> glyphs/885e.json (衞 shape, 16 strokes; deliberate standard display). 衞 -> glyphs/885e.json (correct).",
+        "checkbox_on": "Main index.html: 衛 NOT in VARIANT_GLYPHS -> std() with stdForm null -> glyphs/885b.json (same bytes as 885e, still 衞 shape - WRONG for 衛 even with the checkbox on). 衞 -> glyphs/885e.json (correct).",
+        "enhanced_checkbox_off": "CW_STD_FORM never built -> serves glyphs/885b.json for 衛 (byte-identical to 885e, so same 衞 visual as main; mechanism differs).",
+        "enhanced_checkbox_on": "Same as main: glyphs/885b.json for 衛 (wrong), glyphs/885e.json for 衞."
+      },
+      "files": [
+        {
+          "path": "glyphs/885b.json",
+          "md5": "5664c542a99c709c0d1d410bb57fd55c",
+          "strokes": 16,
+          "serves": "both members in every mode (shared file)",
+          "correct_for_member": false,
+          "evidence": "s11 rendered alone is exactly the short left-wall vertical; s11-s13 together form the 3-vertical 巾 shape, identical to EDB 3677's s11-s13 - i.e. the 衞 form only. Correct for 衞, wrong for 衛 (one extra stroke the 口's left wall that 衛 does not have)."
+        },
+        {
+          "path": "glyphs/885e.json",
+          "md5": "5664c542a99c709c0d1d410bb57fd55c",
+          "strokes": 16,
+          "serves": "衞 (and 衛 via standard redirect / byte identity)",
+          "correct_for_member": true,
+          "evidence": "Matches EDB 3677 (16 layers)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "CHAR_DB 衛 s=16, should be 15.",
+          "evidence": "twpen 15, hanzipi 15, CUHK 15畫 (re-verified by me 2026-11-19).",
+          "fix_needed": "CHAR_DB 衛 16 -> 15 (in v271 Group C), subject to teacher confirmation.",
+          "type": "CHAR_DB count wrong"
+        },
+        {
+          "description": "Shared file shows 衞's form for 衛 in every mode (checkbox on and off, main and enhanced).",
+          "evidence": "md5 5664c542... serves both; 16 strokes vs 15 needed; s11 = 口 left-wall short vertical.",
+          "fix_needed": "New 15-stroke 衛 glyph (twpen 1:1, Edb.R) as glyphs/variants/885b.json + own_glyph true (in v271 Group C).",
+          "type": "glyph wrong for member"
+        },
+        {
+          "description": "885b labelled EDB with no EDB data.",
+          "evidence": "No EDB animation for 衛; file is EDB 3677's 衞.",
+          "fix_needed": "Relabel 885b EDB -> Edb.R after rebuild.",
+          "type": "glyph_sources label wrong"
+        },
+        {
+          "description": "anim_full_885b.json carries id 3677 (衞's animation) under 衛's hex.",
+          "evidence": "anim_full_885b.json: char 衛, id 3677, 16 layers; anim_full_885e.json identical id/layers.",
+          "fix_needed": "Correct the anim/id mapping.",
+          "type": "anim file misfiled"
+        },
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM (0 occurrences); checkbox-OFF standard redirect does not work there.",
+          "evidence": "grep: CW_STD_FORM 3x in main index.html, 0x in enhanced/index.html. For this group the visual outcome is unchanged (twin files), but the mechanism is broken.",
+          "fix_needed": "Build CW_STD_FORM in enhanced (v271 staging notes say this is fixed in v271).",
+          "type": "enhanced loader gap"
+        }
+      ],
+      "student_note": "衞中間口字左邊有一畫短豎，衛就冇呢畫，總共十五畫；衞係香港教育標準寫法，十六畫。",
+      "confidence": "high",
+      "v271_status": "Group C rebuild (new 15-stroke 衛 glyph, twpen 1:1, Edb.R; CHAR_DB 16->15; own_glyph true). User approved all 7 new glyphs 2026-11-19 22:01 ('全ok'). Live in v272 (deployed 2026-11-20 08:31, deployment c922f131). HK count 15 SETTLED by the user 22:15 (no longer awaiting teacher).",
+      "open_item": "SETTLED by the user 2026-11-19 22:15: HK count 15 confirmed; no longer awaiting teacher."
+    },
+    {
+      "group": "裡/裏",
+      "standard": {
+        "char": "裏",
+        "hex": "88cf",
+        "edb_id": "3705",
+        "edb_id_note": "EDB animation id 3705, char 裏, 13 layers (anim_full_88cf.json); variant_pairs standard = 裏 for both members",
+        "strokes_hk": 13,
+        "strokes_authority": "EDB animation id 3705, 13 layers; twpen 裏 13 panels viewed; hanzipi code len 13",
+        "tw_note": "TW 13 — same as HK.",
+        "char_db_live_v270": 13,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/88cf.json",
+        "correct_shape_file_v271": "glyphs/88cf.json"
+      },
+      "variant": {
+        "char": "裡",
+        "hex": "88e1",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 13,
+        "strokes_authority": "EDB animation id 3705, 13 layers (anim_full_88e1.json / anim_full_88cf.json, layers byte-identical); twpen 裏 13 panels viewed; hanzipi 裏 code 4125112113534 len 13; CUHK 裡 13, 「同『裏』字」 (cited in AUDIT.md)",
+        "tw_note": "TW 12: twpen 裡 12 panels viewed; hanzipi 裡 code 452342511211 len 12 — TW 里 vertical is a single continuous stroke and 里 ends with a bottom horizontal, while the HK/EDB 里 has 丿+捺 at the bottom (twpen 裏 panels 10-13). Genuine cross-standard difference, NOT a site error.",
+        "char_db_live_v270": 13,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/88e1.json",
+        "correct_shape_file_v271": "glyphs/88e1.json"
+      },
+      "site_standard": "裏",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "CLEAR",
+      "audit_verdict": "CLEAR — HK standard (from AUDIT.md §CLEAR groups + §19). Do NOT 'fix' to TW 12.",
+      "byte_identity": "glyphs/88e1.json and glyphs/88cf.json are byte-identical (md5 bc472643cf0332fba53b89ea05e61246, 13 strokes). No variants/ file exists for either hex. The shared file is correct for BOTH members under HK, because HK writes 裡 as 裏.",
+      "serving": {
+        "checkbox_off": "Main: 裡 and 裏 both show glyphs/88cf.json (13-stroke 裏 shape) — 裡 via CW_STD_FORM redirect, 裏 via own file. Enhanced: same visible shape (裡 via HK_VARIANT text rewrite to 裏, then own file).",
+        "checkbox_on": "Both sites: 裡 shows glyphs/88e1.json, 裏 shows glyphs/88cf.json — byte-identical files, same 13-stroke 裏 shape in both modes."
+      },
+      "files": [
+        {
+          "path": "glyphs/88e1.json",
+          "md5": "bc472643cf0332fba53b89ea05e61246",
+          "strokes": 13,
+          "serves": "checkbox ON (both sites): 裡. Checkbox OFF (main): not served — 裡 redirects to glyphs/88cf.json (same bytes). Enhanced checkbox OFF: 裡 (same bytes, via own file, no redirect).",
+          "correct_for_member": true,
+          "evidence": "Rendered glyphs/88e1.json to PNG (PIL, filled outlines, y-up, viewBox -150..1230): shows the 13-stroke 裏 shape — 里 with 丿+捺 at the bottom, matching twpen 裏 final panel and the EDB 13-layer animation. HK writes 裡 in this same form, so the shape is correct for 裡 too."
+        },
+        {
+          "path": "glyphs/88cf.json",
+          "md5": "bc472643cf0332fba53b89ea05e61246",
+          "strokes": 13,
+          "serves": "checkbox OFF (main): both 裡 (via CW_STD_FORM redirect) and 裏 (own file). Checkbox ON: 裏. Enhanced: 裏 in both modes; 裡 in OFF mode only via the HK_VARIANT text rewrite (裡→裏) + own file.",
+          "correct_for_member": true,
+          "evidence": "Byte-identical to glyphs/88e1.json; render identical. This is the EDB 3705 extraction and the HK standard shape for both members."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "None in the main site for this group. Cross-standard note only: a reader comparing with TW sources will see 12 for 裡; the site's 13 is the HK/EDB count and must not be changed.",
+          "evidence": "EDB 3705 = 13 layers; twpen 裡 12 panels vs twpen 裏 13 panels (both viewed); hanzipi 裡 len 12 vs 裏 len 13.",
+          "fix_needed": "None.",
+          "type": "cross-standard-count-note"
+        },
+        {
+          "description": "Enhanced version lacks CW_STD_FORM (0 occurrences in enhanced/index.html vs 3 in index.html; enhanced loadGlyphMeta only sets VARIANT_PAIRS). Its glyph-engine.js is byte-identical to the main one, so hkGlyph's stdForm is always null there and checkbox-OFF serves glyphs/<own-hex>.json. For this group there is NO visible difference (both files are byte-identical anyway), but the redirect mechanism itself is absent; enhanced instead normalises input text via HK_VARIANT (裡→裏, line 3275), which masks it for this group.",
+          "evidence": "grep CW_STD_FORM: main index.html 3 hits, enhanced/index.html 0; diff of the two glyph-engine.js files: identical; enhanced/index.html:3275 HK_VARIANT contains 裡:'裏'.",
+          "fix_needed": "v271 staging already adds CW_STD_FORM to enhanced (per STAGING_v271.md) — verify it lands; no group-specific fix.",
+          "type": "enhanced-no-std-redirect"
+        }
+      ],
+      "student_note": "香港寫「裡」同「裏」係同一個字形，都係十三畫，讀 leoi5；台灣「裡」寫十二畫，筆畫分法唔同，唔係寫錯。",
+      "confidence": "high",
+      "v271_status": "No v271 action — CLEAR, no change.",
+      "open_item": ""
+    },
+    {
+      "group": "說/説",
+      "standard": {
+        "char": "説",
+        "hex": "8aac",
+        "edb_id": "3801",
+        "edb_id_note": "Team decoded animations anim_full_8aac.json / anim_full_8aaa.json both id 3801, 14 layers; AUDIT.md: EDB 3801 = 説 (verified layer-by-layer). NOTE: char_id_map has NO entry for either 說 or 説 — the id comes from the decoded-animation data, not char_id_map",
+        "strokes_hk": 14,
+        "strokes_authority": "hanzipi code 41112514325135 (len 14, positions 8-9 = 丶、丿) (AUDIT-A.md §4); EDB 3801 anim 14 layers; twpen 14 panels",
+        "tw_note": "",
+        "char_db_live_v270": 14,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/8aac.json",
+        "correct_shape_file_v271": "glyphs/8aac.json"
+      },
+      "variant": {
+        "char": "說",
+        "hex": "8aaa",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 14,
+        "strokes_authority": "hanzipi 說 總畫數 14畫, code 41112513425135 (verified by browser.open 2026-11-19; positions 8-9 = 3 丿, 4 丶); twpen 14 panels, right top S8 丿 S9 丶 (AUDIT-A.md §4)",
+        "tw_note": "",
+        "char_db_live_v270": 14,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/variants/8aaa.json"
+      },
+      "site_standard": "説",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT — variants/8aaa.json shows 説's (兑's) top; CLEAR for 説 (AUDIT.md #4)",
+      "byte_identity": "glyphs/8aaa.json ≡ glyphs/8aac.json (md5 129bb83b…, 説's shape, correct for 説 only); glyphs/variants/8aaa.json distinct (546f3a65…, 14 strokes, wrong top for 說)",
+      "serving": {
+        "checkbox_off": "Shows 説 (glyphs/8aac.json via CW_STD_FORM redirect) — correct as the HK standard display",
+        "checkbox_on": "Shows 説's shape again (glyphs/variants/8aaa.json, wrong top) — 說 is NEVER displayed correctly in v270",
+        "enhanced_note": "Checkbox OFF in enhanced fetches glyphs/8aaa.json (= 説's shape, same visual as main by accident); checkbox ON same wrong variants file as main. STAGING_v271.md flags 8aaa's 兒丿 as nearest the variant/standard boundary (+4) — a further left nudge is a teacher decision, not done"
+      },
+      "files": [
+        {
+          "path": "glyphs/8aac.json",
+          "md5": "129bb83b041702eebe60bc31d7d56516",
+          "strokes": 14,
+          "serves": "説 in both modes (main + enhanced); 說 checkbox OFF via CW_STD_FORM redirect (main only)",
+          "correct_for_member": true,
+          "evidence": "Right-part top 丶+丿 (兑-form), matching EDB 3801; 言 identical in both forms (AUDIT.md §2/§4); AUDIT-A.md §4 CLEAR for 説"
+        },
+        {
+          "path": "glyphs/8aaa.json",
+          "md5": "129bb83b041702eebe60bc31d7d56516",
+          "strokes": 14,
+          "serves": "Never served in main index; in enhanced checkbox OFF it is fetched as 說's own file",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/8aac.json — it is 説's shape, not 說's"
+        },
+        {
+          "path": "glyphs/variants/8aaa.json",
+          "md5": "546f3a6531181f2aeb36680cf0a731e9",
+          "strokes": 14,
+          "serves": "說 checkbox ON (main + enhanced, hex 8aaa in VARIANT_GLYPHS)",
+          "correct_for_member": false,
+          "evidence": "Renders right-part top as 丶+丿 (説/兑's top); true 說 needs 丿+丶 at strokes 8-9 (AUDIT-A.md §4). The brief's hint of a 言 difference was wrong: the 言 (丶、一、一、一、丨、𠃍、一) is identical in both forms"
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "glyphs/variants/8aaa.json depicts the standard 説, not the variant 說 (right-part top mirrored)",
+          "evidence": "AUDIT-A.md §4: twpen 8aaa S8 丿 S9 丶; hanzipi 說 41112513425135 vs 説 41112514325135; served file renders 丶+丿",
+          "fix_needed": "Redraw/mirror the top two strokes of the right part to 丿+丶 (v271 redo); relabel Edb.R",
+          "type": "wrong_variant_glyph"
+        },
+        {
+          "description": "glyph_sources.json labels 8aaa EDB although no EDB-extracted 說 glyph exists",
+          "evidence": "AUDIT-A.md L13 lists 8aaa among six members with no EDB animation",
+          "fix_needed": "Relabel 8aaa Edb.R when the corrected file ships",
+          "type": "misleading_glyph_source_label"
+        },
+        {
+          "description": "char_id_map has no entry for 說 or 説, although EDB id 3801 exists (per decoded animations)",
+          "evidence": "Dict lookup + raw grep for \"說\"/\"説\" keys in char_id_map.json return nothing; anim_full_8aaa.json and anim_full_8aac.json both carry id 3801",
+          "fix_needed": "Add 說/説 -> 3801 to char_id_map after verifying against the EDB result page",
+          "type": "char_id_map_gap"
+        },
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM (visual outcome coincidentally identical here because glyphs/8aaa.json is a byte-copy of the standard file)",
+          "evidence": "grep: 0 occurrences of CW_STD_FORM in enhanced/index.html",
+          "fix_needed": "Add CW_STD_FORM build to enhanced/index.html",
+          "type": "enhanced_no_std_redirect"
+        }
+      ],
+      "student_note": "說和説左邊言完全一樣，只差右邊兌／兑的頂部：說是撇加點（丿丶），説是點加撇（丶丿）。",
+      "confidence": "high",
+      "v271_status": "Group A: position-mirror rebuild (2026-11-19 ~21:57) SUPERSEDED by user ruling 22:00 (no geometric mirroring); redone twpen 1:1描墨跡 + EDB筆劃原理, user approved 22:11 (「6個效果都很好」). Live in v272 (deployed 2026-11-20 08:31, deployment c922f131).",
+      "open_item": ""
+    },
+    {
+      "group": "醞/醖",
+      "standard": {
+        "char": "醖",
+        "hex": "9196",
+        "edb_id": "4214",
+        "edb_id_note": "AUDIT-C §1: EDB 4214 = 醖; team decoded animation anim_full_9196.json id 4214, 16 layers, 日-form geometry (box inner strokes wide horizontals, h≈50). char_id_map.json contains NO entry for 醖 (nor for any of the 12 chars in groups 13-18).",
+        "strokes_hk": 16,
+        "strokes_authority": "EDB 4214 (anim_full_9196.json, 16 layers, 日-form geometry — box inner strokes are wide horizontals; AUDIT-C §1); Wiktionary 醖 總筆畫 16畫, 酉+9畫 (re-verified by web search 2026-11-19).",
+        "tw_note": "",
+        "char_db_live_v270": 16,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/9196.json",
+        "correct_shape_file_v271": "glyphs/9196.json"
+      },
+      "variant": {
+        "char": "醞",
+        "hex": "919e",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 17,
+        "strokes_authority": "twpen 17 numbered steps (囚-form: step 9 𠃍, 10 丿, 11 捺, 12 一 — 人 inside the box); hanzipi 17 steps, same 囚-form; CUHK 漢語多功能字庫 醞 = 酉 164-10 (17), 倉頡 一田田人廿; MOE 國語辭典簡編本 酉部-10畫-共17畫 (re-verified by web search 2026-11-19); 《說文》「釀也。从酉，𥁕聲」 (AUDIT-C §1).",
+        "tw_note": "TW (MOE/twpen) also counts 醞 17 — HK and TW agree; no divergence.",
+        "char_db_live_v270": 16,
+        "char_db_correct": false,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/919e.json"
+      },
+      "site_standard": "醖",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT — AUDIT.md verdict table #15 and AUDIT-C §1: 醞 is 囚-form 17 strokes; the served 16-stroke 日-form ink is wrong for 醞 on both shape and count.",
+      "byte_identity": "glyphs/919e.json ≡ glyphs/9196.json (md5 8ff02fd84c3384aa09146ed3fc922d9e, 16 strokes); NO variants file exists for either hex.",
+      "serving": {
+        "checkbox_off": "main: glyphs/9196.json (md5 8ff02fd8…, 16 strokes) via CW_STD_FORM[919e]=醖 — shows 醖 (日-form), the HK standard form. Correct for 醖, wrong for 醞.",
+        "checkbox_on": "main: glyphs/919e.json (md5 8ff02fd8…, 16 strokes) — byte-identical to the standard file, so 醞 still shows 醖's 日-form ink. The checkbox has NO effect for 醞 (919e not in VARIANT_GLYPHS, no variants file).",
+        "enhanced": "OFF serves glyphs/919e.json and ON serves the same file (no variants file, no CW_STD_FORM) — 醖's ink in both modes, identical to main."
+      },
+      "files": [
+        {
+          "path": "glyphs/919e.json",
+          "md5": "8ff02fd84c3384aa09146ed3fc922d9e",
+          "strokes": 16,
+          "serves": "醞 when checkbox ON (919e not in VARIANT_GLYPHS, so std() fetches own-hex); identical bytes to the standard file",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/9196.json — the file is 醖's 16-stroke 日-form ink; 醞 needs 17-stroke 囚-form."
+        },
+        {
+          "path": "glyphs/9196.json",
+          "md5": "8ff02fd84c3384aa09146ed3fc922d9e",
+          "strokes": 16,
+          "serves": "醖 in both modes; also 醞 in main checkbox OFF via CW_STD_FORM redirect (wrong for 醞)",
+          "correct_for_member": true,
+          "evidence": "EDB 4214 = 醖; 16 layers, 日-form (AUDIT-C §1)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "CHAR_DB 醞 s=16 is wrong: the true HK count is 17 (囚-form: 酉7 + 囚5 + 皿5). The 16 leaked from 醖 (日-form). Both members' CHAR_DB values are 16, so the site labels 醞 '16畫'.",
+          "evidence": "data.js CHAR_DB 醞 s=16; AUDIT-C §1 (twpen 17, hanzipi 17, CUHK 酉164-10 (17)); MOE 17 (web search 2026-11-19).",
+          "fix_needed": "CHAR_DB 醞 16→17; build 醞 its own 17-stroke 囚-form glyph (twpen 1:1, Edb.R); own_glyph True — v271 Group C.",
+          "type": "count_and_shape"
+        },
+        {
+          "description": "variant_pairs.json says 醞 (919e) own_glyph=False, so the loader has no own-glyph path for 醞 even though 醞 needs its own glyph; and 919e is NOT in the hardcoded VARIANT_GLYPHS list, so checkbox ON cannot serve a variants file either. 醞 is served 醖's file in every mode.",
+          "evidence": "data/variant_pairs.json pairs 919e own_glyph=False; glyph-engine.js VARIANT_GLYPHS has no 919e; no glyphs/variants/919e.json on disk.",
+          "fix_needed": "v271 Group C sets own_glyph True and adds the new glyph (loader wiring per v271).",
+          "type": "serving_no_own_glyph"
+        },
+        {
+          "description": "glyph_sources.json labels both 919e and 9196 'EDB'. The label is true for 醖 (EDB 4214), but 醞 has no EDB id at all — the file labelled EDB for 919e is 醖's EDB extraction, not 醞's form.",
+          "evidence": "data/glyph_sources.json glyphs 919e/9196 = EDB; AUDIT-C §1 (醞 'no EDB id').",
+          "fix_needed": "After the v271 rebuild, label the 919e entry Edb.R.",
+          "type": "glyph_source_label"
+        },
+        {
+          "description": "enhanced/index.html never builds window.CW_STD_FORM (0 occurrences), so the standard-redirect cannot fire in enhanced; checkbox OFF serves glyphs/<own-hex>.json. For this group it is invisible (glyphs/919e.json is byte-identical to glyphs/9196.json), but the mechanism gap is real.",
+          "evidence": "grep enhanced/index.html CW_STD_FORM = 0; enhanced/glyph-engine.js is md5-identical to the main engine and reads window.CW_STD_FORM.",
+          "fix_needed": "Build CW_STD_FORM in enhanced/index.html (v271 staging notes this as fixed).",
+          "type": "enhanced_loader_gap"
+        }
+      ],
+      "student_note": "醞同醖右上分別係囚同日：醞係囚（入面有人），一共17畫；醖係日，一共16畫。香港教科書用醖，但醞釀嘅醞要寫囚形。",
+      "confidence": "high",
+      "v271_status": "Group C: new 17-stroke 囚-form glyph (twpen 1:1, Edb.R) + CHAR_DB 16→17 + own_glyph True; user approved 22:01 ('全ok' among the 7 new glyphs). Live in v272 (deployed 2026-11-20 08:31, deployment c922f131).",
+      "open_item": ""
+    },
+    {
+      "group": "鈎/鉤",
+      "standard": {
+        "char": "鈎",
+        "hex": "920e",
+        "edb_id": "4246",
+        "edb_id_note": "EDB animation id 4246, char 鈎, 12 layers, 勾=勹+厶 (anim_full_920e.json); variant_pairs standard = 鈎",
+        "strokes_hk": 12,
+        "strokes_authority": "EDB animation id 4246, char 鈎, 12 layers (anim_full_920e.json); hanzipi code 341124313554 len 12",
+        "tw_note": "",
+        "char_db_live_v270": 12,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/920e.json",
+        "correct_shape_file_v271": "glyphs/920e.json"
+      },
+      "variant": {
+        "char": "鉤",
+        "hex": "9264",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 13,
+        "strokes_authority": "twpen 鉤 13 panels viewed (steps 9-13 build 勾=勹+口: 丿, 勹 hook, then 口 box closed at step 13); hanzipi code 3411243135251 len 13; CUHK 金 167-5 (13) and 倉頡 金心口 (cited in AUDIT.md); 《說文》从金从句",
+        "tw_note": "TW also 13 (twpen 13 panels; hanzipi len 13). No EDB animation for 鉤.",
+        "char_db_live_v270": 12,
+        "char_db_correct": false,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/9264.json"
+      },
+      "site_standard": "鈎",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT — 鉤 (12→13, 勾=勹+口) (from AUDIT.md). Verified independently here: twpen 鉤 13 panels viewed, served file is the 12-stroke 厶-form.",
+      "byte_identity": "glyphs/920e.json and glyphs/9264.json are byte-identical (md5 cae2455a29f234bb4f91342d75afa3e0, 12 strokes). No variants/ file exists for either hex. The shared file is correct for 鈎 only; it is WRONG for 鉤.",
+      "serving": {
+        "checkbox_off": "Main: 鉤 and 鈎 both show glyphs/920e.json (12-stroke 厶-form) — 鉤 via CW_STD_FORM redirect, 鈎 via own file. Correct for 鈎, wrong for 鉤. Enhanced: same visible file (input 鉤 rewritten to 鈎 by HK_VARIANT).",
+        "checkbox_on": "Both sites: 鉤 shows glyphs/9264.json, 鈎 shows glyphs/920e.json — byte-identical files, same 12-stroke 厶-form. Correct for 鈎, wrong for 鉤."
+      },
+      "files": [
+        {
+          "path": "glyphs/920e.json",
+          "md5": "cae2455a29f234bb4f91342d75afa3e0",
+          "strokes": 12,
+          "serves": "Checkbox OFF (main): both 鉤 (via CW_STD_FORM redirect) and 鈎 (own file). Checkbox ON: 鈎. Enhanced: 鈎 in both modes (OFF also via HK_VARIANT text rewrite).",
+          "correct_for_member": true,
+          "evidence": "Rendered glyphs/920e.json to PNG: 勾=勹+厶 (single slanted stroke, no 口 box), 12 strokes — matches EDB 4246 animation (12 layers) and hanzipi 12."
+        },
+        {
+          "path": "glyphs/9264.json",
+          "md5": "cae2455a29f234bb4f91342d75afa3e0",
+          "strokes": 12,
+          "serves": "Checkbox ON (both sites): 鉤. Checkbox OFF (main): not served — 鉤 redirects to glyphs/920e.json (same bytes). Enhanced checkbox OFF: 鉤 rewritten to 鈎 by HK_VARIANT, then own file (same bytes). All modes show the wrong shape for 鉤.",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/920e.json; render shows 厶-form, 12 strokes. True 鉤 is 勹+口, 13 strokes (twpen 13 panels viewed, 口 box closed at step 13)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "CHAR_DB 鉤 s=12 is wrong; should be 13. The 12 leaked from 鈎 (shared file).",
+          "evidence": "data.js: \"鉤\":{\"jy\":\"gau1\",\"py\":\"gōu\",\"s\":12,...}; twpen 鉤 13 panels viewed; hanzipi code len 13.",
+          "fix_needed": "CHAR_DB 鉤 12→13 (staged in v271, live in v272).",
+          "type": "char-db-count"
+        },
+        {
+          "description": "Served file for 鉤 is the 厶-form (12 strokes), not the 口-form (13). Rendered glyphs/9264.json to PNG: the 勾 component ends in a single slanted 厶 stroke with no 口 box — identical to 鈎. True 鉤 (twpen final viewed) has 勾=勹+口, a closed 口 box.",
+          "evidence": "md5 glyphs/9264.json == glyphs/920e.json (cae2455a29f234bb4f91342d75afa3e0); render viewed; twpen-step-9264.png 13 panels viewed (step 11-13 close the 口).",
+          "fix_needed": "New 13-stroke 口-form own-glyph for 鉤 (twpen 1:1, Edb.R) + own_glyph True (staged in v271, user-approved 22:01; live in v272).",
+          "type": "wrong-shape-for-member"
+        },
+        {
+          "description": "glyph_sources labels 9264 'EDB', but 鉤 has no EDB id and the file is a copy of 鈎's EDB glyph. Label wrong (wrong shape + no EDB source).",
+          "evidence": "data/glyph_sources.json: \"9264\": \"EDB\"; anim id 4246 belongs to 鈎 (12-layer 厶-form animation); char_id_map.json has no entry for either 鈎 or 鉤 (map covers only part of the lexicon).",
+          "fix_needed": "Relabel 9264 Edb.R when the new glyph is built (staged in v271, live in v272).",
+          "type": "wrong-label"
+        },
+        {
+          "description": "Pipeline metadata assigns EDB id 4246 to BOTH members (anim_crosscheck_full/anim_full_9264.json id 4246, layers byte-identical to anim_full_920e.json; anim_crosscheck_id_map.json 9264 id_source variant_standard, std_form 鈎). The borrowing itself is correctly labelled variant_standard here, but it means there is no EDB animation of 鉤 anywhere — the 12-layer animation is 鈎's.",
+          "evidence": "anim_full_920e.json vs anim_full_9264.json: same id 4246, layers identical.",
+          "fix_needed": "None beyond the rebuild; keep the id_map borrowing label accurate (do not present 4246 as 鉤's own id).",
+          "type": "edb-id-shared-with-standard"
+        },
+        {
+          "description": "Enhanced version lacks CW_STD_FORM (0 occurrences). For this group the visible result is unchanged by the missing redirect (both files byte-identical), but enhanced DOES rewrite input 鉤→鈎 via HK_VARIANT (line 3275), so enhanced checkbox-OFF shows 鈎's file via text conversion rather than via the loader redirect — same wrong shape for 鉤 either way.",
+          "evidence": "grep CW_STD_FORM: enhanced/index.html 0; enhanced HK_VARIANT contains 鉤:'鈎'.",
+          "fix_needed": "v271 staging adds CW_STD_FORM to enhanced — verify it lands; no group-specific fix beyond the 鉤 rebuild.",
+          "type": "enhanced-no-std-redirect"
+        }
+      ],
+      "student_note": "「鈎」同「鉤」右邊嘅「勾」唔同：鈎係勹加厶，十二畫；鉤係勹加口（一個口字框），十三畫。",
+      "confidence": "high",
+      "v271_status": "Live in v272: 鉤 rebuilt 13-stroke 口-form Edb.R own-glyph (glyphs/9264.json), CHAR_DB 12→13, own_glyph True, glyph_sources 9264 EDB→Edb.R. User approved the 7 new glyphs (incl. 鉤) 2026-11-19 22:01. Deployed 2026-11-20 08:31, deployment c922f131.",
+      "open_item": ""
+    },
+    {
+      "group": "銳/鋭",
+      "standard": {
+        "char": "鋭",
+        "hex": "92ed",
+        "edb_id": "4264",
+        "edb_id_note": "EDB result page id 4264: 金部 15畫, 「右偏旁亦作[0270.gif]」; team's decoded animation anim_full_92ed.json id 4264, 15 layers; 兌 = 丷 + 口 + 兒, 兒's 丿 tip 51 units right of the 口's bottom-horizontal left edge (inset, standard form).",
+        "strokes_hk": 15,
+        "strokes_authority": "EDB 4264, 15 layers decoded; twpen 92ed 15 steps; hanzipi 15.",
+        "tw_note": "",
+        "char_db_live_v270": 15,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/92ed.json",
+        "correct_shape_file_v271": "glyphs/92ed.json"
+      },
+      "variant": {
+        "char": "銳",
+        "hex": "92b3",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 15,
+        "strokes_authority": "EDB 4264 is 15 strokes and the pair shares the count; twpen 92b3 15 steps; hanzipi 15.",
+        "tw_note": "",
+        "char_db_live_v270": 15,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/variants/92b3.json"
+      },
+      "site_standard": "鋭",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT - top mirror: served variants/92b3.json shows the standard's top (丶+丿); true 銳 is 丿+丶 (AUDIT.md §1). Coordinator OVERTURNED Worker B's CLEAR: twpen step diagrams viewed - 兌 S1=丿+S2=丶 vs 兑 S1=丶+S2=丿; hanzipi codes 兌 3425135 vs 兑 4325135 (positions 1-2 differ, 3=撇 vs 4=點); EDB's own images zx-rmk/0270.gif (兌, 丿+丶) vs YiTiZi_gif/0270a.gif (兑, 丶+丿). B's 兒丿 discriminator is not uniformly confirmed (coordinator spot-check disagreed for 92b3) and does not affect the verdict; the top mirror alone decides SUSPECT. Counts unchanged (15).",
+      "byte_identity": "glyphs/92b3.json ≡ glyphs/92ed.json (md5 5260c0c6fa78ec10200de43c5471f440). glyphs/variants/92b3.json is distinct (md5 a11c0245edb968e61b6070fa2f2e06a1) but shows the wrong (standard) top.",
+      "serving": {
+        "checkbox_off": "Main index.html: 銳 -> CW_STD_FORM[92b3]=鋭 -> glyphs/92ed.json (鋭 top, deliberate standard display). 鋭 -> glyphs/92ed.json (correct).",
+        "checkbox_on": "Main index.html: 銳 (92b3 in VARIANT_GLYPHS) -> variants/92b3.json (shows 鋭's top 丶+丿 - WRONG for 銳, should be 丿+丶). 鋭 -> glyphs/92ed.json (correct).",
+        "enhanced_checkbox_off": "CW_STD_FORM never built -> serves glyphs/92b3.json for 銳 (byte-identical to 92ed, same 鋭-top visual as main).",
+        "enhanced_checkbox_on": "Same as main: variants/92b3.json for 銳 (wrong top), glyphs/92ed.json for 鋭."
+      },
+      "files": [
+        {
+          "path": "glyphs/92b3.json",
+          "md5": "5260c0c6fa78ec10200de43c5471f440",
+          "strokes": 15,
+          "serves": "never served on main (checkbox OFF redirects 銳 -> 92ed; checkbox ON uses variants/92b3.json); served directly in enhanced checkbox-OFF (same visual as 92ed)",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/92ed.json = standard 鋭 top (丶+丿), not 銳's 丿+丶."
+        },
+        {
+          "path": "glyphs/92ed.json",
+          "md5": "5260c0c6fa78ec10200de43c5471f440",
+          "strokes": 15,
+          "serves": "鋭 in both modes; 銳 with checkbox OFF (standard redirect)",
+          "correct_for_member": true,
+          "evidence": "Matches EDB 4264 (丿 tip +37 right of 口 left edge - inset, same as EDB's +51). Correct for 鋭; as the standard display for 銳 with checkbox OFF it is the intended HK-standard form."
+        },
+        {
+          "path": "glyphs/variants/92b3.json",
+          "md5": "a11c0245edb968e61b6070fa2f2e06a1",
+          "strokes": 15,
+          "serves": "銳 with checkbox ON (92b3 is in VARIANT_GLYPHS)",
+          "correct_for_member": false,
+          "evidence": "AUDIT.md §1: first top stroke falls down-right = a dot, i.e. it shows the STANDARD top (丶+丿), not 銳's 丿+丶. Coordinator's median check + s0/s1 renders of the sibling variants/514c.json; 92b3's 丿 tip measured -14 (at/behind the 口's bottom-left corner) by Worker B - but §1 re-verified the TOP is the deciding feature and the top is the standard's. The variant file must show 丿+丶 on top."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "variants/92b3.json shows the standard top (丶+丿) for 銳; true 銳 top is 丿+丶.",
+          "evidence": "AUDIT.md §1 (twpen steps, hanzipi codes 3425135 vs 4325135, EDB 0270.gif vs 0270a.gif, median direction of first top stroke).",
+          "fix_needed": "Mirror/redraw the top two strokes of variants/92b3.json to 丿+丶. v271 A-group: user 2026-11-19 22:00 ruled OUT the position-mirror fix; rebuild twpen 1:1 + EDB principles instead (new coordinator; old mirror files kept as backup).",
+          "type": "glyph wrong for member"
+        },
+        {
+          "description": "92b3 labelled EDB with no EDB data for 銳.",
+          "evidence": "No EDB animation for 銳; served variant file is not EDB-derived.",
+          "fix_needed": "Relabel 92b3 EDB -> Edb.R after rebuild.",
+          "type": "glyph_sources label wrong"
+        },
+        {
+          "description": "anim_full_92b3.json carries id 4264 (鋭's animation) under 銳's hex.",
+          "evidence": "anim_full_92b3.json: char 銳, id 4264, 15 layers; anim_full_92ed.json identical id/layers.",
+          "fix_needed": "Correct the anim/id mapping.",
+          "type": "anim file misfiled"
+        },
+        {
+          "description": "enhanced/index.html never builds CW_STD_FORM (0 occurrences).",
+          "evidence": "grep: CW_STD_FORM 3x in main index.html, 0x in enhanced/index.html. For this group the visual outcome is unchanged (twin files).",
+          "fix_needed": "Build CW_STD_FORM in enhanced (v271 staging notes say this is fixed in v271).",
+          "type": "enhanced loader gap"
+        }
+      ],
+      "student_note": "兩字右邊兌嘅頭兩畫次序相反：銳先寫撇、後寫點，鋭先寫點、後寫撇。鋭係香港教育標準寫法。",
+      "confidence": "high",
+      "v271_status": "A-group redo: position-mirror fix ruled OUT by the user 2026-11-19 22:00; rebuilt twpen 1:1 as tracing base + EDB stroke principles, user approved 22:11. Live in v272 (deployed 2026-11-20 08:31, deployment c922f131). Counts unchanged (15).",
+      "open_item": ""
+    },
+    {
+      "group": "閱/閲",
+      "standard": {
+        "char": "閲",
+        "hex": "95b2",
+        "edb_id": "4349",
+        "edb_id_note": "AUDIT.md / AUDIT-C §2: EDB 4349 = 閲; team decoded animation anim_full_95b2.json id 4349, 15 layers. char_id_map.json contains NO entry for 閲 (nor for any of the 12 chars in groups 13-18).",
+        "strokes_hk": 15,
+        "strokes_authority": "EDB 4349 = 閲 (AUDIT.md); anim_full_95b2.json id 4349, 15 layers.",
+        "tw_note": "",
+        "char_db_live_v270": 15,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/95b2.json",
+        "correct_shape_file_v271": "glyphs/95b2.json"
+      },
+      "variant": {
+        "char": "閱",
+        "hex": "95b1",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 15,
+        "strokes_authority": "twpen 15 steps (top pair Λ/八: step 9 丿 falls left, step 10 捺 falls right); hanzipi 15 steps, same Λ; CUHK 閱 = 門 169-7 (15); 倉頡 日弓金口山 — 金 = 八 (AUDIT-C §2).",
+        "tw_note": "",
+        "char_db_live_v270": 15,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": null,
+        "correct_shape_file_v271": "glyphs/variants/95b1.json"
+      },
+      "site_standard": "閲",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "SUSPECT",
+      "audit_verdict": "SUSPECT — AUDIT.md verdict table #16 and AUDIT-C §2: 閱's own-glyph file shows the same V-top as 閲, not 閱's Λ-top (八). Byte-difference alone did not catch this — only the slant check did.",
+      "byte_identity": "glyphs/95b1.json ≡ glyphs/95b2.json (md5 914a01cf5af532ef0e36104a756a8b90, 15 strokes); glyphs/variants/95b1.json is distinct (md5 f3cbc6a225a47beb4c82cafd8ab17f83, 15 strokes).",
+      "serving": {
+        "checkbox_off": "main: glyphs/95b2.json (md5 914a01cf…, 15 strokes) via CW_STD_FORM[95b1]=閲 — shows 閲 (V-top), the HK standard form.",
+        "checkbox_on": "main: glyphs/variants/95b1.json (md5 f3cbc6a2…, 15 strokes) — still V-top, wrong slant for 閱 (needs Λ-top/八).",
+        "enhanced": "OFF serves glyphs/95b1.json (same bytes as 95b2, so visibly identical to main); ON serves variants/95b1.json. The standard-redirect itself never fires in enhanced (no CW_STD_FORM), but the outcome is the same here because the own-hex file is byte-identical to the standard file."
+      },
+      "files": [
+        {
+          "path": "glyphs/95b1.json",
+          "md5": "914a01cf5af532ef0e36104a756a8b90",
+          "strokes": 15,
+          "serves": "nominally 閱; actually 閲's shape; unserved in main",
+          "correct_for_member": false,
+          "evidence": "Byte-identical to glyphs/95b2.json — the file is 閲's V-top ink; 閱 needs Λ-top (八). Never served in main (OFF redirects to 95b2; ON uses variants/95b1). In enhanced OFF it is served as the own-hex file, same bytes."
+        },
+        {
+          "path": "glyphs/95b2.json",
+          "md5": "914a01cf5af532ef0e36104a756a8b90",
+          "strokes": 15,
+          "serves": "閲 in both modes (main OFF via CW_STD_FORM redirect; enhanced OFF own-hex)",
+          "correct_for_member": true,
+          "evidence": "EDB 4349 = 閲; V-top is correct for 閲."
+        },
+        {
+          "path": "glyphs/variants/95b1.json",
+          "md5": "f3cbc6a225a47beb4c82cafd8ab17f83",
+          "strokes": 15,
+          "serves": "閱 when checkbox ON (95b1 is in hardcoded VARIANT_GLYPHS)",
+          "correct_for_member": false,
+          "evidence": "Medians s9 dx +57 ('\\') and s10 dx -56 ('/') = V-top, same slant pattern as 閲; true 閱 is Λ-top (AUDIT-C §2 twpen red-pixel check: step 9 falls left, step 10 falls right)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "variants/95b1.json (閱, served when checkbox ON) shows 閲's V-top, not 閱's Λ-top (八). Verified from the file's own medians: s9 starts [379,466] ends [436,410] (dx +57, falls right = '\\'); s10 starts [559,536] ends [503,421] (dx -56, falls left = '/'). glyphs/95b2.json shows the same V pattern (s9 dx +39, s10 dx -50). True 閱 needs s9 falling left (丿) and s10 falling right (捺).",
+          "evidence": "glyphs/variants/95b1.json medians s9/s10 vs glyphs/95b2.json medians s9/s10 (v270 work copy); AUDIT-C §2 (medians s9 len 82 '\\' + s10 len 146 '/', zoomed render confirms V-top; coordinator re-verified both files' s9 falls right, s10 falls left).",
+          "fix_needed": "Rebuild variants/95b1.json as true 兌-top Λ (八), 15 strokes — v271 Group B. Count stays 15; CHAR_DB unchanged.",
+          "type": "shape_slant"
+        },
+        {
+          "description": "glyph_sources.json labels both 95b1 and 95b2 'EDB'. The label is true for 閲 (EDB 4349), but 閱 has no EDB headword id, and the variants file actually served for 閱 is a mis-drawn copy of 閲's form, not an EDB extraction.",
+          "evidence": "data/glyph_sources.json glyphs 95b1/95b2 = EDB; AUDIT-C §2 (閱 own-glyph file is a mis-drawn copy).",
+          "fix_needed": "After the v271 rebuild, label the 95b1 entry Edb.R.",
+          "type": "glyph_source_label"
+        },
+        {
+          "description": "enhanced/index.html never builds window.CW_STD_FORM (0 occurrences), so the standard-redirect cannot fire in enhanced; checkbox OFF serves glyphs/<own-hex>.json. For this group it is invisible (glyphs/95b1.json is byte-identical to glyphs/95b2.json), but the mechanism gap is real.",
+          "evidence": "grep enhanced/index.html CW_STD_FORM = 0; enhanced/glyph-engine.js is md5-identical to the main engine and reads window.CW_STD_FORM.",
+          "fix_needed": "Build CW_STD_FORM in enhanced/index.html (v271 staging notes this as fixed).",
+          "type": "enhanced_loader_gap"
+        }
+      ],
+      "student_note": "閱同閲上面分別係八同丷：閱嘅頭兩筆係丿、捺，向兩邊分開；閲嘅頭兩筆向中間合埋。兩字都係15畫，唔好撈埋。",
+      "confidence": "high",
+      "v271_status": "Group B: variants/95b1.json rebuilt as true Λ-top (八), 15 strokes. Live in v272 (deployed 2026-11-20 08:31, deployment c922f131).",
+      "open_item": ""
+    },
+    {
+      "group": "麪/麵",
+      "standard": {
+        "char": "麪",
+        "hex": "9eaa",
+        "edb_id": "4716",
+        "edb_id_note": "EDB animation id 4716, char 麪, 15 layers, 麥+丏 (anim_full_9eaa.json); variant_pairs standard = 麪 for both members",
+        "strokes_hk": 15,
+        "strokes_authority": "EDB animation id 4716, char 麪, 15 layers (anim_full_9eaa.json); hanzipi code 123434343541255 len 15; component arithmetic 麥 11 + 丏 4 = 15",
+        "tw_note": "TW also 15.",
+        "char_db_live_v270": 15,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "EDB",
+        "glyph_label_v271_staged": "EDB",
+        "own_glyph_live_v270": false,
+        "own_glyph_v271_staged": false,
+        "correct_shape_file_v270": "glyphs/9eaa.json",
+        "correct_shape_file_v271": "glyphs/9eaa.json"
+      },
+      "variant": {
+        "char": "麵",
+        "hex": "9eb5",
+        "edb_id": null,
+        "edb_id_note": "No EDB id — variant appears only as 亦作 / no EDB animation.",
+        "strokes_hk": 20,
+        "strokes_authority": "twpen 麵 20 panels viewed (麥 11 + 面 9; 面 box closed at steps 14-20); hanzipi code 12343434354132522111 len 20; component arithmetic 麥 11 + 面 9 = 20. No EDB id for 麵.",
+        "tw_note": "TW also 20 (twpen 20 panels; hanzipi len 20).",
+        "char_db_live_v270": 20,
+        "char_db_correct": true,
+        "glyph_label_live_v270": "Edb.R",
+        "glyph_label_v271_staged": "Edb.R",
+        "own_glyph_live_v270": true,
+        "own_glyph_v271_staged": true,
+        "correct_shape_file_v270": "glyphs/9eb5.json",
+        "correct_shape_file_v271": "glyphs/9eb5.json"
+      },
+      "site_standard": "麪",
+      "site_standard_note": null,
+      "relation_verified": "同字異寫",
+      "relation_live_v270": "同字異寫",
+      "verdict": "NOT AUDITED",
+      "audit_verdict": "NOT AUDITED — full check done here (this group was not one of the 21 audited groups).",
+      "byte_identity": "Distinct files: glyphs/9eaa.json (md5 76551aa7ed62f939ebc43518e061d117, 15 strokes) vs glyphs/9eb5.json (md5 9b65271785318cf0cc43734c65acb7a4, 20 strokes). No variants/ file exists for either hex. The pre-v269 byte-copy failure (9eb5 was a copy of 9eaa) is GONE in this v270 baseline.",
+      "serving": {
+        "checkbox_off": "Main: 麵 and 麪 both show glyphs/9eaa.json (15-stroke 麪) — 麵 via CW_STD_FORM redirect, 麪 via own file. Intended HK-standard default. Enhanced: 麵 shows its OWN glyphs/9eb5.json (20-stroke 麵) — NO redirect (CW_STD_FORM never built) and no HK_VARIANT rewrite for 麵 — so enhanced default disagrees with main.",
+        "checkbox_on": "Both sites: 麵 shows glyphs/9eb5.json (20-stroke 麥+面), 麪 shows glyphs/9eaa.json (15-stroke 麥+丏). Both correct. (Neither hex is in VARIANT_GLYPHS, so ON serves the own glyphs/ file directly.)"
+      },
+      "files": [
+        {
+          "path": "glyphs/9eaa.json",
+          "md5": "76551aa7ed62f939ebc43518e061d117",
+          "strokes": 15,
+          "serves": "Checkbox OFF (main): both 麵 (via CW_STD_FORM redirect) and 麪 (own file). Checkbox ON: 麪. Enhanced: 麪 in both modes.",
+          "correct_for_member": true,
+          "evidence": "Rendered glyphs/9eaa.json to PNG: 麥 + 丏 (small right component with hook), 15 strokes — matches the EDB 4716 animation (15 layers) and hanzipi 15."
+        },
+        {
+          "path": "glyphs/9eb5.json",
+          "md5": "9b65271785318cf0cc43734c65acb7a4",
+          "strokes": 20,
+          "serves": "Checkbox ON (both sites): 麵, via glyphs/<own-hex>.json — 9eb5 is NOT in the hardcoded VARIANT_GLYPHS list and there is no variants/9eb5.json, so the loader serves the own file directly. Checkbox OFF (main): not served — 麵 redirects to glyphs/9eaa.json. Enhanced checkbox OFF: 麵's own file (no redirect).",
+          "correct_for_member": true,
+          "evidence": "Rendered glyphs/9eb5.json to PNG: 麥 + 面 (full box with two inner verticals and bottom horizontal), 20 strokes — matches twpen 麵 final (20 panels viewed) and hanzipi 20. md5 9b65271785318cf0cc43734c65acb7a4 matches the v269 delivery record, confirming the v269 rebuild is in this baseline (not the old byte-copy of 9eaa)."
+        }
+      ],
+      "discrepancies": [
+        {
+          "description": "Pipeline metadata assigns EDB id 4716 to both members (anim_full_9eb5.json id 4716, 15 layers; anim_crosscheck_id_map.json 9eb5 id_source variant_standard, std_form 麪; its strokes field says 15, i.e. the standard's count, not 麵's 20). The borrowing is correctly labelled, but the two anim files are NOT byte-identical: layer 9 differs (path len 110 vs 119, same tx/ty) — likely decode/fetch variance on the same 麪 animation. Layer counts are both 15, i.e. the animation is 麪's, not 麵's.",
+          "evidence": "anim_full_9eaa.json vs anim_full_9eb5.json layer comparison: diff layers [9] only; anim_crosscheck_id_map.json 9eb5 strokes 15.",
+          "fix_needed": "None; note only. Do not present 4716 as 麵's own EDB id, and do not read the id_map's strokes=15 as 麵's count (CHAR_DB correctly has 20).",
+          "type": "edb-id-shared-with-standard"
+        },
+        {
+          "description": "Enhanced version lacks CW_STD_FORM (0 occurrences in enhanced/index.html; loadGlyphMeta only sets VARIANT_PAIRS; glyph-engine.js byte-identical to main, so stdForm is always null). Consequence for THIS group is visible and unmasked: 麵 is NOT in enhanced HK_VARIANT text rewrite, so enhanced checkbox-OFF serves glyphs/9eb5.json (own 20-stroke 麵) instead of redirecting to 麪 — the opposite of the main site's default (show 麪, the HK standard). The checkbox label still promises the standard form.",
+          "evidence": "grep CW_STD_FORM: main index.html 3 hits, enhanced/index.html 0; enhanced HK_VARIANT (line 3275) contains no 麵; hkGlyph() in glyph-engine.js:133 reads window.CW_STD_FORM.",
+          "fix_needed": "Add CW_STD_FORM construction to enhanced/index.html (v271 staging says this is included — verify it lands). Until then, enhanced default display of 麵 disagrees with the main site.",
+          "type": "enhanced-no-std-redirect"
+        }
+      ],
+      "student_note": "「麪」同「麵」右邊唔同：麪係麥加丏，十五畫，係香港標準寫法；麵係麥加面（一個面字框），二十畫。",
+      "confidence": "high",
+      "v271_status": "Already fixed in v269 (麵 rebuilt 20-stroke twpen 1:1 Edb.R, own_glyph True, CHAR_DB 15→20, md5 9b652717… verified in this baseline). No v271 action.",
+      "open_item": ""
+    }
+  ]
+}

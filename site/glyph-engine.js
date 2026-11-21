@@ -17,13 +17,65 @@
 //       window.CHAR_DB (data.js), HanziWriter (for non-EDB fallback + animations),
 //       const NS = 'http://www.w3.org/2000/svg' — declare NS before loading if absent.
 
+// Perm guard (2026-11-19; dev-memo-hw839 §1.5/§1.6 follow-up — 獒 bug):
+// a perm whose length != the HanziWriter stroke count, or whose entries are
+// not a permutation of 0..n-1, used to fail SILENTLY (return data unpermuted),
+// so a wrong perm shipped invisible. Now it warns loudly (once per char per
+// reason) and still falls back to unpermuted order — never break the page
+// for a bad perm. Valid perms and no-perm chars are untouched (no warning).
+// Note the reference count is the HANZIWRITER count, not the EDB count:
+// HW merges strokes EDB keeps apart (e.g. 犍/鄢/鄯/鄲: HW 12/13/14/14 vs
+// EDB 13/14/15/15), so those perms are CORRECT at their shorter length.
+const _permWarned = new Set();
 function applyHKOrder(ch, data) {
   const perm = (window.HK_ORDER || {})[ch];
-  if (!perm || !data || !data.strokes || perm.length !== data.strokes.length) return data;
+  if (!perm || !data || !data.strokes) return data;
+  const n = data.strokes.length;
+  let reason = null;
+  if (!Array.isArray(perm)) reason = 'perm is not an array';
+  else if (perm.length !== n) reason = 'perm length ' + perm.length + ' != ' + n + ' HW strokes';
+  else if (!data.medians) reason = 'no medians array';
+  else if (data.medians.length !== n) reason = 'medians length ' + data.medians.length + ' != ' + n + ' strokes';
+  else {
+    const seen = new Set();
+    for (const i of perm) {
+      if (!Number.isInteger(i) || i < 0 || i >= n || seen.has(i)) { reason = 'perm is not a permutation of 0..' + (n - 1) + ' (bad entry ' + i + ')'; break; }
+      seen.add(i);
+    }
+  }
+  if (reason) {
+    const key = ch + '|' + reason;
+    if (!_permWarned.has(key)) {
+      _permWarned.add(key);
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn('[chineseword] HK_ORDER perm IGNORED for ' + ch + ' (U+' + ch.codePointAt(0).toString(16).toUpperCase() + '): ' + reason + ' — falling back to HanziWriter order. Fix hk_order.js or the HW data.');
+      }
+    }
+    return data;
+  }
   return {
     strokes: perm.map(i => data.strokes[i]),
     medians: perm.map(i => data.medians[i]),
   };
+}
+
+// HW 辶 split overrides (2026-11-19): local repaired HanziWriter data for
+// chars outside CHAR_DB whose 辶 is 3 strokes on the CDN (HW 辶=3, HK=4).
+// HW_SPLIT lists the hexes with an override file in hw-split/ (HK 4-stroke
+// 辶; same ink as the CDN file, only the merged 橫折豎 divided in two).
+// Tried BEFORE the CDN fetch but AFTER the local-glyph check, so chars
+// with a local glyph are never affected. Chars not in HW_SPLIT go straight
+// to the CDN (no extra request). hw-split/ files are HanziWriter format
+// (1024-space, y-up: {strokes, medians, radStrokes}).
+const HW_SPLIT = { '83b2': 1, '8627': 1, '8fb6': 1, '8fb9': 1, '8fbd': 1, '8fbe': 1, '8fc1': 1, '8fc7': 1, '8fc8': 1, '8fd0': 1, '8fd3': 1, '8fd5': 1, '8fd8': 1, '8fd9': 1, '8fdb': 1, '8fdc': 1, '8fdd': 1, '8fde': 1, '8fdf': 1, '8fe8': 1, '8fe9': 1, '8fee': 1, '8ff3': 1, '8ff6': 1, '8ff9': 1, '9002': 1, '9004': 1, '9009': 1, '900a': 1, '9012': 1, '9021': 1, '9026': 1, '902d': 1, '902f': 1, '903b': 1, '9044': 1, '9057': 1, '9065': 1 };
+function hwSplitDir() { return window.HW_SPLIT_DIR || 'hw-split/'; }
+function loadHwData(ch) {
+  const hex = ch.codePointAt(0).toString(16);
+  if (HW_SPLIT[hex]) {
+    return fetch(hwSplitDir() + hex + '.json?v=1').then(r => (r.ok ? r.json() : HanziWriter.loadCharacterData(ch)))
+      .catch(() => HanziWriter.loadCharacterData(ch));
+  }
+  return HanziWriter.loadCharacterData(ch);
 }
 
 // Custom loader so HanziWriter's own animation/quiz也跟香港次序
@@ -34,7 +86,7 @@ function hkCharDataLoader(ch, onComplete, onError) {
       onComplete({ strokes: rec.s, medians: rec.m });
       return null;
     }
-    return HanziWriter.loadCharacterData(ch).then(d => onComplete(applyHKOrder(ch, d)));
+    return loadHwData(ch).then(d => onComplete(applyHKOrder(ch, d)));
   }).catch(e => onError && onError(e));
 }
 
@@ -48,7 +100,7 @@ function glyphDir() { return window.GLYPH_DIR || 'glyphs/'; }
 
 // 「直出異體字」模式：window.CW_VARIANT_GLYPH = true 時，以下字改用 glyphs/variants/ 嘅字形
 // （即跟着輸入字嘅寫法出，唔歸一成香港正字）。目前只有 峰（山在左，HanziWriter 通用字形）。
-const VARIANT_GLYPHS = { '514c': 1, '56ea': 1, '5cf0': 1, '6085': 1, '6236': 1, '6558': 1, '7a05': 1, '7fa4': 1, '812b': 1, '81e5': 1, '8aaa': 1, '92b3': 1, '95b1': 1 };
+const VARIANT_GLYPHS = { '514c': 1, '56ea': 1, '5cf0': 1, '6085': 1, '6236': 1, '6558': 1, '7a05': 1, '7fa3': 1, '7fa4': 1, '812b': 1, '81e5': 1, '8aaa': 1, '92b3': 1, '95b1': 1 };
 function variantMode(ch) {
   return !!(window.CW_VARIANT_GLYPH && VARIANT_GLYPHS[ch.codePointAt(0).toString(16)]);
 }
@@ -98,12 +150,12 @@ function hkGlyph(ch) {
   // 預設（未勾「顯示我輸入的寫法」）示範香港教育標準寫法：輸入字若有另一寫法而標準不同，
   // 字形取標準字（秘→祕、羣→群），與「字形：」標示一致（跟 web 版）。
   const stdForm = !window.CW_VARIANT_GLYPH && window.CW_STD_FORM ? window.CW_STD_FORM[hex] : null;
-  const fetchGlyph = (c) => fetch(`${glyphDir()}${c.codePointAt(0).toString(16)}.json?v=49`).then(r => (r.ok ? r.json() : null));
+  const fetchGlyph = (c) => fetch(`${glyphDir()}${c.codePointAt(0).toString(16)}.json?v=55`).then(r => (r.ok ? r.json() : null));
   const std = () => (stdForm && stdForm !== ch
     ? fetchGlyph(stdForm).then(rec => rec || fetchGlyph(ch))
     : fetchGlyph(ch));
   const load = variantMode(ch)
-    ? () => fetch(`${glyphDir()}variants/${hex}.json?v=1`).then(r => (r.ok ? r.json() : std()))
+    ? () => fetch(`${glyphDir()}variants/${hex}.json?v=2`).then(r => (r.ok ? r.json() : std()))
     : std;
   const p = load()
     .catch(() => null)
@@ -715,12 +767,14 @@ async function addGlyphNumbersAsync(svg, artScale, gen) {
   return true;
 }
 
-// Install HK glyphs into .char-glyph / .guide-glyph spans (font glyph = fallback).
+// Install HK glyphs into .char-glyph / .guide-glyph / .cw-daily-char / .cw-wb-char
+// spans (font glyph = fallback). v268: the daily bar + wordbook cards are guide
+// positions too — variant chars must show the EDB form, not the phone font.
 // Numbers go on the first tracing cell only.
 // gen = generation token from renderWorksheet: stale generations stop early
 // instead of grinding through detached DOM.
 async function installHKGlyphs(root, gen) {
-  const els = [...root.querySelectorAll('.char-glyph[data-ch], .guide-glyph[data-ch]')];
+  const els = [...root.querySelectorAll('.char-glyph[data-ch], .guide-glyph[data-ch], .cw-daily-char[data-ch], .cw-wb-char[data-ch]')];
   if (!els.length) return new Set();
   const chars = [...new Set(els.map(e => e.dataset.ch))]
     // 標點冇字形資料（EDB/HW 都冇），唔應該浪費一個 404 請求
@@ -766,7 +820,7 @@ async function installHKGlyphs(root, gen) {
 
 function _hwCharData(ch) {
   if (_hwCharCache.has(ch)) return _hwCharCache.get(ch);
-  const p = HanziWriter.loadCharacterData(ch)
+  const p = loadHwData(ch)
     .then(d => applyHKOrder(ch, d))
     .catch(() => null);
   _hwCharCache.set(ch, p);

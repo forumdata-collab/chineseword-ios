@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>開發備忘：字形設計邏輯與 HW 839 審計 — 中文筆順練習簿</title>
-<link rel="stylesheet" href="../fonts/lxgw.css">
 <style>
   :root {
     --accent: #2563eb;
@@ -42,6 +41,11 @@
   th { background: #f1f5f9; font-weight: 600; white-space: nowrap; }
   tr:last-child td { border-bottom: none; }
   .hanzi { font-size: 1.25em; font-weight: 600; white-space: nowrap; }
+  /* 手機：表頭可換行，闊表可橫向捲動（唔好撐爆版面） */
+  @media (max-width: 640px) {
+    th { white-space: normal; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  }
   .note {
     background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--accent);
     padding: 12px 16px; border-radius: 4px; margin: 16px 0; font-size: 0.92em;
@@ -135,7 +139,7 @@
   .stroke-no { color: var(--muted); font-weight: 400; margin-right: 3px; font-size: 0.8em; }
   .stroke-example {
     font-size: 1.05em; color: var(--ink); margin-top: 3px; font-weight: 500;
-    font-family: "LXGW WenKai TC", "KaiTi", "STKaiti", "DFKai-SB", "Noto Serif CJK TC", "Songti TC", serif;
+    font-family: "Noto Serif CJK TC", "Noto Serif TC", "Songti TC", "PMingLiU", "STSong", serif;
   }
   .src-badge { font-size:.82em; padding:0 4px; border:1px solid #cfd6dd; border-radius:3px;
                color:#6a7480; font-family: ui-monospace, Consolas, monospace; }
@@ -152,7 +156,7 @@
 <div class="container">
 
   <h1>開發備忘：字形設計邏輯與 HW 839 審計</h1>
-  <div class="subtitle">中文筆順練習簿（chineseword.we1co.me）— 字形與筆順的設計邏輯、重繪清單與待決字。最後更新：2026-11-18（按第三方審核修正計數、來源標籤與徽章數字；審計內容截至 APK v2.32／網站 v2.32，已提交 Hermes，待部署）。</div>
+  <div class="subtitle">中文筆順練習簿（chineseword.we1co.me）— 字形與筆順的設計邏輯、重繪清單與待決字。最後更新：2026-11-21（數字核對至網站 v273，已部署 2026-11-20 08:46，deployment 6fb55003；APK／iOS 據知仍為 v2.47，對應網站 v260，同步目標現為 v273，待用戶確認；glyph_sources.json：EDB 4,818／Edb.R 1,061，總數 5,879）。</div>
   <a class="back" href="../index.html">← 返回練習簿</a>
   <a class="back" href="../about.html" style="margin-left:16px">← 返回開發說明</a>
 
@@ -164,36 +168,39 @@
   <table>
     <thead><tr><th>項目</th><th>數字</th><th>說明</th></tr></thead>
     <tbody>
-      <tr><td>收錄漢字（CHAR_DB）</td><td><b>5,560 字</b></td><td>全部有粵拼、普通話拼音及筆畫數</td></tr>
-      <tr><td>EDB 字形</td><td><b>4,528 字</b></td><td>香港教育局《香港小學學習字詞表》官方筆順，標「香港教育標準」</td></tr>
-      <tr><td>twpen 字形</td><td><b>194 字</b></td><td>台灣教育部《筆順字典》字形，筆順已按香港次序，標「香港次序」</td></tr>
-      <tr><td>HanziWriter 後備（現時）</td><td><b>838 字</b></td><td>無 EDB／twpen 字形者，用 HanziWriter 通用字形；見下方註</td></tr>
-      <tr><td>HW 審計對象</td><td><b>839 字</b></td><td>原後備字總數；獒（7352）獲 EDB 字形後升入 EDB 層，現時後備為 838 字</td></tr>
+      <tr><td>收錄漢字（CHAR_DB）</td><td><b>5,879 字</b></td><td>全部有粵拼、普通話拼音及筆畫數（2026-11-19 核對：0 字缺讀音）。註：data.js 文本有 6,162 個 <code>"X":{"jy":</code> 匹配，係尾段重複聲明同一鍵所致；不重複鍵為 5,879，以不重複鍵為準</td></tr>
+      <tr><td>EDB 字形</td><td><b>4,818 字</b></td><td>香港教育局《香港小學學習字詞表》官方筆順，標「香港教育標準」</td></tr>
+      <tr><td>Edb.R 字形</td><td><b>1,061 字</b></td><td>非教育局數據，但按教育局原則重建／核對，標「按教育局原則」；原台灣筆順字典（194 字）及 HanziWriter（839 字）墨跡已全部逐字核對並按香港次序重排，現已全數改標 Edb.R，不再以 TW／HW 標示。分項見 §1.1（793 部件拼合＋216 改標＋30 新增＋獒／蘊改標＋薀／蕰新建＋麵改標＋秘改標＋v271 變體修正 15 字＋辶新增 1 字＝1,061）</td></tr>
+      <tr><td>HW 審計對象（歷史）</td><td><b>839 字</b></td><td>2026-11-13 審計人口；現已全數改標 Edb.R（見 §2、§3）</td></tr>
       <tr><td>twpen 核對結果</td><td>182 相同 ／ 11 重排 ／ 1 重繪 ／ 0 待決</td><td>共 194 字，全部已核對（見 §2.5、§3）</td></tr>
       <tr><td>HW 審計結果</td><td>666 相同 ／ 76 重排 ／ 64 重繪（58 v2.28 已做＋5 本輪已做＋1 韙核實正確毋須重繪）／ 25 數據問題（10 v2.28 已解決＋10 本輪已做＋3 佈局核實正確毋須改動＋1 禳已裁決毋須改動＋1 諛已裁決毋須改動）／ 8 已有老師拆字（4 本輪解決＋4 跟進解決：夔 perm、齧／贗／鬻核實正確）</td><td>共 839 字；666＋76＋64＋25＋8＝839（見 §2、§3）</td></tr>
       <tr><td>以 EDB 邏輯重繪／重建</td><td><b>85 項（84 字）</b></td><td>58 HW 重繪（v2.28）＋8 新建筆順動畫＋1 twpen 重繪＋1 EDB 拼合新字形＋16 本輪重繪（鬮、啷、骶、鼐、糍、錒、礴、驊、瓤、穰、醴、粼、邃、覷、鎩、饗）＋1 餚有部重繪（老師批准後做，見 §3.4）；覷虛部其後按 EDB 12 筆重做（同一項，唔另計）；獒計兩次（見 §2）</td></tr>
       <tr><td>仍未解決</td><td><b>0 字</b></td><td>839 審計內全部解決（2026-11-13 跟進：夔 perm、齧／贗／鬻核實正確、諛已裁決毋須改動，見 §3 及 <code>tools/organize_followup6.md</code>）。另餚（不在 839 審計內）食部 #2 已按 EDB 飯改好，有部亦已重繪（老師 2026-11-13 19:07 HKT 批准；CHAR_DB 17→16）；飯 #8 EDB median 方向錯亦已按老師批准寫入（見 §3.4 及 <code>tools/organize_followup6.md</code>）</td></tr>
+      <tr><td>843 重掃（v262，已部署）</td><td><b>843 字</b></td><td>由零製作字形按「twpen 描紅底＋EDB 筆劃原理」全部重掃：twpen 1:1 墨跡＋EDB 筆順，842 字＋嗩（EDB 拼合，見 §5）；另 redo-only 夔／瓤 2 字，合共安裝 845 個 glyph 檔；glyph?v= 49→50。重掃 15 項開放問題已於 2026-11-20 由用戶裁決解決（其餘正確；蟎／蹰／鷫對 twpen 成立；蝟 14、15 筆改 EDB 胃墨；隰 17 筆），9 項修正隨 v272 出貨（見 §5）</td></tr>
+      <tr><td>v265–v268 變動（已部署）</td><td><b>＋2 字</b></td><td>薀（8580，v265 新建 17 筆 Edb.R）、蕰（8570，v267 新建 16 筆 Edb.R）；蘊（860a）由 EDB 改標 Edb.R（v265）。總數 5,876→5,878；EDB 4,836→4,835；Edb.R 1,040→1,043（見 §5）</td></tr>
+      <tr><td>v269 變動（已部署）</td><td><b>改標 1 字</b></td><td>麵（9eb5，v269 重建 20 筆 Edb.R；CHAR_DB 15→20、own_glyph 開）；perm guard（applyHKOrder runtime 驗證，兩份 glyph-engine.js）；本頁＋about.html 數字改為 EDB 4,834／Edb.R 1,044。總數 5,878 不變；EDB 4,835→4,834；Edb.R 1,043→1,044（見 §5）</td></tr>
+      <tr><td>v271 變動（待提交）</td><td><b>改標 9 字＋新建 7 字</b></td><td>22 組重複字形 shape audit 修正：兌／悅／說／銳／脫／稅變體頂部鏡像修正、閱重建 Λ-top（15 筆不變）、床 8→7／蔥 13→15／衛 16→15／醞 16→17／溫 12→13／媼 12→13／鉤 12→13（7 新建 Edb.R，own_glyph 開）；戶 perm 修正（丿先）；羣／群分開顯示（glyphs/7fa4.json 換做群形、variants/7fa3.json 新增、loader 接線、engine ?v= 52→53）；秘（79d8）由 EDB 改標 Edb.R（正字參考庫覆核：秘無 EDB id，EDB 2866 係祕；10 筆重建，字形無改）。總數 5,878 不變；EDB 4,834→4,818；Edb.R 1,044→1,060（見 §5）</td></tr>
+      <tr><td>v272 變動（已部署 2026-11-20，deployment c922f131）</td><td><b>＋1 字</b></td><td>辶（8fb6，新增 4 筆 Edb.R；CHAR_DB 5,878→5,879）；嘅（5605，hanzipi 1:1 重建 12 筆，CHAR_DB 14→12）；隰（96b0，還原 17 筆，CHAR_DB 16→17）；CHAR_DB 同步 7 字（v271 新建 glyph）：媼 12→13、床 8→7、溫 12→13、蔥 13→15、衛 16→15、醞 16→17、鉤 12→13（全部等於新 glyph 筆數）；重掃修正 9 字（蟎／蹰／甙／鯛／蔫／蝟／黽／鷫／隰；蝟 14、15 筆 graft EDB 胃墨）；蓽（84fd）按 EDB 艹＋畢重建 15 筆；10 個錯 perm 重寫＋宓由 HW_HK_SAME 移除＋兩表凍結（用戶 2026-11-19 裁決）；HW 辶拆分（hw-split/ 38 字，engine loadHwData()；glyph-engine.js ?v= 53→54、glyph ?v= 54→55）。總數 5,878→5,879；EDB 4,818 不變；Edb.R 1,060→1,061（見 §5）</td></tr>
     </tbody>
   </table>
-  <p class="stat-note">註：網站現時 <code>glyph_sources.json</code> 將獒（7352）標為 twpen（EDB 4,527／twpen 195），工作副本及 APK 標為 EDB（EDB 4,528／twpen 194）；總數同為 4,722，字形本身相同，只係來源標籤唔同，待更正。本備忘用工作副本／APK 計法。</p>
+  <p class="stat-note">註：獒（7352）曾於 2026-11-13 由 EDB 敖＋犬拼合後標為 EDB；2026-11-18 用戶裁決改標 Edb.R（教育局無獒字形，敖＋犬屬按教育局原則合成），例外終止。現時 <code>glyph_sources.json</code>：EDB 4,818／Edb.R 1,061，總數 5,879（2026-11-21 核對 v273）。</p>
 
   <h2>一、設計邏輯</h2>
 
-  <h3>1.1 三層字形架構（權威順序：EDB ＞ twpen ＞ HanziWriter ＞ 系統字體）</h3>
+  <h3>1.1 兩層字形架構（權威順序：EDB ＞ Edb.R ＞ 系統字體）</h3>
   <p>本站每隻字按以下次序取字形，上一層有就唔用下一層：</p>
   <table>
     <thead><tr><th>層</th><th>來源</th><th>字數</th><th>字形</th><th>筆順</th><th>徽章</th></tr></thead>
     <tbody>
-      <tr><td>第 1 層</td><td>香港教育局《香港小學學習字詞表》（edbchinese.hk）官方筆順動畫，逆向提取為向量輪廓（<code>glyphs/&lt;hex&gt;.json</code>，<code>{s, m}</code>）</td><td>4,528</td><td>香港官方字形</td><td>香港官方次序</td><td>香港教育標準</td></tr>
-      <tr><td>第 2 層</td><td>台灣教育部《筆順字典》（twpen.com）分解圖逆向提取</td><td>194</td><td>台灣字形</td><td>已逐字核對並按香港次序重排</td><td>香港次序</td></tr>
-      <tr><td>第 3 層</td><td>HanziWriter（hanziwriter.org）通用字形與筆順（<code>hanzi-writer-data</code>，9,511 字）</td><td>838</td><td>通用字形</td><td>已逐字核對者按香港次序，其餘為通用次序</td><td>香港次序／參考字形（見 §1.6）</td></tr>
+      <tr><td>第 1 層</td><td>香港教育局《香港小學學習字詞表》（edbchinese.hk）官方筆順動畫，逆向提取為向量輪廓（<code>glyphs/&lt;hex&gt;.json</code>，<code>{s, m}</code>）</td><td>4,818</td><td>香港官方字形</td><td>香港官方次序</td><td>香港教育標準</td></tr>
+      <tr><td>第 2 層</td><td>非教育局數據，但按教育局原則重建／核對：以教育局部件拼合，或沿用台灣教育部《筆順字典》（twpen.com）／HanziWriter（hanziwriter.org）墨跡並逐字核對、按香港次序重排</td><td>1,061</td><td>按教育局原則重建的字形</td><td>香港次序</td><td>按教育局原則</td></tr>
       <tr><td>最後後備</td><td>系統字體</td><td>0</td><td>—</td><td>—</td><td>—</td></tr>
     </tbody>
   </table>
-  <p>現時 5,560 字全部有字形來源（4,528＋194＋838＝5,560），無字落入系統字體。第 3 層的 838 字即 HW 審計對象減去獒（見總表註）。字形檔案格式：EDB／twpen 字形為 <code>{s:[輪廓路徑], m:[中線點列]}</code>，hex 為小寫碼位；HanziWriter 數據為 <code>{strokes, medians, radStrokes}</code>。</p>
+  <p>現時 5,879 字全部有字形來源（4,818＋1,061＝5,879），無字落入系統字體。第 2 層分項（2026-11-20 按 <code>glyph_sources.json</code> 變化重新推導，總數與現時 1,061 吻合）：<strong>793 字 EDB 部件拼合</strong>（原有 40 字＋2026-11-17 長尾 753 字，全部 Tier 2 Edb.R，edbid 全 null，0 字在 lexlist DB 字頭）＋<strong>216 字</strong>（2026-11-17 由 twpen／HW 改標 Edb.R，當時最後一批仍帶舊標籤的字）＋<strong>30 字新增粵語用字</strong>＋<strong>1 字獒</strong>（2026-11-18 由 EDB 改標 Edb.R）＋<strong>1 字蘊</strong>（v265 由 EDB 改標 Edb.R）＋<strong>2 字薀／蕰</strong>（v265／v267 新建 Edb.R）＋<strong>1 字麵</strong>（v269 由 EDB 改標 Edb.R）＋<strong>1 字秘</strong>（v271 由 EDB 改標 Edb.R，正字參考庫覆核：秘無 EDB id，EDB 2866 係祕；10 筆重建）＋<strong>15 字變體修正</strong>（v271：兌／悅／說／銳／脫／稅／閱／群改標 8 字＋床／蔥／衛／醞／溫／媼／鉤新建 7 字）＋<strong>1 字辶</strong>（v272 新增 Edb.R）＝1,061。注意：194（twpen）／839（HW）係 2026-11-13 墨跡來源的歷史審計數，唔係 Edb.R 的子集——該批字現按標籤分佈於 EDB 與 Edb.R 兩層（例如靚、餚、潢現標 EDB），所以 753＋30＋194＋839＝1,816 唔可以直接相加，舊寫法容易誤導，現以本段分項為準（歷史三層架構 EDB ＞ twpen ＞ HanziWriter 見 2026-11-13 版備忘）。字形檔案格式：EDB／Edb.R 字形為 <code>{s:[輪廓路徑], m:[中線點列]}</code>，hex 為小寫碼位。</p>
 
   <div class="note">
-    <strong>例子：點解幕同冪望落唔同</strong>——幕（U+5E55）有 EDB 字形（14 筆，標「香港教育標準」），冪（U+51AA）無 EDB 字形（唔在字詞表內），退回 HanziWriter 通用字形（16 筆，標「參考字形」）。筆數一致（冖 2＋幕 14＝16，HanziWriter 冪亦 16 筆），分別純粹係字體風格：EDB 同 HanziWriter 係兩套唔同的字體，同一部件（莫、巾）寫出嚟筆形同比例都唔同。呢個就係第 3 層字形風格不一致問題的具體例子（見 §4）：原 839 字 HanziWriter 字形同 EDB／twpen 風格唔同（獒升入 EDB 層後現為 838 字），全部按 EDB 風格重畫係大工程，待用戶決定。
+    <strong>例子：點解幕同冪望落唔同</strong>——幕（U+5E55）有 EDB 字形（14 筆，標「香港教育標準」），冪（U+51AA）無 EDB 字形（唔在字詞表內），按教育局原則重建（冖＋幕，16 筆，標「按教育局原則」）。筆數一致（冖 2＋幕 14＝16），分別純粹係字體風格：EDB 同 HanziWriter 係兩套唔同的字體，同一部件（莫、巾）寫出嚟筆形同比例都唔同。呢個就係 Edb.R 字形風格不一致問題的具體例子（見 §4）：原 839 字 HanziWriter 字形同 EDB 風格唔同，全部按 EDB 風格重畫係大工程，待用戶決定。
   </div>
 
   <h3>1.2 點解以 EDB 為準</h3>
@@ -236,26 +243,23 @@
     <li><code>hk_order.js</code>（<code>window.HK_ORDER</code>）現有 <strong>770 項</strong>（2026-11-13 時 760 項，其後逐項加入 10 項）：v2.23 之前 671 項；HW 後備字 perm 79 項（76 項純重排＋獒、蓽、饉 3 項隨重繪附帶，見 §2.5）；本輪整理 4 項（冪、鼐、驊、夔）＋辶 6 項（迅、透、造、週、過、遐，2026-11-13 老師「全做」批准）。另有 <code>hw_hk_same.js</code>（<code>window.HW_HK_SAME</code>），<strong>596 字</strong>（2026-11-13 時 580 字；2026-11-14 加入啷、瓤、礴、穰、粼、糍、覷、邃、邈、邋、錒、鎩、餚、饗、骶、鬮 16 字）——原審計判 same 的 HW 字，筆順本身已是香港次序，唔使 perm。注意：呢兩個集合係歷史審計結果，v2.28 之後冇成批重算，只係逐項追加（見 §1.6 註）。</li>
     <li><code>applyHKOrder</code>（<code>glyph-engine.js</code>）：取 perm 後按新次序重排 <code>strokes</code>／<code>medians</code>。有長度守則：<code>perm.length !== data.strokes.length</code> 時原樣返回，唔做任何事——perm 靜默失效。</li>
     <li><strong>長度守則的後果（獒網站 bug）</strong>：網站用 CDN HanziWriter 數據，獒得 14 筆（冇咗敖嗰點），perm 長 15，守則令 perm 唔生效，網站獒筆順錯；App 內置數據有 15 筆，perm 生效，App 正確。修正方法係新增 EDB 拼合字形 <code>glyphs/7352.json</code>（見 §2.4），而唔係改守則——守則係安全網，防止錯長度 perm 亂排。</li>
-    <li><strong>跟進（未做）：長度守則靜默失效要有警報。</strong>獒的 bug 證明 perm 長度唔啱時，守則令 perm 靜默失效，網站／App 數據唔一致都唔會有人知。跟進做法（二揀一）：(a) build-time assertion——出貨前逐一核對已審計字（<code>HK_ORDER</code>／<code>HW_HK_SAME</code> 內）的 perm 長度同實際筆數，唔啱即報錯，唔出貨；(b) runtime log——perm 因長度唔生效時寫入 console／遙測，唔好靜默跳過。未實施，待排期。</li>
+    <li><strong>跟進（2026-11-19 已派 coordinator 做，待結果）：長度守則靜默失效要有警報。</strong>獒的 bug 證明 perm 長度唔啱時，守則令 perm 靜默失效，網站／App 數據唔一致都唔會有人知。跟進做法（二揀一）：(a) build-time assertion——出貨前逐一核對已審計字（<code>HK_ORDER</code>／<code>HW_HK_SAME</code> 內）的 perm 長度同實際筆數，唔啱即報錯，唔出貨；(b) runtime log——perm 因長度唔生效時寫入 console／遙測，唔好靜默跳過。未實施，待 coordinator 結果。</li>
     <li><strong>perm 只改次序，改唔到筆數同筆形</strong>。缺筆、合併筆、筆形錯、佈局錯一律要重繪或換數據，唔可以用 perm 補救。</li>
     <li>twpen 11 字的重排已直接寫入字形檔（<code>glyphs/*.json</code>），唔經 <code>hk_order.js</code>——已核實 11 字皆不在 <code>hk_order.js</code> 內。</li>
   </ul>
 
   <h3>1.6 徽章／層級邏輯</h3>
-  <p>來源判定：<code>src = GLYPH_SOURCES[hex] || (CHAR_DB[ch] ? 'HW' : null)</code>（<code>index.html</code>）。徽章按以下邏輯顯示：</p>
+  <p>來源判定：<code>src = GLYPH_SOURCES[hex]</code>（<code>index.html</code>；<code>glyph_sources.json</code> 只有 EDB／Edb.R 兩種標籤）。徽章按以下邏輯顯示：</p>
   <table>
     <thead><tr><th>來源</th><th>條件</th><th>徽章</th></tr></thead>
     <tbody>
       <tr><td>EDB</td><td><code>src === 'EDB'</code></td><td>香港教育標準</td></tr>
-      <tr><td>twpen</td><td><code>src === 'twpen'</code></td><td>香港次序</td></tr>
       <tr><td>Edb.R</td><td><code>src === 'Edb.R'</code></td><td>EDB 修訂</td></tr>
-      <tr><td>HW（已核對）</td><td><code>src === 'HW'</code> 且（<code>HK_ORDER</code> 有 perm 或 <code>HW_HK_SAME</code> 有該字）</td><td>香港次序</td></tr>
-      <tr><td>HW（未核對）</td><td><code>src === 'HW'</code> 且以上皆無</td><td>參考字形</td></tr>
     </tbody>
   </table>
-  <p class="stat-note">註：「香港次序」徽章只保證筆順次序係香港次序，唔保證字形係香港標準字形。twpen 層本身係台灣字形（筆順已按香港次序重排）；HW 層的「香港次序」亦只保證次序。字形係咪香港標準，要睇來源係 EDB 定 Edb.R／twpen／HW（見 §1.1 及 §1.8）。</p>
+  <p class="stat-note">註：「EDB 修訂」徽章表示該字形並非教育局官方數據，但已按教育局原則重建／核對（見 §1.1）。舊有的 twpen／HW 徽章（「香港次序」／「參考字形」）已於 2026-11-17 重新標籤後取消，不再使用。</p>
   <div class="note">
-    <strong>注意（2026-11-18 修正）</strong>：v2.32 時（2026-11-13），v2.28 重繪的 58 字及新建動畫的 8 字，數據已按 EDB 修正，但徽章邏輯只認 <code>HK_ORDER</code>／<code>HW_HK_SAME</code>；除獒、蓽、饉（有附帶 perm）外，其餘 63 字仍顯示「參考字形」。呢個數字而家已經過時：2026-11-17 重新標籤後，58 字重繪＋8 字新建全部記入 <code>glyph_sources.json</code>（58 字：55 字 Edb.R＋獒、餚、潢 EDB；8 字：7 字 Edb.R＋靚 EDB），徽章改為「EDB 修訂」／「香港教育標準」，唔再顯示「參考字形」。徽章改變唔係因為 <code>HK_ORDER</code>／<code>HW_HK_SAME</code> 重算——呢兩個集合 v2.28 之後冇成批重算（只係 <code>HW_HK_SAME</code> 2026-11-14 手動加入 16 字，<code>HK_ORDER</code> 逐項加到 770 項）；徽章改變係因為字形來源本身由 HW 改為 Edb.R／EDB。哌、鯤亦已於 2026-11-17 標為 Edb.R。跟進：兩個靜態集合應定期對照現時 <code>glyph_sources.json</code> 覆核，唔好再靠人手追加。另 HW 徽章本身維持不變（見 §4）。
+    <strong>注意（2026-11-18 修正）</strong>：v2.32 時（2026-11-13），v2.28 重繪的 58 字及新建動畫的 8 字，數據已按 EDB 修正，但徽章邏輯只認 <code>HK_ORDER</code>／<code>HW_HK_SAME</code>；除獒、蓽、饉（有附帶 perm）外，其餘 63 字仍顯示「參考字形」。呢個數字而家已經過時：2026-11-17 重新標籤後，58 字重繪＋8 字新建全部記入 <code>glyph_sources.json</code>（58 字：56 字 Edb.R＋餚、潢 EDB——獒原標 EDB，2026-11-18 改標 Edb.R；8 字：7 字 Edb.R＋靚 EDB），徽章改為「EDB 修訂」／「香港教育標準」，唔再顯示「參考字形」。徽章改變唔係因為 <code>HK_ORDER</code>／<code>HW_HK_SAME</code> 重算——呢兩個集合 v2.28 之後冇成批重算（只係 <code>HW_HK_SAME</code> 2026-11-14 手動加入 16 字，<code>HK_ORDER</code> 逐項加到 770 項）；徽章改變係因為字形來源本身由 HW 改為 Edb.R／EDB。哌、鯤亦已於 2026-11-17 標為 Edb.R。跟進：兩個靜態集合應定期對照現時 <code>glyph_sources.json</code> 覆核，唔好再靠人手追加——2026-11-19 已派 coordinator 寫對照腳本＋跑一次＋報 drift，待結果。另 HW 徽章本身維持不變（見 §4）。
   </div>
 
   <h3>1.7 座標：HW 同 EDB 都係 y-up</h3>
@@ -357,7 +361,7 @@
     <thead><tr><th>組別</th><th>字數</th><th>明細</th></tr></thead>
     <tbody>
       <tr><td>HW 重排</td><td><b>77 字</b></td><td>原審計 58 字（v2.23）＋再審計 17 字（v2.28：瘢、鋩、澠、蕓、謔、蕷、薊、嚳、櫸、懾、衊、儻、鑊、欒、臠、髖、顴）＋懨（第二輪，v2.28）＋冪（本輪整理）</td></tr>
-      <tr><td>twpen 重排</td><td><b>11 字</b></td><td>嘅、慂、芃、苾、蕁、駔、騸、驁、驄、驍、獁（馬部橫先、艹橫先等；已直接寫入字形檔）</td></tr>
+      <tr><td>twpen 重排</td><td><b>11 字</b></td><td>嘅、慂、芃、苾、蕁、駔、騸、驁、驄、驍、獁（馬部橫先、艹橫先等；已直接寫入字形檔）。<strong>嘅（5605）待重建（2026-11-19 用戶指出）：</strong>twpen 中部士頂寫法唔係香港寫法，須跟 hanzipi 藍本重建；現 CHAR_DB 14 筆 Edb.R、字形 14 筆維持不變，待重建後再核，唔好當已定案</td></tr>
       <tr><td>合計純重排</td><td><b>88 字</b></td><td>另獒、蓽、饉、鼐、驊 5 項 perm 隨重繪附帶，唔計入 77 字內</td></tr>
     </tbody>
   </table>
@@ -365,6 +369,7 @@
 
   <h2>三、跟進記錄：29 字由待決到全部解決（2026-11-13）</h2>
   <p><strong>未解決 0 字</strong>——839 審計內全部解決。以下三節記錄 2026-11-13 當日由 29 字待決到 0 字的過程。29 字分三種狀態：<strong>待核實</strong>（pending_verification，要對 EDB 參照逐筆核對）、<strong>待裁決</strong>（pending_decision，要老師裁決先郁得）、<strong>已裁決待實施</strong>（decided_not_shipped，做法已定，只係未做）。按組計：8 字組（§3.1）係待核實；15 字數據問題組（§3.3）係待核實／待裁決；6 字重繪組（§3.2）係已裁決待實施。本輪整理（2026-11-13）解決 23 字：8 字組 4 字（冪 perm、鬮重繪、蠼／鱺核實正確）、數據問題組 13 字（10 字重繪／更正＋飆／鰲／龕核實正確毋須改動）、6 字重繪組 6 字（5 字重繪＋韙核實正確毋須重繪）；跟進（同日）解決餘下 5 字：夔 perm（中行目先、止後）、齧／贗／鬻核實正確（分別跟 CNS 筆順／鴈／鬲）、諛已裁決毋須改動；禳早已裁決跟 EDB（21 畫）毋須改動。23＋5＋1（禳）＝29，全部解決。報告：<code>tools/organize_20261113.md</code>、<code>tools/verify8_decomp.md</code>、<code>tools/organize_followup6.md</code>。</p>
+  <p><strong>2026-11-19 核對：</strong>上述 29 字現時字形筆數全部與裁決一致（程式核對 <code>glyphs/*.json</code>）：數據問題組及重繪組已裁決筆數（啷12、骶15、鼐15、糍16、錒16、礴24、驊22、瓤27、穰27、鬮28、餚16、粼15、邃18、鎩19、饗21、覷19、禳21）及 8 字老師拆字組（冪16、夔21、齧21、贗22、鬻22、蠼26、鬮28、鱺30）皆已按裁決筆數出貨；韙 18 筆。逐筆筆順仍以本備忘 §3 及《EDB 筆順次序規則》v1.1 為準。瓤其後於 2026-11-19 v262 改為 22 筆（twpen＋EDB 共識；舊 27 筆不成立），見 §5。另憋（618b）／憨（61a8）其後於 v263 由 14／15 改為 15／16 筆（見 §5）；兩字唔在 29 字之列。</p>
 
   <h3>3.1 （a）8 字已有老師拆字——全部已解決</h3>
   <p>老師已於 2026-11-13 提供以下拆字（權威）。以下 8 字當日全部解決：4 字本輪整理解決，4 字跟進解決（老師 18:47 HKT 裁決）。「下一步」欄記錄每字的最終處理。</p>
@@ -412,7 +417,7 @@
       <tr><td class="hanzi">礴</td><td>7934</td><td>簿部 HW 16 筆 vs EDB 19 筆，缺 3 筆；HW 得 21 筆，標準 24 筆</td><td><strong>已做（本輪整理）：</strong>拆 HW #5 做 EDB 簿 #1/#4 兩橫，刪多餘 HW #6（無 EDB 對應嘅斜線），加 EDB 簿 #0 撇、#2 點、#5 點；21→24 筆；CHAR_DB s 21→24。</td></tr>
       <tr><td class="hanzi">禳</td><td>79b3</td><td>HW 21 筆；再審計話「標準 22 筆」嘅理據（EDB 神礻 #4 豎）經核實係錯的——EDB 神 #0–#3 先係礻（4 筆），#4 係申首筆；HW 禳 #0–#3 同 EDB 神礻一致</td><td><strong>已裁決（老師 2026-11-13）：跟 EDB，21 畫，毋須改動</strong>（EDB 係金律；跟 MOE／康熙先係 22 畫）</td></tr>
       <tr><td class="hanzi">驊</td><td>9a4a</td><td>華部中部兩橫併成一長橫，缺 1 筆；首四筆次序亦倒轉</td><td><strong>已做（本輪整理）：</strong>拆 HW #15 做 EDB 華 #5/#7 兩橫；頭四筆用 perm 修正；21→22 筆；CHAR_DB s 21→22。</td></tr>
-      <tr><td class="hanzi">瓤</td><td>74e4</td><td>瓜部位置與 EDB 瓜全不對應，邊界不清；囊部 HW 17 筆 vs EDB 22 筆，缺 5 筆；HW 得 22 筆，標準 27 筆</td><td><strong>已做（本輪整理）：</strong>全重建——EDB 瓜 5 筆（頂 20.7%）＋EDB 囊 22 筆（底 79.3%），22→27 筆；CHAR_DB s 22→27。附註：瓜部垂直壓得好扁（比例由字體實測），請老師目測。</td></tr>
+      <tr><td class="hanzi">瓤</td><td>74e4</td><td>瓜部位置與 EDB 瓜全不對應，邊界不清；囊部 HW 17 筆 vs EDB 22 筆，缺 5 筆；HW 得 22 筆，標準 27 筆</td><td><strong>已做（本輪整理）：</strong>全重建——EDB 瓜 5 筆（頂 20.7%）＋EDB 囊 22 筆（底 79.3%），22→27 筆；CHAR_DB s 22→27。附註：瓜部垂直壓得好扁（比例由字體實測），請老師目測。<strong>（2026-11-19 v262 已推翻：</strong>瓤改為 22 筆，twpen 1:1 墨跡＋EDB 筆順，twpen 瓜比襄闊；舊審計 27 筆不成立，見 §5。<strong>）</strong></td></tr>
       <tr><td class="hanzi">穰</td><td>7a70</td><td>囊部 HW 17 筆 vs EDB 22 筆，缺 5 筆；HW 得 22 筆，標準 27 筆</td><td><strong>已做（本輪整理）：</strong>補 EDB 囊 #2 橫＋#7/#9/#10/#12 四點，22→27 筆；CHAR_DB s 22→27。附註：HW 穰 #5（右上一點）無 EDB 對應，已保留，請老師目測核實。</td></tr>
     </tbody>
   </table>
@@ -450,16 +455,118 @@
 
   <h2>四、未做／不做</h2>
   <ul>
-    <li><strong>HW 徽章維持不變</strong>（用戶決定）：HanziWriter 通用字形唔應冒充 EDB／香港標準，保留原徽章，免魚目混珠。見 §1.6 的徽章邏輯。</li>
-    <li><strong>HW 字形風格與 EDB／twpen 不一致，未處理（風格政策問題，獨立於筆順審計）</strong>：HanziWriter 係通用字體，風格同 EDB／台灣字形有別（例如幕／冪，見 §1.1）。風格統一係另一回事，唔好同筆順審計結論混埋一齊：審計結論（666 相同／76 重排／64 重繪）講的是筆順次序同筆數啱唔啱，唔係講字形靚唔靚；一隻字可以筆順啱但字形風格唔係 EDB。原 839 字（現 838 字，獒已升入 EDB 層）全部按 EDB 風格重畫係大工程——<strong>下一大改版時做，而且係主力</strong>（用戶 2026-11-13 決定）。</li>
+    <li><strong>HW 徽章已取消（2026-11-17 重新標籤）</strong>：原「HW 徽章維持不變」（用戶決定：HanziWriter 通用字形唔應冒充 EDB／香港標準）已由重新標籤取代——原 HW／twpen 字全部改標 Edb.R（徽章「EDB 修訂」），唔再以 HW 徽章示人。見 §1.6 的徽章邏輯。</li>
+    <li><strong>Edb.R 字形風格與 EDB 不一致，未處理（風格政策問題，獨立於筆順審計）</strong>：HanziWriter 係通用字體，風格同 EDB 字形有別（例如幕／冪，見 §1.1）。風格統一係另一回事，唔好同筆順審計結論混埋一齊：審計結論（666 相同／76 重排／64 重繪）講的是筆順次序同筆數啱唔啱，唔係講字形靚唔靚；一隻字可以筆順啱但字形風格唔係 EDB。原 839 字現已全數改標 Edb.R，全部按 EDB 風格重畫係大工程——<strong>下一大改版時做，而且係主力</strong>（用戶 2026-11-13 決定；2026-11-19 確認：留待下一大改版，deferred）。</li>
     <li><strong>筆畫名稱、組詞／例句未做</strong>：無可靠數據來源，唔會憑空編造；候選來源為教育局《香港小學學習字詞表》。</li>
     <li><strong>餚有部重繪已做</strong>：老師 2026-11-13 20:02 HKT 指示右邊參考 EDB 淆，右部 #8–#15 已換做 EDB 淆 #3–#10，長撇 aspect 0.52；老師同日 20:09 HKT 批准全部修正。見 §3.4。</li>
-    <li><strong>網站 HW 數據未同步</strong>：v2.28 的 58 字重繪＋8 字新動畫＋本輪整理嘅 HW 數據修正（91 個辶檔、餘 #2 等）只存在於 App 內置 HW 數據；網站用未修正的 CDN 數據。v2.32 網站提交已包括 <code>data.js</code>（23 個筆數修正）、<code>hk_order.js</code>（760 項）、<code>glyph_sources.json</code>（7352:EDB）＋glyph 包 15 檔；待部署後，再次審計所有資料庫以同步（用戶 2026-11-13 決定）。</li>
-    <li><strong>辶系統性問題已成批處理（v2.32）</strong>：91 個 HW 檔已修復，92／92 筆數一致；6 個 perm 已入 <code>hk_order.js</code>；7 項 CHAR_DB s＋1 已執行。餘下：邐待建檔；邁須老師部件分析。</li>
+    <li><strong>網站數據已同步至 v270（2026-11-19 部署，deployment 4bb942ce）</strong>：原「網站 HW 數據未同步」問題已由重新標籤解決——網站現時全部 5,879 字形皆為 EDB／Edb.R（<code>glyphs/*.json</code>，離線內置），唔再依賴未修正的 HanziWriter CDN 數據。<strong>v261 已經部署</strong>（2026-11-19 live 驗證：about／landing／dev-memo 全部等於 v261 內容；API 狀態仍顯示 diffed、/latest 仍係 v2.60，屬 Hermes 方面記錄落後，live 先係真）。<strong>v262 已部署</strong>（2026-11-19，id <code>chineseword-v262</code>，deploy <code>5ee18ca2</code>）；v262 內容見 §5（843 重掃、調速 fix、嗩→嗦修正，glyph?v= 49→50）。其後 v263–v270 亦已部署，見 §5。APK／iOS 據知仍為 v2.47（vc51／build 51），未跟 v262–v270 同步；同步目標現為 v270，待用戶排期／確認。</li>
+    <li><strong>辶系統性問題已成批處理（v2.32）</strong>：91 個 HW 檔已修復，92／92 筆數一致；6 個 perm 已入 <code>hk_order.js</code>；7 項 CHAR_DB s＋1 已執行。餘下：邐已有字形檔（<code>glyphs/908a.json</code>，標 EDB），但檔內只得 19 筆，與 CHAR_DB s=23 不符（辶 4＋麗 19＝23），須核實邊一邊錯，唔好當已解決（2026-11-19 審計發現）；邁已有 EDB 字形檔，17 筆與 CHAR_DB 一致，已解決。</li>
   </ul>
 
+  <h2>五、v262–v274 更新（2026-11-19–21；v271 從未提交，v272 已部署，v273 文件更新，v274 待提交）</h2>
+  <p>本節只記每版的增量（deltas）；總數見頁頂「數字總表」。</p>
+
+  <h3>v262（id <code>chineseword-v262</code>，2026-11-19 部署，deploy <code>5ee18ca2</code>；live 已係 v262，6 字抽樣覆核全部正確）</h3>
+  <ul>
+    <li><strong>843 重掃</strong>：由零製作字形按「twpen 描紅底＋EDB 筆劃原理」全部重掃——twpen 1:1 墨跡＋EDB 筆順，842 字＋嗩；另 redo-only 夔／瓤 2 字，合共安裝 845 個 glyph 檔；glyph?v= 49→50。重掃發現 live 多隻字形結構錯（憋／憨缺心、懋三層錯、馗首上九下、蕤／薅／藁／虢等），v262 一併修正。</li>
+    <li><strong>嗩（55e9）裁決</strong>：用戶 2026-11-19 裁決，嗩＝EDB 吸的左部分（口 3 筆）＋EDB 鎖的右部分（𧴪 10 筆），13 筆；twpen 13 筆，次序一致，唔使 perm；口右移 +50 收緊左右間距，同日批核。</li>
+    <li><strong>嗩→嗦 bug 修正</strong>：live glyphs/55e9.json 本身就係嗦的筆畫數據（抄錯檔），loader／CHAR_DB 無錯；v262 換成正確嗩 EDB 版。</li>
+    <li><strong>瓤（74e4）筆數更正</strong>：由 27 改為 22 筆（twpen＋EDB 共識；舊審計 27 筆不成立，見 §3.3 註）。</li>
+    <li><strong>筆順調速修正</strong>：調速滑桿以前只改顯示數字，唔改動畫速度；v262 寫入運行中 writer 的速度，拖動即時生效，兼用 localStorage（<code>cw.strokeSpeed</code>）保存。</li>
+  </ul>
+
+  <h3>v263（2026-11-19，已部署）</h3>
+  <ul>
+    <li><strong>數據同步</strong>：CHAR_DB 瓤 27→22、憋 14→15、憨 15→16（v262 裁決）；glyphs／CHAR_DB 一致（瓤 22、憋 15、憨 16 筆，v268 工作副本核實）。</li>
+    <li><strong>文件同步</strong>：data.js＋docs 同步；教師附錄 278 行隨本版上線（<code>docs/teacher-appendix.csv</code>，279 行連表頭，v268 工作副本核實）。</li>
+  </ul>
+
+  <h3>v264（2026-11-19，已部署）</h3>
+  <ul>
+    <li><strong>只改 about.html</strong>，字形／數據唔郁。</li>
+  </ul>
+
+  <h3>v265（2026-11-19 ~16:18，已部署，deployment 69aed904）</h3>
+  <ul>
+    <li><strong>蘊（860a）重建 20 筆</strong>：囚形 Edb.R（舊 live 檔係藴 85f4 的副本，抄錯）；glyph_sources 860a 由 EDB 改標 Edb.R；variant_pairs 860a <code>own_glyph=true</code>。</li>
+    <li><strong>薀（8580）新建 17 筆</strong>：囚形 Edb.R；CHAR_DB 5,876→5,877。</li>
+  </ul>
+
+  <h3>v266（2026-11-19 ~16:54，已部署，deployment c685e43f）</h3>
+  <ul>
+    <li><strong>字體換走 LXGW WenKai TC，改宋體棧</strong>（"Noto Serif CJK TC", "Noto Serif TC", "Songti TC", "PMingLiU", "STSong", serif）；成個 fonts/ 刪走（178 檔）；字形／數據／引擎完全唔郁，冇 ?v= bump。</li>
+  </ul>
+
+  <h3>v266a（Hermes d37079fb 17:05，redeploy e378bfdb；用戶 17:21 同意分法）</h3>
+  <ul>
+    <li><strong>fonts/ 還原</strong>（dedup 4.34MB／88 chunks）；LXGW 改由 <code>&lt;link media="print"&gt;</code> 載入（螢幕載 0 個 woff2，列印先載約 4 個 chunk）；字體棧 LXGW → Kaiti TC → DFKai-SB → 標楷體 → Noto Serif CJK TC → Songti TC → serif。</li>
+    <li><strong>用戶決定：螢幕用系統楷書，列印先載自置 LXGW。</strong></li>
+  </ul>
+
+  <h3>v267（已提交 19:50，id <code>chineseword-v267</code>，state diffed；已被 v268 取代，唔使另外部署）</h3>
+  <ul>
+    <li><strong>蕰（8570）新建 16 筆</strong>：日形 Edb.R（唔係囚形——囚會係 17 筆；twpen 15＋艹 4）；CHAR_DB 5,877→5,878。</li>
+    <li><strong>輸入欄字體棧</strong>：<code>#inputText</code> 改 Noto Serif CJK TC 行先（v268 工作副本核實）。</li>
+  </ul>
+
+  <h3>v268（已提交 20:06，id <code>chineseword-v268</code>，state diffed；已部署 20:09，deployment 12264381）</h3>
+  <ul>
+    <li><strong>SVG 引導字</strong>：每日一句 <code>.cw-daily-char</code>＋生字冊 <code>.cw-wb-char</code> 改 inline SVG，用站內 glyphs 經 <code>installHKGlyphs</code>／<code>hkGlyphSvg</code>（filled s paths）；無字形就 text fallback。字卡／描紅底／文章格本身已經係 SVG——17:09「字體字」嗰次係 glyph 數據未 apply 的 timing 問題，唔係缺機制。</li>
+    <li><strong>改 5 檔</strong>（glyph-engine.js×2、index.html×3）；engine <code>?v=</code> 50→51（v268 工作副本核實 <code>glyph-engine.js?v=51</code>）。</li>
+    <li><strong>v268 包係 v267 的 superset</strong>（differ baseline 係 live v2.66a）：淨係部署 v268 就包埋 v267 全部嘢，v267 唔使另外部署。</li>
+  </ul>
+
+  <h3>v269（已提交 21:10，id <code>chineseword-v269</code>，state diffed；已部署 21:14，deployment 92c6a0d2）</h3>
+  <ul>
+    <li><strong>麵（9eb5）重建 20 筆</strong>：twpen 1:1 墨跡＋EDB 部件原則（麥 11＋面 9），Edb.R；舊檔係 麪（9eaa）15 筆副本；CHAR_DB 麵 15→20、<code>variant_pairs</code> own_glyph 開、<code>glyph_sources</code> EDB→Edb.R；用戶 21:03 批 GIF。About「麵 20畫」本身正確，毋須改。</li>
+    <li><strong>perm guard</strong>：<code>applyHKOrder</code> runtime 驗證（兩份 glyph-engine.js），perm 唔啱就 console.warn 一次並用原次序；engine <code>?v=</code> 51→52。</li>
+    <li><strong>文件</strong>：本頁＋about.html 數字更新至 EDB 4,834／Edb.R 1,044（v269 將麵改標，總數 5,878 不變）；Hermes 部署前改咗 9 處計數，about 第 188 行句式只解釋 +2、實際 +4，v270 補返。</li>
+    <li><strong>改 8 檔</strong>（differ；docs/dev-memo-hw839.html＋glyphs/9eb5.json 係 differ-excluded，Hermes 人手 apply）；glyph <code>?v=</code> 52→53、data.js <code>?v=</code> 1795093736。</li>
+  </ul>
+
+  <h3>v270（已提交 21:22，id <code>chineseword-v270</code>，state diffed；已部署 21:24，deployment 4bb942ce）</h3>
+  <ul>
+    <li><strong>about 第 188 行</strong>：Edb.R 句補返 +4 解釋（v265 蘊改標＋新增薀各 1 字，v267 新增蕰 1 字，v269 麵改標 1 字）；之前只解釋 +2。</li>
+    <li><strong>本頁分項</strong>：Edb.R 分項補「＋1 字麵（v269 改標）」，793＋216＋30＋1＋1＋2＋1＝1,044；v265–v268 行還原真數（EDB 4,836→4,835、Edb.R 1,040→1,043），另加 v269 行。</li>
+    <li><strong>版本沿革</strong>：本頁＋about.html 核對至 v269（deployment 92c6a0d2），加 v269 條目；APK／iOS 同步目標改為 v269。</li>
+  </ul>
+
+  <h3>v271（文件更新，從未提交，被 v272 取代）</h3>
+  <ul>
+    <li><strong>22 組重複字形 shape audit 修正（14 字）</strong>：兌／悅／說／銳／脫／稅變體頂部鏡像修正（丿+丶）；閱重建 Λ-top（15 筆不變）；床 8→7／蔥 13→15／衛 16→15／醞 16→17／溫 12→13／媼 12→13／鉤 12→13（7 新建 Edb.R，own_glyph 開）；戶 perm 修正（丿先）。CHAR_DB 7 處＋glyph_sources 14 字改標 Edb.R＋char_id_map 0941 改屬媪。</li>
+    <li><strong>羣／群分開顯示（用戶 21:42 裁決）</strong>：預設顯示群，勾選「顯示我輸入的寫法」顯示羣。glyphs/7fa4.json 本來係 7fa3 副本（群顯示做羣形），換做 variants/7fa4.json 的群形（改標 Edb.R）；variants/7fa3.json 新增；兩份 glyph-engine.js 加 '7fa3' 入 VARIANT_GLYPHS、glyph ?v= 53→54、engine ?v= 52→53；enhanced/index.html 補 CW_STD_FORM。about §二 羣行改做群標準。</li>
+    <li><strong>秘（79d8）改標 Edb.R（正字參考庫覆核）</strong>：秘無 EDB id（EDB 2866 係祕）；glyphs/79d8.json 係 10 筆重建（禾＋必），應標 Edb.R。數據改動一行，字形無改，毋須 GIF。</li>
+    <li><strong>數字</strong>：EDB 4,834→4,818、Edb.R 1,044→1,060（總數 5,878 不變）；「顯示我輸入的寫法」涵蓋 24 字；本頁＋about.html 核對至 v270（deployment 4bb942ce）。</li>
+    <li><strong>已確認</strong>：蔥 15、衛 15（用戶 2026-11-19 22:15 同意；無 EDB 動畫，twpen 1:1 已建）。</li>
+  </ul>
+
+  <h3>v272（已部署 2026-11-20 08:31，deployment c922f131，id <code>chineseword-v272</code>）</h3>
+  <ul>
+    <li><strong>辶（8fb6）新增 4 筆 Edb.R</strong>：之前 glyphs/8fb6.json 根本唔存在，網站退回 HanziWriter CDN 大陸 3 筆；新建本地字形 twpen 1:1＋EDB 原理（點、橫折、豎、橫；第 2、3 筆駁埋，用戶 22:49 糾正）；CHAR_DB 加辶（jy coek3、py chuò、s 4、r 辵），總數 5,878→5,879。</li>
+    <li><strong>嘅（5605）重建 12 筆</strong>：hanzipi 1:1（口 3＋既 9；既 EDB id 1756）；CHAR_DB 14→12。twpen 士頂非香港寫法，唔用。</li>
+    <li><strong>重掃開放問題 15 項全部解決（用戶 2026-11-20 06:47 裁決「其餘正確」）</strong>：9 項修正出貨——蟎曼按 EDB 重建、蹰雨重排、甙 split-弋重排、鯛 s16 加長（EDB 週 graft）、蔫 #10/#11 調轉、蝟 14、15 筆 graft EDB 胃墨（用戶指定）、黽 #5/#6 調轉、鷫肅部重排、隰還原 17 筆（CHAR_DB 16→17，用戶 06:48 再確認）；16 項 keep；38 筆 API null 已定 type（API 側，v1.1.1 暫停，stage only）。蟎／蹰／鷫已對 twpen 核實（真港台差異，EDB 贏）。</li>
+    <li><strong>蓽（84fd）按 EDB 重建</strong>：艹取自 EDB 草 3445、畢取自 EDB 畢 2630（用戶 22:59「蓽參考艹加畢 edb」）；15 筆，橫／豎 7/7→8/6；perm 更正後一致。</li>
+    <li><strong>10 個錯 perm 重寫＋凍結</strong>：獒／蓽／鼐／驊／迅／透／造／週／過／遐按 EDB 重推（長度＝HW 筆數）；宓由 HW_HK_SAME 移除（perm [0,1,2,3,4,5,7,6] 保留）；HK_ORDER／HW_HK_SAME 用戶 22:52 裁決凍結，留來做參考，唔刪除。check_perm.js（offline snapshot）ERRORS 0、WARNINGS 8（舊有無 HW 數據 8 字）。?v=：hk_order.js＋hw_hk_same.js 1→2（主 index hk_order 用新 timestamp）、enhanced hk_order 5→6。</li>
+    <li><strong>HW 辶拆分（38 字）</strong>：hw-split/ 新目錄＋glyph-engine.js loadHwData() hook（兩份 engine；有本地字形嘅字唔受影響；攞唔到退返 CDN）；HW 辶 3 筆拆做香港 4 筆（點、橫折、豎、捺），墨跡同 CDN 一模一樣，淨係分開咗；44/44 驗證過。engine ?v= 53→54。</li>
+    <li><strong>數字</strong>：總數 5,878→5,879（辶新增）；EDB 4,818 不變、Edb.R 1,060→1,061；glyph ?v= 54→55、data.js 新 timestamp、sources ?v= 251→252、pairs 240 不變。</li>
+    <li><strong>CHAR_DB 同步 7 字（v271 新建 glyph）</strong>：媼 12→13、床 8→7、溫 12→13、蔥 13→15、衛 16→15、醞 16→17、鉤 12→13——全部等於新 glyph 筆數（live data.js＋glyphs 逐字核實）。呢 7 字喺「顯示我輸入的寫法」關閉時顯示標準變體（例：輸入溫→顯示温 12 畫），開啟先顯示 13 畫，行為同 v265 蘊／薀一致，唔係 bug（Hermes 2026-11-20 確認）。</li>
+    <li><strong>唔包</strong>：正字參考頁（時機未定）、氳 char_id_map 2108（等用戶決定）、38 筆 API null（API 側）、龠 API 次序（Tier-2 重衍生 BLOCKED）、API v1.1.1（BLOCKED）。</li>
+  </ul>
+  <h3>v273（文件更新，id <code>chineseword-v273</code>）</h3>
+  <ul>
+    <li><strong>只更新 about.html＋本頁</strong>：補返 v272 CHAR_DB 同步 7 字（見上；Hermes 2026-11-20 提醒 submit note 漏列）；兩份文件核對至 v272；v272 行狀態改為已部署。無數據／engine 改動，無 ?v= 變動。</li>
+  </ul>
+  <h3>v274（文件＋新頁，id <code>chineseword-v274</code>，待提交）</h3>
+  <ul>
+    <li><strong>「正字參考」頁上線</strong>：新增 standard-reference.html（網站根目錄）＋data/standard-reference.json（EDB 正字參考庫 v1.0，24 組／48 字，基線 live v273；D1–D6 已於 v272 修正）。頁面經站內 glyph-engine.js（hkGlyphSvg，engine ?v=54）渲染 48 字正確字形，搜尋＋關係／狀態篩選；繁體書面語，EDB 為金律，無練習／測驗／遊戲。主站頁尾＋about.html「簡繁轉換」加連結。數據檔由 reference-library.json 經 build_docs.py 衍生（md5 056f2b8a…），唔係手打；fonts/lxgw.css 列印連結跟返主站（live 200）。</li>
+    <li><strong>迺（8ffa）核實，無需重建</strong>：CHAR_DB 已有迺（jy naai5、py nǎi、s 10、r 辵），glyphs/8ffa.json 已有 10 筆 EDB 字形（EDB 動畫 4101，char_id_map 迺→4101；twpen 分步圖 10 格＋hanzipi 9 碼對照，香港辶 4 筆＝10 筆；動畫 GIF 以 last frame 驗證，筆順橫、豎、橫折鈎、撇、橫折鈎、橫、點、橫折、豎、橫全部正確）。總數維持 5,879；glyph_sources 8ffa 標 EDB 正確，唔改。</li>
+    <li><strong>數字</strong>：總數 5,879 不變；EDB 4,818／Edb.R 1,061 不變；無數據／engine 改動，無 ?v= 變動（新數據檔 data/standard-reference.json?v=1）。</li>
+    <li><strong>唔包</strong>：筆順 API／v1.1.1（BLOCKED）、龠、陣／除、氳 char_id_map 2108（等用戶決定）、D7／D8／D11 housekeeping、D10 硬編碼 set、D12 兒丿（等老師）、蒟（KEEP）、MASTER_FOOTNOTE、交接簡報英文版、APK／iOS（第二階段，v274 上線後先做）。D9 已於 2026-11-21 live 覆驗：enhanced 有 CW_STD_FORM，closed。</li>
+  </ul>
+  <p class="stat-note">重掃 15 項開放問題已於 2026-11-20 解決（見上；9 項修正隨 v272 出貨，16 項 keep，38 筆 API null 已定 type）。API Tier-2 筆順數據待重新衍生（擤／蕤／薅／藁／虢／踅／彖 7 字）；筆順 API v1.1.0 已上線（428 筆 type null：保留 390／補回 79／新增 38，35 字 Tier 2 未手工修正）；API v1.1.1 已暫停（BLOCKED），唔好自行重啟，等用戶再決定。</p>
+
   <div class="note">
-    備忘本身存放於工作副本；<code>docs/</code> 不在 Hermes API 交付範圍內，部署途徑待定。本頁只係文件，唔改任何字形數據、<code>hk_order.js</code>、<code>data.js</code> 或 APK。
+    備忘本身存放於工作副本；<code>docs/</code> 不在 Hermes API handoff 清單內（handoff 只含主站＋landing），須在提交備註中指明先會部署（v261 起）。本頁只係文件，唔改任何字形數據、<code>hk_order.js</code>、<code>data.js</code> 或 APK。
   </div>
 
 </div>

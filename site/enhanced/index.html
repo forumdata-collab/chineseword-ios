@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="../fonts/lxgw.css" rel="stylesheet" media="print">
 <title>（enhanced 預覽）中文筆順練習簿 — 粵音普通話朗讀 · 筆順練習 · 列印練習紙</title>
-<link href="../fonts/lxgw.css" rel="stylesheet">
-<script src="../data.js?v=1794962240"></script>
+<script src="../data.js?v=1795133896"></script>
 <script src="../data/lexlist_words.js?v=1"></script>
-<script src="../hk_order.js?v=5"></script>
+<script src="../hk_order.js?v=6"></script>
 <script src="../stroke_seq.js?v=3"></script>
-<script>window.GLYPH_DIR='../glyphs/';window.NS='http://www.w3.org/2000/svg';</script>
-<script src="glyph-engine.js?v=47"></script>
+<script>window.GLYPH_DIR='../glyphs/';window.HW_SPLIT_DIR='../hw-split/';window.NS='http://www.w3.org/2000/svg';</script>
+<script src="glyph-engine.js?v=54"></script>
 <script src="../hanzi-writer.min.js"></script>
 <!-- B2-1 (v256): HanziWriter library now loads from the bundled local copy
      (v3.5.0, same as the CDN build) instead of jsdelivr, so stroke animation
@@ -63,13 +63,13 @@ body {
   top: -20px;
   font-size: 200px;
   opacity: 0.07;
-  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'STKaiti', serif;
+  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'DFKai-SB', '標楷體', 'Noto Serif CJK TC', 'Songti TC', serif;
 }
 .hero h1 {
   font-size: 1.6em;
   font-weight: 700;
   letter-spacing: 0.08em;
-  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'STKaiti', serif;
+  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'DFKai-SB', '標楷體', 'Noto Serif CJK TC', 'Songti TC', serif;
   margin-bottom: 2px;
 }
 .hero p { opacity: 0.9; margin-top: 2px; font-size: 0.88em; }
@@ -112,7 +112,7 @@ body {
   border: 2px solid #ddd;
   border-radius: 8px;
   font-size: 1.2em;
-  font-family: "LXGW WenKai TC", "KaiTi", "STKaiti", "Noto Serif TC", "Songti TC", serif;
+  font-family: "Noto Serif CJK TC", "Noto Serif TC", "Songti TC", "PMingLiU", "STSong", serif;
   resize: vertical;
   transition: border-color 0.2s;
   background: white;
@@ -245,7 +245,7 @@ body {
   font-size: 1.6em;
   font-weight: 700;
   color: var(--red);
-  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'STKaiti', serif;
+  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'DFKai-SB', '標楷體', 'Noto Serif CJK TC', 'Songti TC', serif;
   letter-spacing: 0.1em;
   line-height: 1.3;
 }
@@ -531,7 +531,7 @@ body {
 .sentence-section { margin-top: 28px; }
 .sentence-block { margin-bottom: 24px; }
 .sentence-caption {
-  font-family: "LXGW WenKai TC", "KaiTi", "STKaiti", "DFKai-SB", "Noto Serif CJK TC", serif;
+  font-family: "LXGW WenKai TC", "Kaiti TC", "DFKai-SB", "標楷體", "Noto Serif CJK TC", "Songti TC", serif;
   font-size: 1.05em;
   color: #555;
   margin-bottom: 4px;
@@ -572,7 +572,7 @@ body {
 /* ===== 筆順工作紙（附加列印頁，2026-09-18）===== */
 .stroke-page { margin-top: 30px; }
 .stroke-page-title {
-  font-family: "LXGW WenKai TC", "KaiTi", "STKaiti", serif;
+  font-family: "LXGW WenKai TC", "Kaiti TC", "DFKai-SB", "標楷體", "Noto Serif CJK TC", "Songti TC", serif;
   font-size: 1.05em;
   font-weight: 600;
   color: #555;
@@ -582,7 +582,7 @@ body {
 }
 .stroke-page-block { margin-bottom: 16px; page-break-inside: avoid; }
 .stroke-caption {
-  font-family: "LXGW WenKai TC", "KaiTi", "STKaiti", serif;
+  font-family: "LXGW WenKai TC", "Kaiti TC", "DFKai-SB", "標楷體", "Noto Serif CJK TC", "Songti TC", serif;
   font-size: 1em;
   color: #555;
   margin-bottom: 4px;
@@ -947,11 +947,10 @@ body {
 .tj5 { color: #2980B9; }
 .tj6 { color: #8E44AD; }
 .jp-tone { font-weight: 700; }
-/* KaiTi for handwriting feel — self-hosted LXGW WenKai TC (calligraphy) first.
-   Only applied to Han glyph surfaces (model char + tracing guides).
-   Fallbacks: system kaiti → Songti/serif (closer to handwriting than heiti). */
+/* Song stack — Noto Serif CJK TC first (distinguishes variant forms, e.g. 温/溫, 蘊/藴).
+   Only applied to Han glyph surfaces (model char + tracing guides). */
 .kaiti, .char-cell, .practice-cell .guide-char, .sentence-cell .guide-char {
-  font-family: "LXGW WenKai TC", "KaiTi", "STKaiti", "DFKai-SB", "Noto Serif CJK TC", "Noto Serif TC", "Songti TC", "STSong", "PMingLiU", "AR PL UMing TW", serif;
+  font-family: "LXGW WenKai TC", "Kaiti TC", "DFKai-SB", "標楷體", "Noto Serif CJK TC", "Songti TC", serif;
 }
 
 /* ===== OPTICAL NORMALIZATION (per-char ink balance) ===== */
@@ -1013,7 +1012,7 @@ details.advance-collapse summary:hover { color: var(--red); }
 .preview-heading h2 {
   font-size: 1.15em;
   color: var(--red);
-  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'STKaiti', serif;
+  font-family: 'LXGW WenKai TC', 'Kaiti TC', 'DFKai-SB', '標楷體', 'Noto Serif CJK TC', 'Songti TC', serif;
   letter-spacing: 0.05em;
 }
 .preview-heading p { font-size: 0.82em; color: #999; margin-top: 2px; }
@@ -1590,11 +1589,18 @@ let GLYPH_SOURCES = {};
 let VARIANT_PAIRS = {};
 function loadGlyphMeta() {
   Promise.all([
-    fetch('../data/glyph_sources.json?v=247').then(r => (r.ok ? r.json() : null)).catch(() => null),
-    fetch('../data/variant_pairs.json?v=237').then(r => (r.ok ? r.json() : null)).catch(() => null),
+    fetch('../data/glyph_sources.json?v=252').then(r => (r.ok ? r.json() : null)).catch(() => null),
+    fetch('../data/variant_pairs.json?v=240').then(r => (r.ok ? r.json() : null)).catch(() => null),
   ]).then(([gs, vp]) => {
     if (gs) GLYPH_SOURCES = gs.glyphs || {};
-    if (vp) VARIANT_PAIRS = vp.pairs || {};
+    if (vp) {
+      VARIANT_PAIRS = vp.pairs || {};
+      // 標準寫法對照：輸入字 → 香港教育標準字（秘→祕、羣→群…），供 loader 預設示範標準字形
+      window.CW_STD_FORM = {};
+      for (const [hex, p] of Object.entries(VARIANT_PAIRS)) {
+        if (p && p.standard && p.char && p.standard !== p.char) window.CW_STD_FORM[hex] = p.standard;
+      }
+    }
     // 已產生工作紙就重畫一次，令來源標示／另一寫法即時出現
     if (document.querySelector('.char-card')) renderWorksheet();
   });
@@ -2900,6 +2906,39 @@ function hanziWriterOpts(extra = {}) {
   }, extra);
 }
 
+// ===== v262: 筆順調速修正 =====
+// Bug: the speed slider only updated the label. The running writer kept its
+// creation-time speed (the slider is read once, at HanziWriter.create), and
+// strokeReplay's setCharacter() silently ignores its options argument — this
+// HanziWriter build's setCharacter(t) takes only the character — so the speed
+// never changed until the modal was closed and reopened. Fix: write the new
+// speed into the live writer's options (animateCharacter/animateStroke read
+// _options at call time) and, once the user commits the value, restart the
+// animation at the new speed. The speed is saved to localStorage
+// (cw.strokeSpeed, same pattern as cw.rainbow) and restored on open.
+function applyStrokeSpeed(v, restart) {
+  if (!strokeWriter) return;
+  var modal = document.getElementById('strokeModal');
+  if (!modal || !modal.classList.contains('show')) return;
+  try { if (strokeWriter._options) strokeWriter._options.strokeAnimationSpeed = v; } catch (e) {}
+  if (!restart) return;
+  strokeStepIndex = 0;
+  strokeResetPauseBtn();
+  try { strokeWriter.pauseAnimation(); } catch (e) {}
+  try { var p = strokeWriter.animateCharacter(); if (p && p.catch) p.catch(function(){}); } catch (e) {}
+}
+function restoreStrokeSpeed() {
+  try {
+    var saved = localStorage.getItem('cw.strokeSpeed');
+    if (!saved) return;
+    var v = parseFloat(saved);
+    if (!(v >= 0.1 && v <= 2)) return;
+    var sp = document.getElementById('strokeSpeed');
+    sp.value = String(v);
+    document.getElementById('speedVal').textContent = sp.value + 'x';
+  } catch (e) {}
+}
+
 function openStroke(ch) {
   if (isPunct(ch)) return;
   strokeUnavailable(ch).then(missing => {
@@ -2911,6 +2950,7 @@ function openStroke(ch) {
   // a previous 「未收錄」 char may have left the controls disabled
   document.querySelectorAll('#strokeModal button, #strokeModal input').forEach(el => { el.disabled = false; });
 
+    restoreStrokeSpeed();   // v262: restore saved speed BEFORE the writer reads the slider
     const target = document.getElementById('stroke-target');
     target.innerHTML = '';
 
@@ -2932,7 +2972,7 @@ function openStroke(ch) {
       // (possibly stale) writer, and disable the action buttons so
       // 重播/逐筆 are not left dead (or replaying a previous character).
       strokeWriter = null;
-      target.innerHTML = `<div style="font-size:120px;font-family:'LXGW WenKai TC','KaiTi','STKaiti',serif;line-height:1;">${esc(ch)}</div><p style="margin-top:10px;color:#999;">筆順動畫載入失敗，請關閉後再試一次</p>`;
+      target.innerHTML = `<div style="font-size:120px;font-family:'LXGW WenKai TC','Kaiti TC','DFKai-SB','標楷體','Noto Serif CJK TC','Songti TC',serif;line-height:1;">${esc(ch)}</div><p style="margin-top:10px;color:#999;">筆順動畫載入失敗，請關閉後再試一次</p>`;
       document.querySelectorAll(`#strokeModal button, #strokeModal input`).forEach(el => {
         if (el.classList.contains('modal-close')) return;
         if (/關閉|close/i.test(el.textContent)) return;
@@ -2941,9 +2981,14 @@ function openStroke(ch) {
       });
     }
 
-    // Bind speed change
+    // Bind speed change (v262: previously label-only — see applyStrokeSpeed).
     document.getElementById('strokeSpeed').oninput = function() {
       document.getElementById('speedVal').textContent = this.value + 'x';
+      applyStrokeSpeed(parseFloat(this.value), false);
+    };
+    document.getElementById('strokeSpeed').onchange = function() {
+      try { localStorage.setItem('cw.strokeSpeed', this.value); } catch (e) {}
+      applyStrokeSpeed(parseFloat(this.value), true);
     };
   });
 }
@@ -2995,7 +3040,7 @@ function showStrokeUnavailable(ch, modalId = 'strokeModal', targetId = 'stroke-t
   openModal(modalId);
   const target = document.getElementById(targetId);
   target.innerHTML =
-    `<div style="font-size:110px;font-family:'LXGW WenKai TC','KaiTi','STKaiti',serif;line-height:1.1;">${esc(ch)}</div>` +
+    `<div style="font-size:110px;font-family:'LXGW WenKai TC','Kaiti TC','DFKai-SB','標楷體','Noto Serif CJK TC','Songti TC',serif;line-height:1.1;">${esc(ch)}</div>` +
     strokeSeqHtml(ch) +
     twpenNoteHtml(ch) +
     `<p style="margin-top:12px;color:#8a8a8a;font-size:13px;line-height:1.6;">` +
@@ -3108,6 +3153,10 @@ function strokeReplay() {
       strokeAnimationSpeed: parseFloat(document.getElementById('strokeSpeed').value),
       strokeColor: '#33302A',
     })); } catch (e) {}
+  // v262: setCharacter() ignores its options argument (this HanziWriter
+  // build's setCharacter takes only the character), so set the speed
+  // directly — animateCharacter() reads _options at call time.
+  try { if (strokeWriter._options) strokeWriter._options.strokeAnimationSpeed = parseFloat(document.getElementById('strokeSpeed').value); } catch (e) {}
   const p = strokeWriter.animateCharacter();
   if (p && p.catch) p.catch(() => {});
 }
@@ -3190,7 +3239,7 @@ function startQuiz() {
       }
     });
   } catch(e) {
-    target.innerHTML = `<div style="font-size:120px;font-family:'LXGW WenKai TC','KaiTi','STKaiti',serif;line-height:1;">${esc(currentStrokeChar)}</div><p style="margin-top:10px;color:#999;">此字暫無試寫功能，請用練習格練習</p>`;
+    target.innerHTML = `<div style="font-size:120px;font-family:'LXGW WenKai TC','Kaiti TC','DFKai-SB','標楷體','Noto Serif CJK TC','Songti TC',serif;line-height:1;">${esc(currentStrokeChar)}</div><p style="margin-top:10px;color:#999;">此字暫無試寫功能，請用練習格練習</p>`;
   }
 }
 let quizMistakes = 0;
@@ -3312,11 +3361,11 @@ if ('speechSynthesis' in window) {
   speechSynthesis.addEventListener('voiceschanged', refreshVoiceCache);
 }
 
-// Re-balance glyphs once the webfont actually finishes loading (font-display: swap
-// means fallback shows first, then swaps to LXGW; re-measure when it arrives).
+// Re-balance glyphs once fonts are ready (system Song stack — no webfont to swap in,
+// but re-measure in case the first paint used a fallback font).
 if (document.fonts && document.fonts.load) {
-  // Eagerly warm the webfont for the sample chars so the swap happens quickly
-  // after first render (instead of waiting for each glyph to be requested lazily).
+  // Eagerly warm the display font for the sample chars so the first render
+  // measures with the right font (instead of waiting for each glyph lazily).
   try {
     document.fonts.load('58px "LXGW WenKai TC"', '你好中文學龍飛樂一');
   } catch (e) {}
@@ -3341,7 +3390,7 @@ if (document.fonts && document.fonts.ready) {
 .ws-page .art-fields .line{display:inline-block;min-width:62px;border-bottom:1px solid #9a9a9a}
 .art-grid{flex:1;display:grid;border-left:1px solid var(--red-grid);border-top:1px solid var(--red-grid);background:#fff;min-height:0}
 .article-cell{position:relative;border-right:1px solid var(--red-grid);border-bottom:1px solid var(--red-grid);overflow:hidden;display:flex;align-items:center;justify-content:center}
-.article-cell .guide-char{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;line-height:1;color:var(--guide-tint);font-family:"LXGW WenKai TC","KaiTi","STKaiti",serif}
+.article-cell .guide-char{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;line-height:1;color:var(--guide-tint);font-family:"LXGW WenKai TC","Kaiti TC","DFKai-SB","標楷體","Noto Serif CJK TC","Songti TC",serif}
 .article-cell .attached{position:absolute;right:3%;bottom:0;font-size:.58em;line-height:1.1;color:var(--guide-tint)}
 .art-page-no{font-size:10px;color:#999;text-align:right}
 .art-opt output{font-size:.85em;color:#777;margin-left:4px}
