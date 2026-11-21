@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="fonts/lxgw.css" rel="stylesheet" media="print">
+<title>正字參考 — 中文筆順練習簿</title>
+<!--
+  正字參考頁（2026-11-21，v274 上線）
+  資料來源：data/standard-reference.json（由 EDB 正字參考庫 reference-library.json 衍生，唯一 source of truth）
+  字形：經站內 glyph-engine.js（hkGlyphSvg）渲染，每字取數據集 correct_shape_file_v271
+        指向嘅正確字形檔（D1–D6 所述問題已於 v272 修正，全部字形齊全）。
+  規格：繁體中文、書面語、EDB 為金律；無練習／測驗／遊戲。
+-->
+<style>
+  :root {
+    --accent: #2563eb;
+    --ink: #1e293b;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --bg: #f8fafc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.75;
+    padding: 24px 16px 60px;
+  }
+  .container { max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 1.6em; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 0.95em; margin-bottom: 20px; }
+  a.back { display: inline-block; color: var(--accent); text-decoration: none; margin-bottom: 24px; font-size: 0.95em; }
+  a.back:hover { text-decoration: underline; }
+  h2 {
+    font-size: 1.2em; margin: 32px 0 12px;
+    padding-bottom: 6px; border-bottom: 2px solid var(--line);
+  }
+  p, li { font-size: 0.95em; }
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .tools input, .tools select {
+    font: inherit; padding: 8px 10px; border: 1px solid var(--line);
+    border-radius: 8px; background: #fff; color: var(--ink);
+  }
+  .tools input { flex: 1 1 220px; }
+  .count { color: var(--muted); font-size: 0.9em; margin: 4px 0 16px; }
+  .group {
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px; margin-bottom: 16px;
+  }
+  .group h3 { font-size: 1.05em; margin-bottom: 8px; }
+  .group h3 .verdict {
+    font-size: 0.8em; font-weight: normal; color: var(--muted); margin-left: 8px;
+  }
+  .cards { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0; }
+  .card {
+    flex: 1 1 200px; border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px; text-align: center;
+  }
+  .card .role { font-size: 0.85em; color: var(--muted); }
+  .card .glyph { height: 120px; display: flex; align-items: center; justify-content: center; }
+  .card .glyph svg { width: 110px; height: 110px; }
+  .card .glyph .missing {
+    color: #b45309; font-size: 0.9em; border: 1px dashed #f59e0b;
+    border-radius: 8px; padding: 8px 10px;
+  }
+  .card .meta { font-size: 0.88em; color: #334155; margin-top: 6px; }
+  .note { font-size: 0.95em; margin-top: 8px; }
+  .note b { color: #334155; }
+  .src { font-size: 0.85em; color: var(--muted); margin-top: 6px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="index.html">← 返回練習簿</a>
+  <h1>正字參考</h1>
+  <p class="subtitle">香港教育標準寫法與異體字對照（EDB 為金律）</p>
+
+  <p>本頁收錄 EDB 正字參考庫全部 24 組、48 字，對照香港教育標準寫法（正字）同異體字。審核發現嘅問題已於 v272 修正；以下逐組對照，認住唔同之處。</p>
+
+  <div class="tools">
+    <input id="q" type="search" placeholder="輸入一個字搜尋（例如 溫、羣、閱）" aria-label="搜尋字">
+    <select id="relation" aria-label="按關係篩選">
+      <option value="">全部關係</option>
+    </select>
+    <select id="verdict" aria-label="按狀態篩選">
+      <option value="">全部狀態</option>
+      <option value="SUSPECT">曾有問題（已於 v272 修正）</option>
+      <option value="CLEAR">無問題</option>
+      <option value="NOT AUDITED">已覆核正確</option>
+    </select>
+  </div>
+  <p class="count" id="count"></p>
+
+  <div id="groups"></div>
+
+  <h2>說明</h2>
+  <ul>
+    <li>「正字」即香港教育標準寫法（EDB《香港小學學習字詞表》字頭）；「異體」即同一字嘅另一種寫法，日常亦會見到。</li>
+    <li>筆畫數以香港標準為準；台灣或內地筆數唔同嗰陣，頁面會另有附註，唔會因此改香港筆數。</li>
+    <li>字形全部由站內 EDB 字形數據渲染，唔係字體字；無字形檔嗰陣會顯示提示，唔會用錯嘅字形頂替。</li>
+    <li>EDB id 即 EDB 官網字條編號；異體字一般無自己嘅 EDB id（只係喺正字字條下作「亦作」出現）。</li>
+  </ul>
+  <p class="src" id="source-line"></p>
+</div>
+
+<!-- glyph-engine.js 唔會自己定義 NS（SVG namespace）：主站 index.html 先定義 NS 再載入 engine；
+     獨立頁面必須同樣喺載入 engine 之前定義 NS，否則 hkGlyphSvg 會 throw「NS is not defined」。 -->
+<script>var NS = (typeof NS === 'undefined') ? 'http://www.w3.org/2000/svg' : NS;</script>
+<script src="glyph-engine.js?v=54"></script>
+<script>
+(function () {
+  var DATA_URL = 'data/standard-reference.json?v=1';
+  var groupsEl = document.getElementById('groups');
+  var countEl = document.getElementById('count');
+  var qEl = document.getElementById('q');
+  var relEl = document.getElementById('relation');
+  var verEl = document.getElementById('verdict');
+  var data = null;
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  function glyphBox(member) {
+    var box = document.createElement('div');
+    box.className = 'glyph';
+    var path = member.correct_shape_file_v271;
+    if (!path) {
+      box.innerHTML = '<span class="missing">字形未能載入</span>';
+      return box;
+    }
+    fetch(path).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (rec) {
+        var svg = (typeof hkGlyphSvg === 'function') ? hkGlyphSvg(rec, member.char) : null;
+        if (svg) box.appendChild(svg);
+        else box.innerHTML = '<span class="missing">字形未能載入</span>';
+      })
+      .catch(function () { box.innerHTML = '<span class="missing">字形未能載入</span>'; });
+    return box;
+  }
+
+  function card(member, role) {
+    var c = document.createElement('div');
+    c.className = 'card';
+    c.innerHTML = '<div class="role">' + esc(role) + '</div>';
+    c.appendChild(glyphBox(member));
+    var meta = '<div class="meta">' + esc(member.char) + '　' + member.strokes_hk + ' 畫';
+    if (member.edb_id) meta += '　EDB ' + esc(member.edb_id);
+    meta += '<br>' + esc(member.glyph_label_v271_staged || member.glyph_label_live_v270) + '</div>';
+    var m = document.createElement('div');
+    m.innerHTML = meta;
+    c.appendChild(m.firstChild);
+    return c;
+  }
+
+  function render(list) {
+    groupsEl.innerHTML = '';
+    list.forEach(function (gr) {
+      var sec = document.createElement('div');
+      sec.className = 'group';
+      var h = document.createElement('h3');
+      h.textContent = gr.group + ' — ' + gr.standard.char + '／' + gr.variant.char;
+      var v = document.createElement('span');
+      v.className = 'verdict';
+      v.textContent = gr.verdict === 'SUSPECT' ? '（審核時發現問題，已於 v272 修正）'
+        : gr.verdict === 'CLEAR' ? '（無問題）' : '（已覆核正確）';
+      h.appendChild(v);
+      sec.appendChild(h);
+      var cards = document.createElement('div');
+      cards.className = 'cards';
+      cards.appendChild(card(gr.standard, '正字（香港教育標準）'));
+      cards.appendChild(card(gr.variant, '異體'));
+      sec.appendChild(cards);
+      var note = document.createElement('p');
+      note.className = 'note';
+      note.innerHTML = '<b>點分：</b>' + esc(gr.student_note);
+      sec.appendChild(note);
+      var src = document.createElement('p');
+      src.className = 'src';
+      src.textContent = '關係：' + gr.relation_verified
+        + '　·　正字筆數依據：' + gr.standard.strokes_authority
+        + (gr.site_standard_note ? '　·　' + gr.site_standard_note : '');
+      sec.appendChild(src);
+      groupsEl.appendChild(sec);
+    });
+    countEl.textContent = '共 ' + list.length + ' 組（全部 ' + (data ? data.groups.length : 0) + ' 組）';
+  }
+
+  function applyFilter() {
+    if (!data) return;
+    var q = qEl.value.trim();
+    var rel = relEl.value;
+    var ver = verEl.value;
+    render(data.groups.filter(function (gr) {
+      if (q && gr.group.indexOf(q) === -1 && gr.standard.char !== q && gr.variant.char !== q) return false;
+      if (rel && gr.relation_verified !== rel) return false;
+      if (ver && gr.verdict !== ver) return false;
+      return true;
+    }));
+  }
+
+  fetch(DATA_URL).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (json) {
+      data = json;
+      var rels = [];
+      data.groups.forEach(function (gr) { if (rels.indexOf(gr.relation_verified) === -1) rels.push(gr.relation_verified); });
+      rels.sort().forEach(function (r) {
+        var o = document.createElement('option'); o.value = r; o.textContent = r; relEl.appendChild(o);
+      });
+      document.getElementById('source-line').textContent =
+        '資料來源：' + data.name + ' ' + data.version + '（基線 ' + data.baseline + '）。';
+      render(data.groups);
+    })
+    .catch(function () {
+      groupsEl.innerHTML = '<p>參考庫數據未能載入（' + esc(DATA_URL) + '）。</p>';
+    });
+
+  qEl.addEventListener('input', applyFilter);
+  relEl.addEventListener('change', applyFilter);
+  verEl.addEventListener('change', applyFilter);
+})();
+</script>
+</body>
+</html>

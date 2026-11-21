@@ -1,7 +1,7 @@
 {
  "version": 1,
  "generated": "2026-10-26",
- "note": "同一字的另一寫法（字形檔案相同＝同一個 EDB 筆順動畫）。standard = EDB 動畫所畫的香港教育標準字形；own_glyph = 有冇該字自己的字形。",
+ "note": "同一字的另一寫法。own_glyph 為 false 時兩寫法共用同一個字形檔案；為 true 時該字有自己獨立的字形檔案。standard = EDB 動畫所畫的香港教育標準字形；own_glyph = 有冇該字自己的字形。",
  "pairs": {
   "9eaa": {
    "char": "麪",
@@ -19,7 +19,7 @@
    ],
    "standard": "麪",
    "relation": "同字異寫",
-   "own_glyph": false
+   "own_glyph": true
   },
   "7a0e": {
    "char": "税",
@@ -46,7 +46,7 @@
    ],
    "standard": "衞",
    "relation": "同字異寫",
-   "own_glyph": false
+   "own_glyph": true
   },
   "885e": {
    "char": "衞",
@@ -73,7 +73,7 @@
    ],
    "standard": "群",
    "relation": "部件位置變體",
-   "own_glyph": false
+   "own_glyph": true
   },
   "8471": {
    "char": "葱",
@@ -91,7 +91,7 @@
    ],
    "standard": "葱",
    "relation": "同字異寫",
-   "own_glyph": false
+   "own_glyph": true
   },
   "5e8a": {
    "char": "床",
@@ -100,7 +100,7 @@
    ],
    "standard": "牀",
    "relation": "同字異寫",
-   "own_glyph": false
+   "own_glyph": true
   },
   "7240": {
    "char": "牀",
@@ -127,7 +127,7 @@
    ],
    "standard": "藴",
    "relation": "同字異寫",
-   "own_glyph": false
+   "own_glyph": true
   },
   "919e": {
    "char": "醞",
@@ -136,7 +136,7 @@
    ],
    "standard": "醖",
    "relation": "同字異寫",
-   "own_glyph": false
+   "own_glyph": true
   },
   "9196": {
    "char": "醖",
@@ -226,7 +226,7 @@
    ],
    "standard": "鈎",
    "relation": "同字異寫",
-   "own_glyph": false
+   "own_glyph": true
   },
   "920e": {
    "char": "鈎",
@@ -271,7 +271,7 @@
    ],
    "standard": "媪",
    "relation": "同字異寫",
-   "own_glyph": false
+   "own_glyph": true
   },
   "514c": {
    "char": "兌",
@@ -424,7 +424,7 @@
    ],
    "standard": "温",
    "relation": "同字異寫",
-   "own_glyph": false
+   "own_glyph": true
   },
   "6e29": {
    "char": "温",
